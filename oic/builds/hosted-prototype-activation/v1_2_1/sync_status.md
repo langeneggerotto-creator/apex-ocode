@@ -13,11 +13,13 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Visual_Replay_Video_Exporter_v1_2_5.
-Verification: 25 of 25 PASS.
+Current O-Code strict anchor: APEX_OIC_SWOT_Visual_Replay_Video_Exporter_v1_2_5_1.
+Verification: 18 of 18 PASS.
 Stress: 1000000 iterations, 0 failures.
-O-Code hash: a8353d6cf0f661619385282c01d4a72b46599dca6721ed1c126bf15c27407b08.
-OOO hash: c99a76d79156e8d35f58bd9c10292a9bdd12ad3c5c9c2dac85d373f5b58ae363.
-OIC hash: a30d490893ac141dc6c79e25b284a075eddc899d90dc84ad25dd404130248dbc.
-HTML hash: 4f7ffa70621ec6e715ad764a86d81059462ad7269cb510b0720fecc8bec3c822.
-ZIP hash: bc952f6270f26adfcec506c8c387560c5845ac6e5bcf430977ba63cd4e9c9bd1.
+Commentary model: SWOT - Strengths, Weaknesses, Opportunities, Threats.
+Link repair: self-contained HTML runtime adapter.
+O-Code hash: f4218e0ebeefebfe43b0b9e3c28cab2d606087ba1301cf8c621d2e7c2a1c7b8d.
+OOO hash: 7702ad6431d279edc87d70598cb9ccc98ea071492db2d07126a3c88fc3b255c5.
+OIC hash: e553f9caf4721fdbf293e5498528cfd7dedd1ce44a23dd4177c888b55fb980f7.
+HTML hash: 8690db8478d34812fdc92f6d1beb57199eff149dd95f4b3371b00c5992fb7a49.
+ZIP hash: 9763570e56c256144f1437d003c6394c91a0a82385b117fb7a940c2a38272ad3.
