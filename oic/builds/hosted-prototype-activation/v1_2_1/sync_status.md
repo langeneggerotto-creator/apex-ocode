@@ -13,11 +13,11 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Intent_Recorder_Activation_Fix_v1_2_4_1.
-Verification: 22 of 22 PASS.
+Current O-Code strict anchor: APEX_OIC_Visual_Replay_Video_Exporter_v1_2_5.
+Verification: 25 of 25 PASS.
 Stress: 1000000 iterations, 0 failures.
-O-Code hash: 2b38146a2724d9fc5cb7c4683eac17d4fbcb0924a442d33fbafa51254244267d.
-OOO hash: ddb88fd78dd80d45c214c0d0e548faeb5fdfc6565eda913f4046c3829355fd31.
-OIC hash: 022cae1f81b4fba6fe8a660b5074a8cc08d33c2750637a8815697b72cdb8b6e5.
-HTML hash: 5e3bc7fbc5ddfcf37cce1505fc8f819ee8f6003de70abdda5930312ea675c2a6.
-ZIP hash: b3ff998f54ab19abdd35d302e67f73bf1bcb8965b7aaa289795394db2ef7a6bb.
+O-Code hash: a8353d6cf0f661619385282c01d4a72b46599dca6721ed1c126bf15c27407b08.
+OOO hash: c99a76d79156e8d35f58bd9c10292a9bdd12ad3c5c9c2dac85d373f5b58ae363.
+OIC hash: a30d490893ac141dc6c79e25b284a075eddc899d90dc84ad25dd404130248dbc.
+HTML hash: 4f7ffa70621ec6e715ad764a86d81059462ad7269cb510b0720fecc8bec3c822.
+ZIP hash: bc952f6270f26adfcec506c8c387560c5845ac6e5bcf430977ba63cd4e9c9bd1.
