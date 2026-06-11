@@ -13,13 +13,13 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Hosted_SWOT_Visual_Replay_Test_Harness_v1_2_6.
+Current O-Code strict anchor: APEX_OIC_Infinite_Zoom_Control_Dashboard_Completion_v1_3_0.
 Vision target: finish console/dashboard so it can support infinite zoom and control functions.
 Verification: 20 of 20 PASS.
 Stress: 1000000 iterations, 0 failures.
-Hosted state: hosting-ready, not hosted-proven.
-O-Code hash: 4abde44724cedd08dafe840a69450beef99d9caa84cb83f4e196ba931be53a1c.
-OOO hash: 8b09fd8638c560ef6ef12cf7a2be8d7cd12052ffb9e60ffd100ab83a06746e87.
-OIC hash: 3e0acd449a58a611a8336b256215ef92315e151bcfde022ed49eb0c5a94f20fb.
-HTML hash: 03bbb4cf5264484ed9552c7a5ba2c98807aca032d220fe7112b93cb0831c92b9.
-ZIP hash: b9d31ae6b64410ec23c22d6b9c9ed5ad96c58ca2de92eb05caa66ce95fa995a3.
+Runtime state: local runtime prototype ready.
+O-Code hash: 404a6b4b3f72f419fa705f2518db421bec16ca13030bb6b9d2415433b5580344.
+OOO hash: 1489663dc60409aaaf80192cf58ad0cfdda046cf8441245c64ea312e843d29e9.
+OIC hash: 00585f2a3b72c6cd1a0da541761425248f98df3ca72bdbb1dad23fa6698979ea.
+HTML hash: 5c427a17ef885e1fbdfad647224f7cf0a116d26c84765cfd80e66370a96bbd06.
+ZIP hash: 559c3618eb589fcc6e3e9e9f2a978ca25f6271fd0af5df48a3d0f6e6d682e664.
