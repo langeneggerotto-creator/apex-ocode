@@ -13,16 +13,16 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Universal_Traversal_Command_Console_v2_0.
-User direction: no more visible intermediate consoles before v2.0; use attached landscape expectation screens as the visual target.
-Design target: dense cinematic landscape operator console with source browser, main viewport, zoom/detail inspector, alt views, claim integrity, time/decision scenario controls, dual joysticks, image adjustments, quick actions, automated UI test, and proof export.
+Current O-Code strict anchor: APEX_OIC_Universal_Traversal_OS_v3_0.
+User direction: autonomously carry on until v3.0 OS ready; no intermediate visible console before v3.0.
+Design target: merge v2.0 landscape command console direction with v3.0.1 mobile proof harness behavior, real local control bindings, control map, dead-control detector, truth overlay, UX Twin Infinity proof path, and proof export.
 Runtime doctrine: ChatGPT-first when possible; self-contained HTML fallback when browser APIs are required; never hide runtime limitations.
-MVP scope: image traversal plus article/document traversal with scenario and evidence boundary controls.
-Verification: 26 of 26 PASS.
+MVP scope: Universal Traversal OS local runtime candidate for source, claim, time, scenario, evidence boundary, control response proof, and O-Code packaging.
+Verification: 21 of 21 PASS.
 Stress: 1000000 iterations, 0 failures.
-Runtime state: v2.0 local runtime candidate ready.
-O-Code hash: 2f77d99319d0cb91c197cebe7ddb5c9a6bfd3e853d09fc02b5bfdd78ea199e27.
-OOO hash: 23024060913c4a899db7babcee5063c2503f502347a3492e73bef8aaa71213fa.
-OIC hash: 957bbc6c8b7e2588862e5c7624d2044229c7e08b00fdfefd52ec2f8089b65e9e.
-HTML hash: 6607e2ba5d5a0c27c9c1bf029096e11ed63a131bec83718245e08834e7efe9f1.
-ZIP hash: b70e3d6cb1d166fa1f0d3ef1204d667602cc9cf612625de5b5b785d87fdd5c92.
+Runtime state: v3.0 OS-ready local runtime candidate.
+O-Code hash: dc162b9b8e5f418a75babcf55b99ffc7e11c6592c93dba95c4c5c15eda3f88d3.
+OOO hash: 6076dec97c53945eed268aa1d0b2775b7670eaa734bb2d4d4d211aa271d3f91e.
+OIC hash: 5850f5ef638bb4a0174a2bbcd374b4ade7f37a63a26068a53571699832515cfd.
+HTML hash: d2270bce48290fff11dd1451d34fd11bf767324d36b3f56fc1c5c9f450e6f3d2.
+ZIP hash: 0622dc5d646e5b62d6e9f956d6b13b81d183df2c47eca0d207b583a5753c93d6.
