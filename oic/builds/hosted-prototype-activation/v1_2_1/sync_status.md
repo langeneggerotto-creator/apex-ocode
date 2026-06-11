@@ -13,13 +13,14 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Image_Traversal_Control_Console_MVP_v1_3_1.
-Vision target: landscape image traversal console MVP with upload, zoom, pan, dual joystick controls, image adjustments, simulated UI test, and proof export.
+Current O-Code strict anchor: APEX_OIC_Image_Traversal_Console_Landscape_Repair_v1_3_1_1.
+Vision target: fixed 16:9 landscape image traversal console with visible upload, repaired dual joysticks, sample fallback, automated dry-run UI test, and proof export.
+Failure repaired: v1.3.1 collapsed out of landscape mode and upload/joystick behavior did not meet expected console behavior.
 Verification: 18 of 18 PASS.
 Stress: 1000000 iterations, 0 failures.
-Runtime state: local runtime MVP ready.
-O-Code hash: 4be07eda3c133bfc7d413da47ed1662c55519718d658617b949aa542be4c99b0.
-OOO hash: 0cfc72b58a83fbd48d8a40775c4fc58f4f56fb83c28f0b966b0e41b32fa06ddd.
-OIC hash: f691db8abb71d82e5f28c113775a360d411a9f44ac8e2df5a6428bf93de2f05d.
-HTML hash: 9f760dd84b36d30304bb4ed3fca2a6050f10f2fee75802af4b5353b637cff929.
-ZIP hash: 1bb733500181c916434e5a7322e758f2f079dfcf38ff47118765e4ed33a45d8a.
+Runtime state: landscape repair local runtime ready.
+O-Code hash: c9573f71d45f502bc4be74cbc16541a83adfb20cab3fc60bcb317bc0803b2892.
+OOO hash: defa6de099a2760f1b5c3e735f210605c346c9d43695f773a428f1c58598f58a.
+OIC hash: 785175334acaaed2613b85b70e7210474baadea42ab98de19f6f283165239296.
+HTML hash: f12f62eb48f0315d0cba1182546c73271bbf7684817473ebc4caed50dc5cbe52.
+ZIP hash: 3cc53482ab08548b2903ac31bca7fd965ad13b717f00210ec7aeafc3526c0bed.
