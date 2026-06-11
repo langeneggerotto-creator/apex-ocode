@@ -13,15 +13,15 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Universal_Traversal_Console_v1_4_0.
+Current O-Code strict anchor: APEX_OIC_Universal_Traversal_Console_v1_4_0_PUBLISHED.
 Universal formula: Any source -> any layer -> any claim -> any time -> any scenario -> evidence boundary -> zoom deeper / wider / backward / forward.
 Runtime doctrine: ChatGPT-first when possible; self-contained HTML fallback when browser APIs are required; never hide runtime limitations.
 MVP scope: image traversal plus article/document traversal.
 Verification: 18 of 18 PASS.
 Stress: 1000000 iterations, 0 failures.
 Runtime state: local universal traversal MVP ready.
-O-Code hash: 06e25527885d08c21fa62aed5fb62fc0f4a08abfce40d8c9c08163aa66ac909d.
-OOO hash: e148e2e27687e9fe91f2a89d2e94bcd8017e7e0cae0590b7a5a846295c6af9a7.
-OIC hash: cd17e6d63fe72d4a5661b673bb18f409459472a69c1dceb527630486814a9a97.
-HTML hash: c1df28aaf2f8d98a0ff273579fe8fb94d4a05ce062b4c9bb87383edf6433b9b1.
-ZIP hash: 269715658b34032f32516981f454d5e256f8a8ebb169e6ff9153c1029b743142.
+O-Code hash: 2a61fd384c469ca10c92cee0e177a3b57a6aedd12ede8b6a3d1ca8089f3eec43.
+OOO hash: 5565566d5c3e7443204c2dafbf62b717a594408521fcf19e8c41986e2b525d4f.
+OIC hash: e077dac98f9ce8a061240334132df97e548b7543af37b4e5a6b15d439cb48b68.
+HTML hash: d204572945a6d4463dbe6a19550b15c8e08e0b20b529b61bc1d738f16955fe87.
+ZIP hash: 48243e2960b64bcef8682b3ff68290ee2f66eda5d349d2c0823f585207974843.
