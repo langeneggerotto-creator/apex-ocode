@@ -26,3 +26,10 @@ Current sync repair anchor:
 
 - Build: APEX_OIC_Hosted_Prototype_Activation_v1_2
 - Sync repair: APEX_OIC_GitHub_Sync_Repair_v1_2_1
+
+Current runner anchor:
+
+- Build: APEX_OIC_GateHub_Autocommit_Runner_v1_2_2
+- Verification: 20 / 20 PASS
+- Stress: 1,000,000 iterations, 0 failures
+- Boundary: active authorized session only until external runner or GitHub Action exists
