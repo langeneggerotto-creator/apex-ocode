@@ -12,3 +12,7 @@ Code repository: langeneggerotto-creator/apex-ocode
 Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
+
+Testing anchor: APEX_OIC_Simulated_UI_Test_Crawler_v1_2_3.
+Verification: 23 of 23 PASS.
+Stress: 1000000 iterations, 0 failures.
