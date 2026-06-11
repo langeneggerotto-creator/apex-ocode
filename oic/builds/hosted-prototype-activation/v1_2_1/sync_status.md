@@ -13,15 +13,16 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Universal_Traversal_Console_v1_4_0_PUBLISHED.
-Universal formula: Any source -> any layer -> any claim -> any time -> any scenario -> evidence boundary -> zoom deeper / wider / backward / forward.
+Current O-Code strict anchor: APEX_OIC_Universal_Traversal_Console_ChatGPT_Landscape_Repair_v1_4_0_1.
+Repair reason: v1.4.0 preserved fixed 16:9 layout but scaled too small inside portrait ChatGPT/browser viewport.
+Repair target: ChatGPT-first landscape runtime that does not collapse and does not shrink below usable size; scroll-safe shell when viewport is too small.
 Runtime doctrine: ChatGPT-first when possible; self-contained HTML fallback when browser APIs are required; never hide runtime limitations.
 MVP scope: image traversal plus article/document traversal.
-Verification: 18 of 18 PASS.
+Verification: 17 of 17 PASS.
 Stress: 1000000 iterations, 0 failures.
-Runtime state: local universal traversal MVP ready.
-O-Code hash: 2a61fd384c469ca10c92cee0e177a3b57a6aedd12ede8b6a3d1ca8089f3eec43.
-OOO hash: 5565566d5c3e7443204c2dafbf62b717a594408521fcf19e8c41986e2b525d4f.
-OIC hash: e077dac98f9ce8a061240334132df97e548b7543af37b4e5a6b15d439cb48b68.
-HTML hash: d204572945a6d4463dbe6a19550b15c8e08e0b20b529b61bc1d738f16955fe87.
-ZIP hash: 48243e2960b64bcef8682b3ff68290ee2f66eda5d349d2c0823f585207974843.
+Runtime state: local ChatGPT landscape repair ready.
+O-Code hash: 141ae0b899b779d048bf06ac5043fbe77d3b015248358c801d3fbc84f032144d.
+OOO hash: 212cd23865dddbf602a1d76addb5b8c91e1ca6b8db9fe2a7b0d736ffc4574857.
+OIC hash: f9a82128b5462ed968f4869a370d183949bdbf3364a6bdcf73c4f12e537bce54.
+HTML hash: fd856107741220101f6e349d454aaf63e8ca1702db3abdaa5e90b556785157a9.
+ZIP hash: 4a57c38ece919a57da9e76097c2dd4653d281d5f28a310bacc4a6fe4492ddf38.
