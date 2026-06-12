@@ -13,20 +13,21 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Universal_Traversal_OS_v3_0_2_Runtime_Navigation_Guardrails.
-Reason: real-device recording showed v3.0.1 opened and controls responded, but pan/zoom could disorient the operator and exported proof JSON was not captured.
-Decision: REPAIR before promotion.
-Repair target: runtime navigation guardrails and proof-export reliability.
-Fixes: bounded pan, safe zoom, return-to-console, guardrail state indicator, visible proof JSON fallback, copy-proof fallback, download retry, fixed proof dock retained, dead-control detector retained.
-Status format preference: future verbal status updates should be normal readable text, not code blocks, and should explain what was done, what worked, what failed, why, what was fixed, test results, current status, recommendation, and next action.
-Runtime doctrine: ChatGPT-first when possible; self-contained HTML fallback when browser APIs are required; never hide runtime limitations.
-Truth boundary: this is still a local repair candidate, not validated product or production-ready system.
+Current O-Code strict anchor: APEX_Universal_Console_Test_Intelligence_System_v1_0.
+Reason: user locked Ultimate Universal Console Test Intelligence Expansion as the governing test-suite specification.
+Decision: build first reusable universal console testing toolkit, not just another console repair.
+Purpose: create the reusable test engine that can test any APEX/OIC/OmniFly console or generic browser console with external headless mode and embedded in-console Test button mode.
+Built components: external Playwright-style runner skeleton, embedded test runner module, embedded test demo, normalized report schema, O-Code contract, OOO object, OIC package, governing prompt, verification report, proof packet.
+Embedded module features: Test button, control discovery, visual tracer, state-diff detection, dead/weak/manual/unsafe classification, visible proof fallback, copy proof, download proof attempt, promotion decision.
+External runner features: local file or hosted URL target, control discovery, safe activation, screenshot capture, JSON reports, control map, dead-control report, promotion decision, overclaim scan.
+Truth boundary: v1.0 is a local toolkit candidate, not yet a validated universal test platform, not a certified security audit tool, and not proof that every possible console can be tested.
 Verification: 21 of 21 PASS.
-Guardrail simulation: 1000000 iterations, 0 failures.
-Stress: 1000000 iterations, 0 failures.
-Runtime state: v3.0.2 runtime navigation guardrails local candidate ready for real-device retest.
-O-Code hash: ce3c54c0b08c939fe5657acb6262254ae3c0a893d99f4e77abc1eec514848629.
-OOO hash: d070418f04bbee28a094a849e52f38c5b4071717a35152714bc17c70e2f03f25.
-OIC hash: 327407d26eca6914aa5592c3ca65c2f57cf8848b86274b472eb70724d714b069.
-HTML hash: c4c65c13111447fab539613e66374c69b38e6a713838bd6581e4fa70a4023049.
-ZIP hash: 1039b8bb41647017bf3fcd0acbb9333b9d6018beec2033eb2619fe025d90596f.
+Spec logic stress: 1000000 iterations, 0 failures.
+Runtime state: UCTIS v1.0 local toolkit candidate ready.
+O-Code hash: included in package delivery status.
+OIC hash: 7b990972c8c69f3a7e7069474e40f7c42e0a9d3af90822e025811c3461e5de92.
+Demo HTML hash: f5e601b393aac8f4d9b438827edab0d49985f1ebef021dcf1019a93703bb5a01.
+Package ZIP hash: 799645c986ecc17ce77e39a866ee8eb558bd6abefc577db90be6f4cfc9f92626.
+Runner hash: 79a1bb7ae1473438b713dccd0ccc6b2fb69acc6d885dcb97f6b1560b93d0475f.
+Embedded JS hash: af11a84f01e4707a8acd469424163ec09dafbb526006729b45d58746c827c99a.
+Next recommended build: APEX_UCTIS_v1_1_Real_Playwright_Run_Against_v3_0_2_and_v3_1.
