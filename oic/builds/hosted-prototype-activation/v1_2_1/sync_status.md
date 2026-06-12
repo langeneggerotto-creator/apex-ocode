@@ -13,16 +13,20 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Universal_Traversal_OS_v3_0.
-User direction: autonomously carry on until v3.0 OS ready; no intermediate visible console before v3.0.
-Design target: merge v2.0 landscape command console direction with v3.0.1 mobile proof harness behavior, real local control bindings, control map, dead-control detector, truth overlay, UX Twin Infinity proof path, and proof export.
+Current O-Code strict anchor: APEX_OIC_Universal_Traversal_OS_v3_0_1_Runtime_Accessibility_Hardening.
+Reason: local headless mobile run of v3.0 opened and executed several proof controls, but Dead Scan top command became hard to click due pointer interception in constrained mobile/sticky/scroll context.
+Decision: REPAIR, not promote to v3.1 yet.
+Repair target: keep v3.0 OS candidate, add always-tappable fixed proof dock, preserve control map, dead-control detector, truth overlay, proof export, and O-Code packaging.
 Runtime doctrine: ChatGPT-first when possible; self-contained HTML fallback when browser APIs are required; never hide runtime limitations.
-MVP scope: Universal Traversal OS local runtime candidate for source, claim, time, scenario, evidence boundary, control response proof, and O-Code packaging.
-Verification: 21 of 21 PASS.
+Verification: 16 of 16 PASS.
+Headless post-repair test: PASS.
+Headless post-repair observed: readiness 100%, status Proof exported, controls 37/37, dead controls 0.
 Stress: 1000000 iterations, 0 failures.
-Runtime state: v3.0 OS-ready local runtime candidate.
-O-Code hash: dc162b9b8e5f418a75babcf55b99ffc7e11c6592c93dba95c4c5c15eda3f88d3.
-OOO hash: 6076dec97c53945eed268aa1d0b2775b7670eaa734bb2d4d4d211aa271d3f91e.
-OIC hash: 5850f5ef638bb4a0174a2bbcd374b4ade7f37a63a26068a53571699832515cfd.
-HTML hash: d2270bce48290fff11dd1451d34fd11bf767324d36b3f56fc1c5c9f450e6f3d2.
-ZIP hash: 0622dc5d646e5b62d6e9f956d6b13b81d183df2c47eca0d207b583a5753c93d6.
+Runtime state: v3.0.1 local runtime accessibility hardening ready.
+O-Code hash: 75f5dbdb890efeb73eb6a84779489a1fbd956b54b97f140550154c1ac10f3f2d.
+OOO hash: deca20ca4ccbd8690ef4400105b46ecb31c2abe131a2578810f419a144842550.
+OIC hash: 3b071b5b388ca896a15d1b0b5eb1e4aeb296633b3de0b6dc4b946ae11055e3b8.
+HTML hash: 8e05dce3fb7a71b16d7aebedb273f290ab405d86322727bfa9fa77b71b75286f.
+ZIP hash: ec33ab7252cd36db8d091c76c8df19e178558cf9c39ea1728fee061c8d42da84.
+Headless proof hash: 02d9944f7435122088b6267d1b35550bde0c4ce27748e0a69b805140220afc6a.
+Headless recording hash: 60a03eaa7ee34c939709c419004496537a7f0cc3b6618e6f07a39ab056f57d36.
