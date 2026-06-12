@@ -13,20 +13,18 @@ Evidence repository: langeneggerotto-creator/apex-evidence-ledger
 
 Large binary packages are not included in this text commit. They are tracked by name and hash in the sync manifest.
 
-Current O-Code strict anchor: APEX_OIC_Universal_Traversal_OS_v3_0_1_Runtime_Accessibility_Hardening.
-Reason: local headless mobile run of v3.0 opened and executed several proof controls, but Dead Scan top command became hard to click due pointer interception in constrained mobile/sticky/scroll context.
-Decision: REPAIR, not promote to v3.1 yet.
-Repair target: keep v3.0 OS candidate, add always-tappable fixed proof dock, preserve control map, dead-control detector, truth overlay, proof export, and O-Code packaging.
+Current O-Code strict anchor: APEX_OIC_Universal_Traversal_OS_v3_1_Source_Adapters.
+Reason: user approved proceeding to v3.1 design/build while keeping v3.0.1 under real-device validation gate.
+Status format preference: future verbal status updates should be normal readable text, not code blocks, and should explain what was done, what worked, what failed, why, what was fixed, test results, current status, recommendation, and next action.
+Design target: add the first source-adapter expansion after v3.0.1 runtime accessibility hardening.
+Source adapters: local image upload, article/document paste, URL/news link plus pasted article text, source ledger, claim candidates, evidence boundary, proof ledger export.
 Runtime doctrine: ChatGPT-first when possible; self-contained HTML fallback when browser APIs are required; never hide runtime limitations.
-Verification: 16 of 16 PASS.
-Headless post-repair test: PASS.
-Headless post-repair observed: readiness 100%, status Proof exported, controls 37/37, dead controls 0.
+Truth boundary: URL/news adapter records provided URL and pasted content only; it does not independently verify external facts in the local runtime.
+Verification: 20 of 20 PASS.
 Stress: 1000000 iterations, 0 failures.
-Runtime state: v3.0.1 local runtime accessibility hardening ready.
-O-Code hash: 75f5dbdb890efeb73eb6a84779489a1fbd956b54b97f140550154c1ac10f3f2d.
-OOO hash: deca20ca4ccbd8690ef4400105b46ecb31c2abe131a2578810f419a144842550.
-OIC hash: 3b071b5b388ca896a15d1b0b5eb1e4aeb296633b3de0b6dc4b946ae11055e3b8.
-HTML hash: 8e05dce3fb7a71b16d7aebedb273f290ab405d86322727bfa9fa77b71b75286f.
-ZIP hash: ec33ab7252cd36db8d091c76c8df19e178558cf9c39ea1728fee061c8d42da84.
-Headless proof hash: 02d9944f7435122088b6267d1b35550bde0c4ce27748e0a69b805140220afc6a.
-Headless recording hash: 60a03eaa7ee34c939709c419004496537a7f0cc3b6618e6f07a39ab056f57d36.
+Runtime state: v3.1 source-adapter local runtime candidate ready.
+O-Code hash: 12d049803f6a926349cc1233bc5f9064903d794a60db61f173db6cefb43cec5d.
+OOO hash: c73b852eca438fe73c4ca7422a7417cbc72c6ab96e3cea2d0cb1f1c3cde9f23d.
+OIC hash: b03e591b60886116951bdebbe2d7e249817df39de98bc500a09f540284ab6ef4.
+HTML hash: 2b418d6e9a63b24dd640fac049bf3ed34e61fe67185ada69172aca1a5fc4faee.
+ZIP hash: 1299b5fb45a39136a5a4777155298f723c369b82522994555e7aeda71d3da697.
