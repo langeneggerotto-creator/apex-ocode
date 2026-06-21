@@ -1,0 +1,11 @@
+{
+  "artifact_id": "APEX_MIRROR_ITERATION_AUTOMATER_VERTICAL_SLICE_v0_1",
+  "artifact_name": "APEX Mirror Iteration Automater Vertical Slice v0.1 Validated Local",
+  "local_sha256": "ff23e1719c839a9388e9b09759c468e4c4b1fd9ebf9398b65aeec60586c407c9",
+  "repo_path": "vertical_slices/apex_mirror_iteration_automater_vertical_slice_v0_1/README_CAPTURE.md",
+  "commit_sha": "a11cc57dd9194db8d171ccfab0c7a05c07add84a",
+  "validation_status": "LOCAL_TESTS_PASSED_6_OF_6",
+  "truth_status": "REPOSITORY_CAPTURED_AFTER_COMMIT_PARTIAL_TEXT_CAPTURE",
+  "promotion_status": "HOLD_PENDING_FULL_PACKAGE_CAPTURE_AND_REVIEW",
+  "boundary": "This commit captures the validation record and ledger metadata. The binary ZIP package was not committed as a ZIP in this step. Full repository capture requires committing the package contents or ZIP through a binary-capable workflow."
+}
