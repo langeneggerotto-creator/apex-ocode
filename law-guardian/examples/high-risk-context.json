@@ -1,0 +1,20 @@
+{
+  "taskId": "HIGH-STAKES-MEDICAL-DECISION",
+  "description": "Prepare a consequential medical action recommendation.",
+  "domain": "MEDICAL",
+  "mode": "HIGH_STAKES",
+  "riskLevel": "CRITICAL",
+  "authorityLevel": "EXECUTION_REQUESTED",
+  "reversible": false,
+  "affectedParties": 1,
+  "commitments": {
+    "money": 10000,
+    "timeHours": 100,
+    "externalWrites": 1,
+    "reputation": 5
+  },
+  "evidence": {
+    "truth_boundary_recorded": true,
+    "qualified_review_complete": false
+  }
+}
