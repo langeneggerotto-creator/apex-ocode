@@ -50,6 +50,33 @@ OCODE must compare applicable routes rather than assume conventional coding:
 - defer;
 - reject.
 
+## Law Guardian and Policy Compiler responsibility
+
+OCODE must also prevent Core OS governance from becoming a source of paralysis. It must not blindly apply every law, principle, standard, and checklist to every task.
+
+OCODE shall:
+
+1. classify requirements by constitutional, universal, domain, project, temporary, and advisory tiers;
+2. activate only the rules applicable to the current task, risk, lifecycle stage, authority, and affected parties;
+3. preserve constitutional truth, safety, human control, consent, ownership, evidence, and mandatory external requirements;
+4. detect duplicate, overlapping, contradictory, obsolete, and unsupported rules;
+5. compile multiple supporting laws into the smallest observable control set;
+6. estimate governance burden and expected risk-reduction/decision value;
+7. propose merge, simplification, downgrade, suspension, review, or retirement where burden exceeds value;
+8. expose the active law set, reasons, conflicts, exceptions, burden, and reassessment triggers to the human operator;
+9. preserve human review for promotion, repeal, constitutional exceptions, and unresolved conflicts;
+10. record control effectiveness and burden in the Evidence Ledger.
+
+Governing design reference:
+
+`governance/OCODE_LAW_GUARDIAN_AND_POLICY_COMPILER_v0.1.md`
+
+Core OS meta-law candidate:
+
+`langeneggerotto-creator-APEX-CORE-OS/core_os/candidates/APEX_MINIMUM_SUFFICIENT_GOVERNANCE_AND_LAW_ECONOMY_META_LAW_v0.1.md`
+
 ## Promotion boundary
 
 A generated codebase, passing unit tests, or successful local build does not prove dreamer fit, deployment feasibility, ownership, maintainability, or production readiness. Those conditions require separate evidence.
+
+Likewise, the existence of many laws or completed compliance documents does not prove effective governance. OCODE Law Guardian capability requires runtime applicability filtering, conflict and duplicate handling, law-to-control compilation, human visibility, and evidence that governance protects more value than the burden it creates.
