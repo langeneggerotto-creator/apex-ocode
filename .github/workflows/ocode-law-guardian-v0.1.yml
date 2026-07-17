@@ -1,0 +1,47 @@
+name: OCODE Law Guardian v0.1
+
+on:
+  pull_request:
+    paths:
+      - 'law-guardian/**'
+      - '.github/workflows/ocode-law-guardian-v0.1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: law-guardian
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run law guardian tests
+        run: npm test
+      - name: Generate low-risk policy receipt
+        run: node src/cli.mjs examples/laws.json examples/prototype-context.json prototype-receipt.json
+      - name: Verify high-risk hold behavior
+        shell: bash
+        run: |
+          set +e
+          node src/cli.mjs examples/laws.json examples/high-risk-context.json high-risk-receipt.json
+          status=$?
+          set -e
+          if [ "$status" -ne 3 ]; then
+            echo "Expected hold exit code 3, received $status"
+            exit 1
+          fi
+      - name: Upload policy receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocode-law-guardian-v0.1-receipts
+          path: |
+            law-guardian/prototype-receipt.json
+            law-guardian/high-risk-receipt.json
+          if-no-files-found: error
+          retention-days: 30
