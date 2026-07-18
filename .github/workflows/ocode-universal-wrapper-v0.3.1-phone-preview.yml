@@ -27,8 +27,23 @@ jobs:
       - name: Install bounded preview dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Run Expo doctor, TypeScript, behavior tests, and native exports
-        run: npm run verify
+      - name: Verify Expo dependency compatibility
+        run: npm run doctor
+
+      - name: Type-check the phone preview
+        run: npm run typecheck
+
+      - name: Run Dream Intake behavior tests
+        run: npm test
+
+      - name: Export the iOS JavaScript bundle
+        run: npm run export:ios
+
+      - name: Export the Android JavaScript bundle
+        run: npm run export:android
+
+      - name: Verify exported bundles and create hash ledger
+        run: npm run verify:exports
 
       - name: Confirm generated evidence
         shell: bash
