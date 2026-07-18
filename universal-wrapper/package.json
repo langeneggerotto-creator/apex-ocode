@@ -1,0 +1,20 @@
+{
+  "name": "@apex/ocode-universal-wrapper",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "OCODE universal-wrapper founder proof: intent to semantic contract to Expo/TypeScript source to tests to reconstructed specification and handoff.",
+  "bin": {
+    "ocode": "./bin/ocode.mjs"
+  },
+  "scripts": {
+    "build:proof": "node bin/ocode.mjs build examples/dream-intake.intent.txt --adapter expo-typescript --out proofs/dream-intake-v0.3",
+    "validate:proof": "node src/validate-proof.mjs proofs/dream-intake-v0.3",
+    "test:generated": "node --experimental-strip-types --test proofs/dream-intake-v0.3/tests/dream-intake.test.ts",
+    "test:unit": "node --test tests/*.test.mjs",
+    "test": "rm -rf proofs/dream-intake-v0.3 && npm run build:proof && npm run test:unit && npm run test:generated && npm run validate:proof"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

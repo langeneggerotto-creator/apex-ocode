@@ -1,0 +1,14 @@
+{
+  "build": "OCODE_UNIVERSAL_WRAPPER_v0.3_FOUNDER_PROOF_VERTICAL_SLICE",
+  "verified_at": "2026-07-18",
+  "truth_status": "IMPLEMENTED_AND_LOCALLY_TESTED__GITHUB_ACTIONS_REQUIRED_BEFORE_MERGE",
+  "local_runtime": "Node.js v22.16.0",
+  "tests": {
+    "wrapper_tests": {"passed": 8, "failed": 0},
+    "generated_typescript_behavior_tests": {"passed": 4, "failed": 0},
+    "proof_validator": "PASS"
+  },
+  "scope": "one intent, one Dream Intake screen, one Expo/TypeScript adapter, one test suite, one reconstruction, one continuation package",
+  "not_claimed": ["Expo bundle", "device runtime", "production readiness", "universal language support"],
+  "required_ci_result": "ALL_PASS_BEFORE_MERGE"
+}
