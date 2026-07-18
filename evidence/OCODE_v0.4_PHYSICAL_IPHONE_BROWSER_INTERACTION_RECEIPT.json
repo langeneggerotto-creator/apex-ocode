@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "ocode.mobile-browser-proof-receipt.v0.4",
+  "build": "OCODE_v0.4_MOBILE_FIRST_DECISION_RUNTIME_AND_SECOND_ADAPTER_PROOF",
+  "sourceUrl": "file:///var/mobile/Containers/Data/Application/DBB6FA2D-0C18-4E00-B9E6-63236075792E/Library/Caches/Users/25713969/FileCacheV2/Loaded/daa914a2825b72992ef8e9d58d8e53952cdc6554aa312b48f70df4a5c5c3d2a2/656e2dc1a82a3026b83a5/original.html",
+  "executedAt": "2026-07-18T13:46:28.963Z",
+  "environment": {
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+    "language": "en-US",
+    "viewport": "375x768"
+  },
+  "checks": {
+    "screen-launch": "PASS",
+    "dream-entry": "PASS",
+    "draft-save": "PASS",
+    "dream-card": "PASS",
+    "original-preserved": "PASS",
+    "correction": "PASS",
+    "one-question": "PASS",
+    "draft-restore": "PASS"
+  },
+  "result": "PASS",
+  "truthStatus": "PHYSICAL_IPHONE_BROWSER_INTERACTION_SELF_REPORTED__NATIVE_EXPO_NOT_PROVEN"
+}
