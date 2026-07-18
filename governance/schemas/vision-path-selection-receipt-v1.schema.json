@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://apex.local/ocode/vision-path-selection-receipt-v1.schema.json",
+  "title": "OCODE Vision Path Selection Receipt v1",
+  "type": "object",
+  "required": [
+    "receipt_version",
+    "generated_at",
+    "vision_anchor",
+    "current_demonstrated_state",
+    "weakest_barrier",
+    "candidate_paths",
+    "selected_path",
+    "smallest_complete_proof",
+    "stop_condition",
+    "maximum_commitment",
+    "reassessment_trigger",
+    "truth_boundary"
+  ],
+  "properties": {
+    "receipt_version": {"const": "1.0"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "vision_anchor": {"type": "string", "minLength": 1},
+    "current_demonstrated_state": {"type": "string", "minLength": 1},
+    "weakest_barrier": {"type": "string", "minLength": 1},
+    "candidate_paths": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "description",
+          "vision_contribution",
+          "evidence_gain",
+          "time_to_proof",
+          "user_environment_fit",
+          "risk_and_constraints",
+          "path_rank",
+          "decision"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1},
+          "vision_contribution": {"type": "string", "minLength": 1},
+          "evidence_gain": {"type": "string", "minLength": 1},
+          "time_to_proof": {"type": "string", "minLength": 1},
+          "cost_and_complexity": {"type": "string"},
+          "user_environment_fit": {"type": "string", "minLength": 1},
+          "reversibility_ownership_maintenance": {"type": "string"},
+          "risk_and_constraints": {"type": "string", "minLength": 1},
+          "reuse_value": {"type": "string"},
+          "path_rank": {"type": "integer", "minimum": 1},
+          "decision": {"enum": ["SELECT", "DEFER", "REJECT", "HOLD", "ALTERNATE"]},
+          "reason": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "selected_path": {"type": "string", "minLength": 1},
+    "selection_reason": {"type": "string"},
+    "smallest_complete_proof": {"type": "string", "minLength": 1},
+    "active_law_set": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "stop_condition": {"type": "string", "minLength": 1},
+    "maximum_commitment": {"type": "string", "minLength": 1},
+    "reassessment_trigger": {"type": "string", "minLength": 1},
+    "evidence_location": {"type": ["string", "null"]},
+    "consecutive_enabling_builds": {"type": "integer", "minimum": 0},
+    "detour_limit_status": {"enum": ["WITHIN_LIMIT", "VISION_PROOF_REQUIRED", "RECORDED_SAFETY_EXCEPTION"]},
+    "human_approval": {
+      "type": "object",
+      "properties": {
+        "required": {"type": "boolean"},
+        "status": {"enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "REJECTED"]}
+      },
+      "additionalProperties": true
+    },
+    "truth_boundary": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}
