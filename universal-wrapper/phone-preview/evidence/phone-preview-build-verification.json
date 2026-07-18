@@ -1,0 +1,58 @@
+{
+  "build": "OCODE_UNIVERSAL_WRAPPER_v0.3.1_EXPO_BUNDLE_AND_PHONE_PREVIEW_HANDOFF",
+  "verified_at": "2026-07-18T12:15:16Z",
+  "verified_commit": "27a1d8dcdd51cc51ae6a962b9d22799495387ef6",
+  "selected_path_reason": "The generated screen source and model tests passed, while Expo bundling and physical-phone interaction remained the weakest unproven runtime barrier.",
+  "scope": "the same one-screen Dream Intake proof only",
+  "implementation_status": "IMPLEMENTED_AND_EXPO_NATIVE_EXPORTS_VERIFIED__PHYSICAL_IPHONE_PREVIEW_PENDING",
+  "automated_checks": {
+    "expo_doctor": "PASS",
+    "typescript": "PASS",
+    "domain_and_storage_tests": {
+      "status": "PASS",
+      "passed": 5,
+      "failed": 0
+    },
+    "ios_export": {
+      "status": "PASS",
+      "bundle_format": "HERMES_BYTECODE",
+      "size_bytes": 1737879,
+      "sha256": "b1189ae9b59fe5edef2c5f2347a11b5779ea38d37161f3bfce817d1556c73d0b"
+    },
+    "android_export": {
+      "status": "PASS",
+      "bundle_format": "HERMES_BYTECODE",
+      "size_bytes": 1745503,
+      "sha256": "28fc8ab6afbcc7743b86e77f13f9089229124787736f44cb95c9a985cf68f7cc"
+    },
+    "export_hash_ledger": "PASS",
+    "github_actions": {
+      "workflow": "OCODE Universal Wrapper v0.3.1 Phone Preview",
+      "run_id": 29643954413,
+      "run_number": 3,
+      "conclusion": "SUCCESS"
+    }
+  },
+  "workflow_artifact": {
+    "name": "ocode-dream-intake-v0.3.1-expo-native-exports",
+    "artifact_id": 8429461681,
+    "size_bytes": 1507610,
+    "digest": "sha256:4849ab0efd41bfab3732f24e52e0c0dd45d0ad5d4f5fe99a6a42397ce46f79ba",
+    "expires_at": "2026-08-17T12:15:15Z"
+  },
+  "physical_phone_preview": {
+    "status": "NOT_EXECUTED",
+    "required_evidence": "PHONE_PREVIEW.md completed against an identified commit on Otto's physical iPhone"
+  },
+  "vision_progress_actual": [
+    "The exact one-screen proof now exists inside a minimal Expo application.",
+    "Expo Doctor confirms dependency compatibility.",
+    "Strict TypeScript verification passes.",
+    "Five Dream Intake domain and persistence tests pass.",
+    "Expo produces verified iOS and Android Hermes bundles.",
+    "A bounded physical-phone validation checklist is ready."
+  ],
+  "new_weakest_barrier": "The exact application has not yet been opened and exercised on Otto's physical iPhone.",
+  "stop_condition": "SATISFIED__NO_ADDITIONAL_SCREEN_BACKEND_LIVE_AI_STORE_DEPLOYMENT_OR_ADAPTER_ADDED",
+  "truth_boundary": "Successful CI proves dependency compatibility, static type correctness, domain and in-memory persistence behavior, and platform-targeted Expo bundle generation. It does not prove native binary compilation, installation, launch, touch interaction, visual correctness, AsyncStorage restoration after reopening on a physical phone, or production readiness."
+}

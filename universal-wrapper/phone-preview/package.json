@@ -9,10 +9,11 @@
     "phone:tunnel": "expo start --tunnel",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "doctor": "expo-doctor",
+    "doctor": "npx expo-doctor@latest",
     "export:ios": "expo export --platform ios --output-dir dist-ios",
     "export:android": "expo export --platform android --output-dir dist-android",
-    "verify": "npm run typecheck && npm test && npm run export:ios && npm run export:android"
+    "verify:exports": "node scripts/verify-exports.mjs",
+    "verify": "npm run doctor && npm run typecheck && npm test && npm run export:ios && npm run export:android && npm run verify:exports"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -22,7 +23,9 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.10",
-    "expo-doctor": "^1.17.11",
     "typescript": "~5.9.2"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
