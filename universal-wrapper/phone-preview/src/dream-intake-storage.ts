@@ -23,7 +23,11 @@ export class MemoryKeyValueStore implements KeyValueStore {
 export class DreamDraftStore {
   static readonly DRAFT_KEY = 'apex.dream-builder.dream-intake.draft.v0.3.1';
 
-  constructor(private readonly store: KeyValueStore) {}
+  private readonly store: KeyValueStore;
+
+  constructor(store: KeyValueStore) {
+    this.store = store;
+  }
 
   async saveDraft(dream: string): Promise<void> {
     await this.store.setItem(DreamDraftStore.DRAFT_KEY, dream);
