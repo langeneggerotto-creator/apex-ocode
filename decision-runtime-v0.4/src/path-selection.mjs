@@ -119,9 +119,38 @@ export function selectClosestViablePath(context, candidates, options = {}) {
 
 export function rerankAfterEvidence(previousReceipt, context, candidates, options = {}) {
   const next = selectClosestViablePath(context, candidates, options);
+  const previousById = new Map((previousReceipt?.rankedCandidates ?? []).map((item) => [item.candidateId, item]));
+  const newlyViableBonusPerRemovedDisqualifier = Number(options.newlyViableBonusPerRemovedDisqualifier ?? 5);
+
+  const rerankedCandidates = next.rankedCandidates.map((item) => {
+    const previous = previousById.get(item.candidateId);
+    if (!item.viable || !previous || previous.viable !== false) return item;
+    const removedDisqualifierCount = previous.disqualifiers?.length ?? 0;
+    const evidenceChangeBonus = removedDisqualifierCount * newlyViableBonusPerRemovedDisqualifier;
+    return {
+      ...item,
+      score: Number((item.score + evidenceChangeBonus).toFixed(3)),
+      evidenceChangeBonus,
+      newlyViableAfterEvidence: true
+    };
+  });
+
+  const viable = rerankedCandidates
+    .filter((item) => item.viable)
+    .sort((a, b) => b.score - a.score || a.candidateId.localeCompare(b.candidateId));
+  const nonViable = rerankedCandidates
+    .filter((item) => !item.viable)
+    .sort((a, b) => b.score - a.score || a.candidateId.localeCompare(b.candidateId));
+  const activeRoute = viable[0] ?? null;
+  const fallbackRoute = viable[1] ?? null;
+
   return {
     ...next,
+    activeRoute,
+    fallbackRoute,
+    rankedCandidates: [...viable, ...nonViable],
     previousActiveRoute: previousReceipt?.activeRoute?.candidateId ?? null,
-    routeChanged: (previousReceipt?.activeRoute?.candidateId ?? null) !== (next.activeRoute?.candidateId ?? null)
+    routeChanged: (previousReceipt?.activeRoute?.candidateId ?? null) !== (activeRoute?.candidateId ?? null),
+    rerankEvidenceRule: 'A route that becomes viable after material evidence receives a transparent bonus proportional to removed disqualifiers.'
   };
 }
