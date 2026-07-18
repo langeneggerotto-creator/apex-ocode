@@ -1,0 +1,1 @@
+Create a phone-first Decision Clarity screen where a person can describe a decision, enter two options and one constraint, save the draft, review a structured Decision Card, correct the interpretation, select a current preference, and receive exactly one next question.
