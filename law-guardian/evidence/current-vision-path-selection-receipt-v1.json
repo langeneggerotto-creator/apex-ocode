@@ -1,0 +1,79 @@
+{
+  "receipt_version": "1.0",
+  "generated_at": "2026-07-18T05:20:00Z",
+  "vision_anchor": "OCODE is a universal governed wrapper that converts human intent or existing code into platform-neutral specifications, suitable target implementations, tests, execution evidence, and transferable handoff across languages, platforms, devices, and AI systems.",
+  "current_demonstrated_state": "The Law Guardian v0.1 and v0.2 can compile a canonical law registry into a minimum active control set and produce schema-validated Evidence Ledger-compatible policy records. OCODE has not yet proven an end-to-end human-intent-to-semantic-contract-to-real-adapter-to-working-code-to-test-to-handoff cycle.",
+  "weakest_barrier": "The central universal-wrapper behavior remains unproven in a real founder use case.",
+  "candidate_paths": [
+    {
+      "id": "OCODE_UNIVERSAL_WRAPPER_v0.3_FOUNDER_PROOF_VERTICAL_SLICE",
+      "description": "Use the Dream Builder first-screen use case to prove natural-language intake, platform-neutral semantic specification, dreamer/environment profile, route comparison, minimum law activation, one real target adapter, tests, bidirectional explanation, and continuation package.",
+      "vision_contribution": "Directly proves the core OCODE wrapper cycle rather than another supporting subsystem.",
+      "evidence_gain": "Produces decision-grade evidence about semantic contracts, route fit, adapter architecture, user control, code generation, testing, and handoff.",
+      "time_to_proof": "Bounded vertical slice; expected to reach meaningful proof sooner than broad platform or synchronization work.",
+      "cost_and_complexity": "Moderate and scope-controllable through one use case and one adapter.",
+      "user_environment_fit": "Directly tests Otto's iPhone-first, Windows-supported, AI-directed-builder role and ownership requirements.",
+      "reversibility_ownership_maintenance": "Can remain repository-based, testable, portable, and replaceable without permanent platform lock.",
+      "risk_and_constraints": "Must not overclaim native deployment or universal language support; one adapter is a proof, not universality.",
+      "reuse_value": "Creates the semantic contract and adapter pattern needed by future languages, platforms, agents, and modules.",
+      "path_rank": 1,
+      "decision": "SELECT",
+      "reason": "Highest direct validated vision progress rate and resolves the present weakest barrier."
+    },
+    {
+      "id": "OCODE_LAW_GUARDIAN_v0.3_AUTHENTICATED_SYNC_AND_EVIDENCE_LEDGER_WRITER",
+      "description": "Add authenticated Core OS registry synchronization and cross-repository Evidence Ledger writes.",
+      "vision_contribution": "Improves governance continuity and provenance but does not prove the universal wrapper itself.",
+      "evidence_gain": "Would prove private registry drift checks and idempotent evidence storage.",
+      "time_to_proof": "Likely short to moderate, but evidence remains concentrated in governance plumbing.",
+      "cost_and_complexity": "Moderate cross-repository permissions and credential complexity.",
+      "user_environment_fit": "Mostly invisible to the founder and does not test the intended conversational building experience.",
+      "reversibility_ownership_maintenance": "Repository-based and useful, but adds credential and connector maintenance.",
+      "risk_and_constraints": "Could deepen infrastructure drift after two consecutive governance builds.",
+      "reuse_value": "Useful later for all governed OCODE operations.",
+      "path_rank": 2,
+      "decision": "DEFER",
+      "reason": "Necessary enabling infrastructure, but not the closest current route to proving the governing vision."
+    },
+    {
+      "id": "OCODE_ADDITIONAL_GOVERNANCE_AND_LAW_EXPANSION",
+      "description": "Continue deriving, documenting, and automating additional laws before a wrapper proof.",
+      "vision_contribution": "Indirect and increasingly marginal until the current law system is exercised inside a real end-to-end build.",
+      "evidence_gain": "Low without runtime use and user-facing proof.",
+      "time_to_proof": "Fast for documents but slow for central product validation.",
+      "cost_and_complexity": "Low per document but cumulatively high cognitive and maintenance burden.",
+      "user_environment_fit": "Does not reduce the founder's uncertainty about whether OCODE can build and transfer real software.",
+      "reversibility_ownership_maintenance": "Easy to create but creates governance inventory requiring future consolidation.",
+      "risk_and_constraints": "High risk of bureaucracy and analysis paralysis.",
+      "reuse_value": "Unknown until exercised.",
+      "path_rank": 3,
+      "decision": "DEFER",
+      "reason": "Fails the current enabling-work admission test and does not resolve the weakest barrier."
+    }
+  ],
+  "selected_path": "OCODE_UNIVERSAL_WRAPPER_v0.3_FOUNDER_PROOF_VERTICAL_SLICE",
+  "selection_reason": "It is the smallest bounded build that directly exercises the Law Guardian inside OCODE's intended universal-wrapper behavior and yields user-facing, adapter, code, test, and handoff evidence.",
+  "smallest_complete_proof": "Convert one Dream Builder natural-language screen request into a platform-neutral semantic contract, evaluate Otto's environment and route options, activate the minimum law set, generate one repository-based implementation through one adapter, run tests, reconstruct the behavior from the code, and produce a continuation package.",
+  "active_law_set": [
+    "OCODE_CLOSEST_VIABLE_PATH_TO_VISION_LAW",
+    "whole_pathway",
+    "no_premature_architecture",
+    "dreamer_as_infrastructure",
+    "route_fit",
+    "implementation_or_it_did_not_happen",
+    "anti_paralysis_execution",
+    "one_move",
+    "minimum_sufficient_governance"
+  ],
+  "stop_condition": "Stop or re-scope if the build expands beyond one bounded Dream Builder use case and one target adapter without first producing an executable semantic-contract-to-code proof.",
+  "maximum_commitment": "One bounded vertical-slice build before mandatory evidence review and route re-ranking.",
+  "reassessment_trigger": "Reassess after the first generated implementation and tests, or earlier if the selected adapter cannot run in the available environment, ownership becomes unacceptable, or a faster credible route appears.",
+  "evidence_location": "law-guardian/evidence/current-vision-path-selection-receipt-v1.json",
+  "consecutive_enabling_builds": 2,
+  "detour_limit_status": "VISION_PROOF_REQUIRED",
+  "human_approval": {
+    "required": false,
+    "status": "NOT_REQUIRED"
+  },
+  "truth_boundary": "This receipt records the current path decision from available evidence. It does not prove the selected build will succeed, that one adapter establishes universality, or that deployment to a real mobile device has occurred."
+}
