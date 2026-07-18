@@ -1,0 +1,19 @@
+{
+  "name": "@apex/ocode-decision-runtime-v0.4",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic feasibility, law-compilation, path-ranking, drift-checking, and evidence runtime for bounded OCODE decisions.",
+  "bin": {
+    "ocode-decide": "bin/ocode-decide.mjs"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "demo": "node bin/ocode-decide.mjs examples/mobile-only-context.json examples/candidates.json --out evidence/current-path-receipt.json",
+    "validate:mobile": "node scripts/validate-mobile-preview.mjs",
+    "verify": "npm test && npm run demo && npm run validate:mobile"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
