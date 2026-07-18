@@ -1,0 +1,60 @@
+name: OCODE v0.5 Second-Intent Generalization Proof
+
+on:
+  pull_request:
+    paths:
+      - 'generalization-v0.5/**'
+      - 'evidence/OCODE_v0.4_PHYSICAL_IPHONE_BROWSER_INTERACTION_RECEIPT.json'
+      - 'evidence/OCODE_v0.4_SCREEN_RECORDING_EVIDENCE_MANIFEST.json'
+      - 'evidence/OCODE_v0.5_VISION_PATH_SELECTION_RECEIPT.json'
+      - '.github/workflows/ocode-generalization-v0.5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-second-intent-generalization:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: generalization-v0.5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify compiler, generated model, proof package, and cross-adapter equivalence
+        run: npm run verify
+
+      - name: Confirm physical iPhone browser evidence was preserved
+        shell: bash
+        working-directory: .
+        run: |
+          test -s evidence/OCODE_v0.4_PHYSICAL_IPHONE_BROWSER_INTERACTION_RECEIPT.json
+          test -s evidence/OCODE_v0.4_SCREEN_RECORDING_EVIDENCE_MANIFEST.json
+          grep -q '"result": "PASS"' evidence/OCODE_v0.4_PHYSICAL_IPHONE_BROWSER_INTERACTION_RECEIPT.json
+          grep -q 'VERIFIED_WITH_USER_RECEIPT_AND_SCREEN_RECORDING' evidence/OCODE_v0.4_SCREEN_RECORDING_EVIDENCE_MANIFEST.json
+
+      - name: Confirm generated evidence and equivalence result
+        shell: bash
+        run: |
+          test -s proofs/decision-clarity-v0.5/evidence-receipt.json
+          test -s proofs/decision-clarity-v0.5/cross-adapter-equivalence-report.json
+          grep -q '"result": "PASS"' proofs/decision-clarity-v0.5/cross-adapter-equivalence-report.json
+          grep -q 'decision-clarity-second-intent-v0.5' proofs/decision-clarity-v0.5/semantic-contract.json
+
+      - name: Preserve OCODE v0.5 proof package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocode-v0.5-second-intent-dual-adapter-generalization-proof
+          path: |
+            generalization-v0.5/proofs/decision-clarity-v0.5
+            evidence/OCODE_v0.4_PHYSICAL_IPHONE_BROWSER_INTERACTION_RECEIPT.json
+            evidence/OCODE_v0.4_SCREEN_RECORDING_EVIDENCE_MANIFEST.json
+            evidence/OCODE_v0.5_VISION_PATH_SELECTION_RECEIPT.json
+          if-no-files-found: error
+          retention-days: 30

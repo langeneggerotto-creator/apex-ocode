@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "ocode.screen-recording-evidence-manifest.v0.1",
+  "build": "OCODE_v0.4_MOBILE_FIRST_DECISION_RUNTIME_AND_SECOND_ADAPTER_PROOF",
+  "evidenceType": "PHYSICAL_IPHONE_BROWSER_INTERACTION_RECORDING",
+  "recording": {
+    "filename": "ScreenRecording_07-18-2026 07-45-00_1.mp4",
+    "sha256": "3409d74ef8459e52dcbf51ec024340a45ae05e21870cd12bc2a75ae3b71ff978",
+    "durationSeconds": 97.333333,
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "resolution": "512x1106",
+    "frameRate": 30
+  },
+  "observedSequence": [
+    "Dream Intake page visible on an iPhone-sized viewport",
+    "dream text entered",
+    "Dream Card displayed after save",
+    "original dream and current interpretation displayed separately",
+    "correction applied with preserved correction count",
+    "exactly one next question displayed",
+    "all eight phone evidence checklist items marked complete",
+    "JSON evidence receipt displayed with result PASS"
+  ],
+  "corroboratedChecks": {
+    "screen-launch": "CORROBORATED_BY_RECORDING",
+    "dream-entry": "CORROBORATED_BY_RECORDING",
+    "draft-save": "CORROBORATED_BY_RECORDING",
+    "dream-card": "CORROBORATED_BY_RECORDING",
+    "original-preserved": "CORROBORATED_BY_RECORDING",
+    "correction": "CORROBORATED_BY_RECORDING",
+    "one-question": "CORROBORATED_BY_RECORDING",
+    "draft-restore": "CHECKLIST_AND_RECEIPT_VISIBLE__CLOSE_REOPEN_TRANSITION_NOT_INDEPENDENTLY_ISOLATED"
+  },
+  "promotion": {
+    "physicalIphoneBrowserInteraction": "VERIFIED_WITH_USER_RECEIPT_AND_SCREEN_RECORDING",
+    "nativeExpoGoExecution": "NOT_PROVEN",
+    "nativeBinaryExecution": "NOT_PROVEN",
+    "productionReadiness": "NOT_CLAIMED"
+  },
+  "truthBoundary": "The recording corroborates physical iPhone browser interaction with the self-contained mobile-web adapter. It does not prove native Expo Go execution, native iOS compilation, store deployment, production security, or architectural suitability."
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "ocode.vision-path-selection-receipt.v0.5",
+  "decision": "PROCEED_WITH_SELECTED_ROUTE",
+  "vision": "Enable a dreamer to express intent once and receive governed, portable, maintainable implementations across suitable platforms while preserving control and evidence.",
+  "currentDemonstratedState": {
+    "dreamIntakeIntent": "COMPILED_TO_EXPO_TYPESCRIPT_AND_MOBILE_WEB",
+    "expoBundle": "VERIFIED",
+    "physicalIphoneBrowserInteraction": "VERIFIED_WITH_RECEIPT_AND_SCREEN_RECORDING",
+    "nativeExpoGoExecution": "NOT_PROVEN",
+    "decisionRuntime": "VERIFIED_BY_CI",
+    "lawGuardianRuntime": "VERIFIED_WITHIN_BOUNDED_ACCEPTANCE_SCOPE"
+  },
+  "weakestVisionBarrier": "The wrapper has only been proven against one Dream Intake intent, so it may still be use-case-specific rather than intent-general.",
+  "rankedCandidates": [
+    {
+      "candidateId": "ocode-v0.5-second-intent-dual-adapter-generalization-proof",
+      "rank": 1,
+      "viable": true,
+      "directVisionContribution": 10,
+      "evidenceGain": 10,
+      "userEnvironmentFit": 9,
+      "speedToProof": 9,
+      "reversibility": 10,
+      "reason": "Tests the newly exposed generalization barrier with one bounded second intent and reuses the established two-adapter evidence pattern."
+    },
+    {
+      "candidateId": "native-expo-go-physical-device-test",
+      "rank": 2,
+      "viable": false,
+      "reason": "Still requires a computer-hosted development server and is not executable in the current mobile-only environment."
+    },
+    {
+      "candidateId": "third-adapter-proof",
+      "rank": 3,
+      "viable": true,
+      "reason": "Adds platform breadth but does not test whether the intent compiler is hard-coded to Dream Intake."
+    }
+  ],
+  "activeRoute": "OCODE_v0.5_SECOND_INTENT_DUAL_ADAPTER_GENERALIZATION_PROOF",
+  "fallbackRoute": "third-adapter-proof",
+  "stopCondition": "One second intent, one screen, two adapters, one shared model suite, one equivalence report, and one continuation package. No backend, live AI, authentication, payments, store deployment, production certification, or third product screen.",
+  "reassessmentTriggers": [
+    "second-intent compiler succeeds or fails",
+    "cross-adapter equivalence succeeds or fails",
+    "physical device access changes",
+    "new evidence reveals hard-coded behavior"
+  ],
+  "truthStatus": "HUMAN_VISIBLE_DETERMINISTIC_PATH_RECEIPT__NOT_AUTONOMOUS_AUTHORITY"
+}

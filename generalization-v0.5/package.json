@@ -1,0 +1,19 @@
+{
+  "name": "@apex/ocode-generalization-v0.5",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "ocode-generalize": "bin/ocode-generalize.mjs"
+  },
+  "scripts": {
+    "build": "node bin/ocode-generalize.mjs examples/decision-clarity.intent.txt --adapters expo-typescript,mobile-web --out proofs/decision-clarity-v0.5",
+    "test:compiler": "node --test tests/generalization.test.mjs",
+    "test:generated": "node --experimental-strip-types --test proofs/decision-clarity-v0.5/tests/*.test.ts",
+    "validate": "node bin/validate-proof.mjs proofs/decision-clarity-v0.5",
+    "verify": "npm run test:compiler && npm run build && npm run test:generated && npm run validate"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
