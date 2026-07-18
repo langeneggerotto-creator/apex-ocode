@@ -1,13 +1,15 @@
 {
   "name": "@apex/ocode-law-guardian",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Minimum-sufficient, risk-proportionate law selection and policy compilation for OCODE.",
+  "description": "Minimum-sufficient, risk-proportionate law selection with canonical Core OS registry provenance and Evidence Ledger receipts.",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "demo": "node src/cli.mjs examples/laws.json examples/prototype-context.json",
-    "demo:high-risk": "node src/cli.mjs examples/laws.json examples/high-risk-context.json"
+    "demo:high-risk": "node src/cli.mjs examples/laws.json examples/high-risk-context.json",
+    "demo:registry": "node src/registry-cli.mjs examples/prototype-context.json policy-receipt-v0.2.json core-os-policy-evidence-v0.1.json",
+    "demo:registry:high-risk": "node src/registry-cli.mjs examples/high-risk-context.json high-risk-policy-receipt-v0.2.json high-risk-core-os-policy-evidence-v0.1.json"
   },
   "engines": {
     "node": ">=20"
