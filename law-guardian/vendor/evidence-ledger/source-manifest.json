@@ -1,0 +1,8 @@
+{
+  "source_repository": "langeneggerotto-creator/apex-evidence-ledger",
+  "source_path": "schemas/core-os-policy-evidence-record-v0.1.schema.json",
+  "source_blob_sha": "f892e5a1fe65be1a63b1b2c347a6d7ccffc4d85f",
+  "captured_at": "2026-07-18T00:00:00Z",
+  "sync_status": "PINNED_SNAPSHOT",
+  "truth_boundary": "The vendored schema matches the recorded Evidence Ledger blob at capture time. It is not a live cross-repository synchronization claim."
+}
