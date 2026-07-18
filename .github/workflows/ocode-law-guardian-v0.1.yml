@@ -1,4 +1,4 @@
-name: OCODE Law Guardian v0.1
+name: OCODE Law Guardian v0.2
 
 on:
   pull_request:
@@ -21,27 +21,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run law guardian tests
+      - name: Run all Law Guardian tests
         run: npm test
-      - name: Generate low-risk policy receipt
-        run: node src/cli.mjs examples/laws.json examples/prototype-context.json prototype-receipt.json
-      - name: Verify high-risk hold behavior
-        shell: bash
+      - name: Generate canonical registry receipt and Evidence Ledger record
+        run: npm run demo:registry
+      - name: Verify receipt and record exist
         run: |
-          set +e
-          node src/cli.mjs examples/laws.json examples/high-risk-context.json high-risk-receipt.json
-          status=$?
-          set -e
-          if [ "$status" -ne 3 ]; then
-            echo "Expected hold exit code 3, received $status"
-            exit 1
-          fi
-      - name: Upload policy receipts
+          test -s policy-receipt-v0.2.json
+          test -s core-os-policy-evidence-v0.1.json
+          node -e "const e=require('./core-os-policy-evidence-v0.1.json'); if(e.record_type!=='CORE_OS_POLICY_EVIDENCE') process.exit(1); if(e.inherited_law.sync_status!=='PINNED_SNAPSHOT') process.exit(1);"
+      - name: Preserve verification artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ocode-law-guardian-v0.1-receipts
+          name: ocode-law-guardian-v0.2-evidence
           path: |
-            law-guardian/prototype-receipt.json
-            law-guardian/high-risk-receipt.json
+            law-guardian/policy-receipt-v0.2.json
+            law-guardian/core-os-policy-evidence-v0.1.json
           if-no-files-found: error
           retention-days: 30
