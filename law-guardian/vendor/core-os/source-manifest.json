@@ -1,0 +1,14 @@
+{
+  "source_repository": "langeneggerotto-creator/langeneggerotto-creator-APEX-CORE-OS",
+  "source_paths": {
+    "registry": "registry/apex_core_os_universal_laws_registry_v1.0.json",
+    "contract": "schemas/core_os_universal_laws_contract.json"
+  },
+  "source_blob_shas": {
+    "registry": "d8e1b8e37762c1a24cb693c3db9b77baf40c26b2",
+    "contract": "9c4854db3311bf8f1ea506d169020d2170f59afd"
+  },
+  "snapshot_captured_at": "2026-07-17T23:59:00Z",
+  "sync_status": "PINNED_SNAPSHOT",
+  "truth_boundary": "This manifest proves which canonical blobs were copied into OCODE. It does not prove the private source repository has not changed since capture. A drift check is required before claiming current canonical synchronization."
+}
