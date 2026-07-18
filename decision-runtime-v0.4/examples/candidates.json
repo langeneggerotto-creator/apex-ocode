@@ -1,0 +1,122 @@
+{
+  "candidates": [
+    {
+      "id": "ocode-v0.4-mobile-first-second-adapter-and-decision-runtime",
+      "label": "Hosted mobile-web Dream Intake equivalence proof plus deterministic decision runtime",
+      "kind": "vision-facing",
+      "supportedDevices": ["iphone", "mobile", "safari"],
+      "requiredDependencies": [
+        { "name": "mobile browser", "status": "AVAILABLE" },
+        { "name": "GitHub-hosted source", "status": "AVAILABLE" }
+      ],
+      "credentialAssumptions": [
+        { "name": "public read access to merged preview", "status": "KNOWN" }
+      ],
+      "maintenance": {
+        "owner": "Otto with OCODE continuation package",
+        "recovery": "single self-contained HTML file retained in GitHub history",
+        "update": "regenerate from the same semantic contract and rerun CI",
+        "operatingCostStatus": "no dedicated runtime service required for bounded proof"
+      },
+      "reversibleProof": "Open the same one-screen behavior on the current iPhone browser, exercise the eight checks, and retain evidence without selecting permanent architecture.",
+      "localBuildVerified": true,
+      "deploymentVerified": false,
+      "productionValidated": false,
+      "metrics": {
+        "directVisionContribution": 10,
+        "evidenceGain": 10,
+        "successProbability": 9,
+        "userEnvironmentFit": 10,
+        "speedToProof": 10,
+        "reversibility": 10,
+        "ownership": 10,
+        "maintainability": 9,
+        "reuseValue": 10,
+        "costBurden": 1,
+        "complexity": 3,
+        "dependencyBurden": 2,
+        "governanceBurden": 2,
+        "safetyRisk": 1,
+        "lockIn": 1
+      }
+    },
+    {
+      "id": "wait-for-windows-native-expo-go-test",
+      "label": "Wait for Windows access and execute the existing Expo Go test",
+      "kind": "vision-facing",
+      "supportedDevices": ["windows"],
+      "requiredDependencies": [
+        { "name": "Windows computer", "status": "UNAVAILABLE" },
+        { "name": "Expo development server", "status": "BLOCKED" }
+      ],
+      "credentialAssumptions": [
+        { "name": "Expo Go installation", "status": "UNKNOWN" }
+      ],
+      "maintenance": {
+        "owner": "Otto",
+        "recovery": "repository and phone-preview checklist",
+        "update": "rerun Expo verification",
+        "operatingCostStatus": "low but delayed"
+      },
+      "reversibleProof": "Run the native preview when the Windows computer becomes available.",
+      "localBuildVerified": true,
+      "deploymentVerified": false,
+      "productionValidated": false,
+      "metrics": {
+        "directVisionContribution": 9,
+        "evidenceGain": 9,
+        "successProbability": 6,
+        "userEnvironmentFit": 1,
+        "speedToProof": 1,
+        "reversibility": 9,
+        "ownership": 9,
+        "maintainability": 8,
+        "reuseValue": 7,
+        "costBurden": 2,
+        "complexity": 4,
+        "dependencyBurden": 10,
+        "governanceBurden": 2,
+        "safetyRisk": 1,
+        "lockIn": 2
+      }
+    },
+    {
+      "id": "decision-runtime-only",
+      "label": "Implement the automated path engine without a user-facing phone proof",
+      "kind": "enabling",
+      "supportedDevices": ["any"],
+      "requiredDependencies": [
+        { "name": "GitHub Actions", "status": "AVAILABLE" }
+      ],
+      "credentialAssumptions": [
+        { "name": "repository write access", "status": "KNOWN" }
+      ],
+      "maintenance": {
+        "owner": "OCODE repository maintainers",
+        "recovery": "deterministic Node source and tests",
+        "update": "versioned scoring rules with receipt comparison",
+        "operatingCostStatus": "CI minutes only"
+      },
+      "reversibleProof": "Run the scoring engine against the current route candidates and inspect the receipt.",
+      "deploymentVerified": true,
+      "productionValidated": false,
+      "metrics": {
+        "directVisionContribution": 6,
+        "evidenceGain": 8,
+        "successProbability": 9,
+        "userEnvironmentFit": 10,
+        "speedToProof": 9,
+        "reversibility": 10,
+        "ownership": 10,
+        "maintainability": 10,
+        "reuseValue": 10,
+        "costBurden": 1,
+        "complexity": 4,
+        "dependencyBurden": 1,
+        "governanceBurden": 4,
+        "safetyRisk": 1,
+        "lockIn": 1
+      }
+    }
+  ]
+}

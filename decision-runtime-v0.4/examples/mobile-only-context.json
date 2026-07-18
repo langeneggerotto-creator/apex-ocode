@@ -1,0 +1,70 @@
+{
+  "contextId": "ocode-v0.4-mobile-only-rerank-2026-07-18",
+  "vision": "Enable a dreamer to express intent once and receive governed, portable, maintainable implementations across suitable platforms while preserving control and evidence.",
+  "currentBarrier": "The native Expo phone preview requires a Windows-hosted development server, while the dreamer currently has only an iPhone available.",
+  "dreamer": {
+    "desiredRole": "founder-controller assisted by autonomous builders",
+    "codingCapacity": "limited direct implementation time",
+    "learningWillingness": "learn only what is necessary for control and recovery",
+    "maximumSustainedWorkHoursPerDay": 4
+  },
+  "environment": {
+    "currentDevice": "iPhone mobile Safari",
+    "windowsComputerAvailableNow": false,
+    "browserAvailable": true,
+    "githubAccess": true,
+    "preferredInteraction": "phone-first"
+  },
+  "buildHistory": [
+    { "id": "ocode-v0.3-founder-proof", "kind": "vision-facing", "material": true },
+    { "id": "ocode-v0.3.1-expo-bundle-proof", "kind": "vision-facing", "material": true }
+  ],
+  "stopCondition": "Stop after one hosted mobile-web adapter, one deterministic decision runtime, and issue-disposition evidence. Do not add another product screen, backend, live AI, payments, authentication, native store deployment, or production certification.",
+  "policyContext": {
+    "domain": "software-builder",
+    "riskLevel": "low",
+    "tags": ["reversible-proof", "mobile-only", "founder-control"]
+  },
+  "laws": [
+    {
+      "id": "OCODE-CVP-001",
+      "title": "Closest Viable Path to Vision",
+      "tier": "MANDATORY",
+      "controlKey": "select-closest-viable-path",
+      "failureMode": "Work drifts into locally convenient tasks that do not remove the current vision barrier.",
+      "action": "Rank plausible routes and select the highest viable evidence-producing route.",
+      "evidenceRequired": ["Vision Path Selection Receipt"],
+      "appliesWhen": { "domains": ["software-builder"] }
+    },
+    {
+      "id": "OCODE-ENV-001",
+      "title": "Dreamer and Environment Fit",
+      "tier": "MANDATORY",
+      "controlKey": "assess-dreamer-environment-fit",
+      "failureMode": "A technically valid route cannot be operated by the dreamer in the current environment.",
+      "action": "Assess current device, role, capability, dependencies, ownership, and recovery before selecting a framework.",
+      "evidenceRequired": ["environment snapshot", "route comparison"],
+      "appliesWhen": { "domains": ["software-builder"] }
+    },
+    {
+      "id": "OCODE-TRUTH-001",
+      "title": "Runtime Honesty",
+      "tier": "CONSTITUTIONAL",
+      "controlKey": "preserve-runtime-truth-boundary",
+      "failureMode": "Generated or bundled software is represented as physically operated or production validated without evidence.",
+      "action": "Separate generated, tested, bundled, browser-operated, native-operated, and production-validated claims.",
+      "evidenceRequired": ["truth-status receipt"],
+      "appliesWhen": { "domains": ["software-builder"] }
+    },
+    {
+      "id": "OCODE-REVIEW-001",
+      "title": "Temporary Mobile Route Review",
+      "tier": "TEMPORARY",
+      "controlKey": "review-temporary-mobile-route",
+      "failureMode": "A temporary workaround becomes an unexamined permanent architecture.",
+      "action": "Rerank native and web routes after device evidence or Windows access changes.",
+      "reviewAt": "2026-08-18",
+      "appliesWhen": { "tags": ["mobile-only"] }
+    }
+  ]
+}

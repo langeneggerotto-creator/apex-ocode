@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#071426" />
+  <title>APEX Dream Intake — Mobile Proof</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #071426;
+      --muted: #536174;
+      --paper: #f6f2e9;
+      --card: #ffffff;
+      --line: #cfd6df;
+      --accent: #2456d8;
+      --accent-2: #6639b7;
+      --success: #08783f;
+      --warning: #a95a00;
+      --shadow: 0 18px 50px rgba(7, 20, 38, 0.12);
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--ink); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(36,86,216,.18), transparent 34rem),
+        linear-gradient(180deg, #eef3ff 0, var(--paper) 30rem);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, textarea, input { font: inherit; }
+    button { touch-action: manipulation; }
+    .shell { width: min(760px, 100%); margin: 0 auto; padding: max(22px, env(safe-area-inset-top)) 16px max(48px, env(safe-area-inset-bottom)); }
+    .hero { padding: 8px 4px 22px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 900; letter-spacing: .14em; }
+    .mark { width: 32px; height: 32px; display: grid; place-items: center; border: 2px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: 20px; }
+    h1 { margin: 18px 0 8px; max-width: 640px; font-size: clamp(34px, 9vw, 58px); line-height: .98; letter-spacing: -.045em; }
+    .lede { margin: 0; max-width: 620px; color: var(--muted); font-size: 17px; line-height: 1.5; }
+    .proof-badge { display: inline-flex; margin-top: 16px; padding: 8px 11px; border: 1px solid #9fb1da; border-radius: 999px; background: rgba(255,255,255,.72); font-size: 12px; font-weight: 800; }
+    .panel { margin-top: 16px; padding: 20px; border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,.94); box-shadow: var(--shadow); }
+    .panel h2 { margin: 0 0 6px; font-size: 22px; }
+    .helper { margin: 0 0 14px; color: var(--muted); line-height: 1.45; }
+    label { display: block; margin: 14px 0 7px; font-size: 13px; font-weight: 850; }
+    textarea { width: 100%; min-height: 132px; resize: vertical; padding: 14px; border: 1px solid #9eabbc; border-radius: 15px; background: #fff; color: var(--ink); line-height: 1.45; }
+    textarea:focus, button:focus-visible, input:focus-visible { outline: 3px solid rgba(36,86,216,.25); outline-offset: 2px; }
+    .button { width: 100%; min-height: 52px; margin-top: 12px; padding: 12px 16px; border: 0; border-radius: 14px; background: var(--ink); color: #fff; font-weight: 850; cursor: pointer; }
+    .button.secondary { border: 1px solid var(--ink); background: #fff; color: var(--ink); }
+    .button.copy { background: var(--accent-2); }
+    .button:disabled { opacity: .48; cursor: not-allowed; }
+    .status { min-height: 24px; margin: 11px 2px 0; color: var(--success); font-size: 14px; font-weight: 750; }
+    .dream-card { display: none; margin-top: 18px; padding: 18px; border: 1px solid #8da1c7; border-radius: 18px; background: #f9fbff; }
+    .dream-card.visible { display: block; }
+    .kicker { margin: 0; color: var(--accent); font-size: 11px; font-weight: 950; letter-spacing: .14em; }
+    .card-title { margin: 7px 0 14px; font-size: 26px; line-height: 1.05; }
+    .field { margin: 13px 0; }
+    .field-name { display: block; margin-bottom: 4px; color: var(--muted); font-size: 12px; font-weight: 850; text-transform: uppercase; letter-spacing: .06em; }
+    .field-value { margin: 0; font-size: 16px; line-height: 1.48; white-space: pre-wrap; }
+    .question { margin-top: 16px; padding: 15px; border-radius: 14px; background: #ece7fa; }
+    .question p { margin: 5px 0 0; font-size: 18px; line-height: 1.38; font-weight: 800; }
+    .revision { color: var(--muted); font-size: 13px; }
+    .checks { display: grid; gap: 10px; margin-top: 15px; }
+    .check { display: grid; grid-template-columns: 28px 1fr; align-items: start; gap: 8px; padding: 11px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    .check input { width: 22px; height: 22px; margin: 0; accent-color: var(--success); }
+    .check span { line-height: 1.35; }
+    .receipt { margin-top: 12px; padding: 12px; border-radius: 12px; background: #071426; color: #eaf1ff; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; display: none; }
+    .receipt.visible { display: block; }
+    .truth { margin-top: 16px; padding: 13px; border-left: 4px solid var(--warning); background: #fff7ea; color: #683b00; font-size: 13px; line-height: 1.45; }
+    footer { margin-top: 20px; padding: 0 4px; color: #667286; font-size: 12px; line-height: 1.45; }
+    @media (min-width: 680px) { .checks { grid-template-columns: 1fr 1fr; } .panel { padding: 28px; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="brand"><span class="mark" aria-hidden="true">∞</span> APEX DREAM BUILDER</div>
+      <h1>Turn your dream into a card you control.</h1>
+      <p class="lede">Enter the dream in your own words, save it locally, correct the interpretation, and receive exactly one next question.</p>
+      <span class="proof-badge">OCODE v0.4 · mobile-web second-adapter proof</span>
+    </header>
+
+    <section class="panel" aria-labelledby="intake-heading">
+      <h2 id="intake-heading">Dream Intake</h2>
+      <p class="helper">This bounded proof stores the draft only in this browser. It does not send your dream to a server.</p>
+
+      <label for="dream-input">Describe your dream</label>
+      <textarea id="dream-input" maxlength="5000" placeholder="I want to…" autocomplete="off"></textarea>
+      <button class="button" id="save-review" type="button">Save and review my Dream Card</button>
+      <div class="status" id="status" role="status" aria-live="polite">Tell APEX about your dream.</div>
+
+      <article class="dream-card" id="dream-card" aria-live="polite">
+        <p class="kicker">DREAM CARD</p>
+        <h3 class="card-title" id="card-title"></h3>
+        <div class="field"><span class="field-name">Your original words</span><p class="field-value" id="original-dream"></p></div>
+        <div class="field"><span class="field-name">Current interpretation</span><p class="field-value" id="interpreted-outcome"></p></div>
+        <div class="field"><span class="field-name">Success signal</span><p class="field-value">You confirm that this interpretation feels accurate.</p></div>
+
+        <label for="correction-input">Correct the interpretation</label>
+        <textarea id="correction-input" placeholder="Correct anything that does not feel right"></textarea>
+        <button class="button secondary" id="apply-correction" type="button">Apply my correction</button>
+        <p class="revision" id="revision-count">Preserved corrections: 0</p>
+
+        <div class="question" id="one-next-question">
+          <span class="field-name">One next question</span>
+          <p>What would be the clearest real-world sign that this dream has come true?</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel" aria-labelledby="proof-heading">
+      <h2 id="proof-heading">Phone evidence checklist</h2>
+      <p class="helper">Complete these checks on the current iPhone. The receipt records browser proof only.</p>
+      <div class="checks" id="checks">
+        <label class="check"><input type="checkbox" data-check="screen-launch"><span>The screen launches.</span></label>
+        <label class="check"><input type="checkbox" data-check="dream-entry"><span>Dream entry works.</span></label>
+        <label class="check"><input type="checkbox" data-check="draft-save"><span>The draft saves.</span></label>
+        <label class="check"><input type="checkbox" data-check="dream-card"><span>The Dream Card appears.</span></label>
+        <label class="check"><input type="checkbox" data-check="original-preserved"><span>Original words remain unchanged.</span></label>
+        <label class="check"><input type="checkbox" data-check="correction"><span>Correction changes only the interpretation.</span></label>
+        <label class="check"><input type="checkbox" data-check="one-question"><span>Exactly one next question appears.</span></label>
+        <label class="check"><input type="checkbox" data-check="draft-restore"><span>The draft restores after closing and reopening.</span></label>
+      </div>
+      <button class="button copy" id="create-receipt" type="button" disabled>Create and copy evidence receipt</button>
+      <pre class="receipt" id="receipt"></pre>
+      <div class="truth"><strong>Truth boundary:</strong> a passing receipt proves interaction in this mobile browser with this web adapter. It does not prove native Expo Go launch, native binary behavior, production security, or permanent architecture suitability.</div>
+    </section>
+
+    <footer>Build: OCODE_v0.4_MOBILE_FIRST_DECISION_RUNTIME_AND_SECOND_ADAPTER_PROOF · Same one-screen semantic behavior · No backend · No live AI · No account required</footer>
+  </main>
+
+  <script id="ocode-semantic-contract" type="application/json">{
+    "contractId": "dream-intake-v0.4-mobile-web-equivalence",
+    "requiredBehaviors": [
+      "dream_entry",
+      "draft_persistence",
+      "structured_dream_card",
+      "dreamer_correction_preserves_original",
+      "exactly_one_next_question"
+    ],
+    "truthBoundary": "browser interaction is not native Expo or production validation"
+  }</script>
+  <script>
+    (() => {
+      'use strict';
+      const DRAFT_KEY = 'apex.dream-builder.dream-intake.draft.v0.4.web';
+      const CHECK_KEY = 'apex.dream-builder.dream-intake.checks.v0.4.web';
+      const input = document.querySelector('#dream-input');
+      const correctionInput = document.querySelector('#correction-input');
+      const cardElement = document.querySelector('#dream-card');
+      const statusElement = document.querySelector('#status');
+      const receiptElement = document.querySelector('#receipt');
+      const receiptButton = document.querySelector('#create-receipt');
+      let card = null;
+
+      function normalize(value) { return String(value ?? '').trim().replace(/\s+/g, ' '); }
+      function createCard(rawDream) {
+        const dream = normalize(rawDream);
+        if (!dream) throw new Error('Please enter a dream before creating the Dream Card.');
+        const words = dream.replace(/[.!?]+$/g, '').split(' ');
+        const shortTitle = words.slice(0, 7).join(' ');
+        return {
+          title: shortTitle.length < dream.length ? `${shortTitle}…` : shortTitle,
+          originalDream: dream,
+          interpretedOutcome: dream,
+          revisionHistory: []
+        };
+      }
+      function renderCard() {
+        if (!card) return;
+        document.querySelector('#card-title').textContent = card.title;
+        document.querySelector('#original-dream').textContent = card.originalDream;
+        document.querySelector('#interpreted-outcome').textContent = card.interpretedOutcome;
+        document.querySelector('#revision-count').textContent = `Preserved corrections: ${card.revisionHistory.length}`;
+        cardElement.classList.add('visible');
+      }
+      function setStatus(message, isError = false) {
+        statusElement.textContent = message;
+        statusElement.style.color = isError ? '#a22121' : '#08783f';
+      }
+
+      const restored = localStorage.getItem(DRAFT_KEY);
+      if (restored) {
+        input.value = restored;
+        setStatus('Your saved draft was restored in this browser.');
+      }
+
+      document.querySelector('#save-review').addEventListener('click', () => {
+        try {
+          card = createCard(input.value);
+          localStorage.setItem(DRAFT_KEY, card.originalDream);
+          renderCard();
+          setStatus('Draft saved. Review and correct the Dream Card below.');
+        } catch (error) {
+          setStatus(error instanceof Error ? error.message : 'Unable to create the Dream Card.', true);
+        }
+      });
+
+      document.querySelector('#apply-correction').addEventListener('click', () => {
+        if (!card) return setStatus('Create the Dream Card before applying a correction.', true);
+        const correction = normalize(correctionInput.value);
+        if (!correction) return setStatus('Enter a correction before applying it.', true);
+        card = {
+          ...card,
+          interpretedOutcome: correction,
+          revisionHistory: [...card.revisionHistory, { correction, appliedAt: new Date().toISOString() }]
+        };
+        correctionInput.value = '';
+        renderCard();
+        setStatus('Correction applied. Your original words remain preserved.');
+      });
+
+      const checkboxes = [...document.querySelectorAll('[data-check]')];
+      const savedChecks = JSON.parse(localStorage.getItem(CHECK_KEY) || '{}');
+      checkboxes.forEach((box) => { box.checked = Boolean(savedChecks[box.dataset.check]); });
+
+      function updateChecks() {
+        const state = Object.fromEntries(checkboxes.map((box) => [box.dataset.check, box.checked]));
+        localStorage.setItem(CHECK_KEY, JSON.stringify(state));
+        receiptButton.disabled = !checkboxes.every((box) => box.checked);
+      }
+      checkboxes.forEach((box) => box.addEventListener('change', updateChecks));
+      updateChecks();
+
+      receiptButton.addEventListener('click', async () => {
+        const receipt = {
+          schemaVersion: 'ocode.mobile-browser-proof-receipt.v0.4',
+          build: 'OCODE_v0.4_MOBILE_FIRST_DECISION_RUNTIME_AND_SECOND_ADAPTER_PROOF',
+          sourceUrl: location.href,
+          executedAt: new Date().toISOString(),
+          environment: {
+            userAgent: navigator.userAgent,
+            language: navigator.language,
+            viewport: `${window.innerWidth}x${window.innerHeight}`
+          },
+          checks: Object.fromEntries(checkboxes.map((box) => [box.dataset.check, box.checked ? 'PASS' : 'FAIL'])),
+          result: checkboxes.every((box) => box.checked) ? 'PASS' : 'FAIL',
+          truthStatus: 'PHYSICAL_IPHONE_BROWSER_INTERACTION_SELF_REPORTED__NATIVE_EXPO_NOT_PROVEN'
+        };
+        const text = JSON.stringify(receipt, null, 2);
+        receiptElement.textContent = text;
+        receiptElement.classList.add('visible');
+        try {
+          await navigator.clipboard.writeText(text);
+          setStatus('Evidence receipt created and copied. Paste it into the project conversation.');
+        } catch {
+          setStatus('Evidence receipt created. Copy the visible JSON and paste it into the project conversation.');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

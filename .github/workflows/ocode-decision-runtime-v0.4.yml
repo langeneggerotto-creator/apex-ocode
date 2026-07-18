@@ -1,0 +1,47 @@
+name: OCODE v0.4 Mobile-First Decision Runtime
+
+on:
+  pull_request:
+    paths:
+      - 'decision-runtime-v0.4/**'
+      - 'universal-wrapper/mobile-web-preview/**'
+      - '.github/workflows/ocode-decision-runtime-v0.4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-mobile-first-runtime:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: decision-runtime-v0.4
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run decision runtime, law compiler, registry, evidence, and mobile-adapter verification
+        run: npm run verify
+
+      - name: Confirm generated path receipt
+        shell: bash
+        run: |
+          test -s evidence/current-path-receipt.json
+          grep -q 'ocode-v0.4-mobile-first-second-adapter-and-decision-runtime' evidence/current-path-receipt.json
+          grep -q 'PROCEED_WITH_SELECTED_ROUTE' evidence/current-path-receipt.json
+
+      - name: Preserve decision and mobile-proof artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocode-v0.4-mobile-first-decision-and-second-adapter-proof
+          path: |
+            decision-runtime-v0.4/evidence/current-path-receipt.json
+            universal-wrapper/mobile-web-preview/index.html
+            decision-runtime-v0.4/README.md
+          if-no-files-found: error
+          retention-days: 30
