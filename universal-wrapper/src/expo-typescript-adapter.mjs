@@ -30,7 +30,7 @@ export function createDreamCard(rawDream: string): DreamCard {
   const words = dream.replace(/[.!?]+$/g, '').split(' ');
   const title = words.slice(0, 7).join(' ');
   return {
-    title: title.length < dream.length ? \`${title}…\` : title,
+    title: title.length < dream.length ? title + '…' : title,
     originalDream: dream,
     interpretedOutcome: dream,
     successSignal: 'The dreamer confirms that this interpretation feels accurate.',
