@@ -1,0 +1,32 @@
+name: OCODE Universal Wrapper v0.3 Founder Proof
+
+on:
+  pull_request:
+    paths:
+      - 'universal-wrapper/**'
+      - '.github/workflows/ocode-universal-wrapper-v0.3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  founder-proof:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: universal-wrapper
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run complete founder proof
+        run: npm test
+      - name: Preserve generated proof package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocode-universal-wrapper-v0.3-dream-intake-proof
+          path: universal-wrapper/proofs/dream-intake-v0.3
+          if-no-files-found: error
+          retention-days: 30

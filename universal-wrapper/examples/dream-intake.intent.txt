@@ -1,0 +1,1 @@
+Create a phone-first Dream Intake screen where a dreamer can enter a dream, save it, review a structured Dream Card, correct the interpretation, and receive exactly one next question.

@@ -1,0 +1,51 @@
+{
+  "build": "OCODE_UNIVERSAL_WRAPPER_v0.3_FOUNDER_PROOF_VERTICAL_SLICE",
+  "verified_at": "2026-07-18T05:49:58Z",
+  "truth_status": "IMPLEMENTED_AND_AUTOMATED_TESTS_PASS__ONE_ADAPTER_ONLY__NOT_DEVICE_OR_PRODUCTION_VALIDATED",
+  "local_runtime": "Node.js v22.16.0",
+  "tests": {
+    "wrapper_tests": {"passed": 8, "failed": 0},
+    "generated_typescript_behavior_tests": {"passed": 4, "failed": 0},
+    "proof_validator": "PASS",
+    "github_actions": {
+      "workflow": "OCODE Universal Wrapper v0.3 Founder Proof",
+      "run_id": 29632930630,
+      "run_number": 2,
+      "conclusion": "SUCCESS",
+      "verified_head_sha": "8c2cba7523469fcf451a405894f3db76558f4c83"
+    }
+  },
+  "proof_artifact": {
+    "name": "ocode-universal-wrapper-v0.3-dream-intake-proof",
+    "artifact_id": 8426095719,
+    "size_bytes": 14216,
+    "digest": "sha256:ac3de2a79e5065302504084251aca5926dadfe76c7e46ff8272ff91cfcc2a021",
+    "expires_at": "2026-08-17T05:49:57Z"
+  },
+  "scope": "one intent, one Dream Intake screen, one Expo/TypeScript adapter, one test suite, one reconstruction, one continuation package",
+  "vision_progress_actual": [
+    "Natural-language intent is converted into a platform-neutral semantic contract.",
+    "A minimum applicable law set is compiled into fewer visible control groups.",
+    "One replaceable adapter generates real TypeScript and React Native source.",
+    "Generated model and persistence behavior executes under automated tests.",
+    "Five critical behaviors survive the bounded manifest-assisted reconstruction cycle.",
+    "A portable continuation package and evidence receipt are generated."
+  ],
+  "new_weakest_barrier": "The generated React Native screen has not yet been bundled by Expo or executed on Otto's actual iPhone, so runtime and founder-control usability remain unproven.",
+  "reassessment_required": true,
+  "next_path_candidates": [
+    "Expo bundle and phone preview of the same one-screen proof",
+    "Independent second adapter reproducing the same semantic contract",
+    "Repair any founder-control or maintainability issue discovered during review"
+  ],
+  "not_claimed": [
+    "Expo bundling or simulator compilation",
+    "iPhone or Android device runtime",
+    "production readiness",
+    "arbitrary code understanding",
+    "universal language support",
+    "permanent selection of Expo as the Dream Builder architecture"
+  ],
+  "stop_condition": "SATISFIED__NO_ADDITIONAL_SCREEN_ADAPTER_BACKEND_OR_DEPLOYMENT_SCOPE_ADDED",
+  "truth_boundary": "Automated evidence proves deterministic generation, Node-executed model and storage behavior, structural screen checks, and one bounded reconstruction pattern. It does not prove device execution, production operation, or universal translation."
+}
