@@ -1,0 +1,50 @@
+name: OCODE Universal Wrapper v0.3.1 Phone Preview
+
+on:
+  pull_request:
+    paths:
+      - 'universal-wrapper/phone-preview/**'
+      - '.github/workflows/ocode-universal-wrapper-v0.3.1-phone-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-phone-preview-project:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: universal-wrapper/phone-preview
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install bounded preview dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Run Expo doctor, TypeScript, behavior tests, and native exports
+        run: npm run verify
+
+      - name: Confirm generated evidence
+        shell: bash
+        run: |
+          test -s evidence/native-export-verification.json
+          test -d dist-ios
+          test -d dist-android
+
+      - name: Preserve iOS and Android export evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocode-dream-intake-v0.3.1-expo-native-exports
+          path: |
+            universal-wrapper/phone-preview/dist-ios
+            universal-wrapper/phone-preview/dist-android
+            universal-wrapper/phone-preview/evidence/native-export-verification.json
+            universal-wrapper/phone-preview/PHONE_PREVIEW.md
+          if-no-files-found: error
+          retention-days: 30
