@@ -1,6 +1,6 @@
 # OCODE Universal Wrapper v0.3 — Founder Proof Vertical Slice
 
-Truth status: `IMPLEMENTED_AND_AUTOMATED_TESTS_PASS__ONE_ADAPTER_ONLY__NOT_DEVICE_OR_PRODUCTION_VALIDATED`
+Truth status: `IMPLEMENTED_AND_AUTOMATED_TESTS_PASS__ONE_ADAPTER_ONLY__DEVICE_PREVIEW_PENDING`
 
 This package proves one bounded OCODE round trip:
 
@@ -29,7 +29,7 @@ After an npm link, the equivalent command is:
 ocode build examples/dream-intake.intent.txt --adapter expo-typescript --out proofs/dream-intake-v0.3
 ```
 
-## Verify
+## Verify the founder proof
 
 ```bash
 npm test
@@ -37,7 +37,7 @@ npm test
 
 No production credentials, backend, live AI API, customer data, store account, or physical-device access is required.
 
-## What the proof establishes
+## What the founder proof establishes
 
 - One natural-language instruction generates the complete required artifact package.
 - The semantic contract contains no target-language or target-framework assumptions.
@@ -47,10 +47,41 @@ No production credentials, backend, live AI API, customer data, store account, o
 - Claims clearly distinguish generated source, Node-tested behavior, structural screen validation, device runtime, and production operation.
 - `CONTINUATION.md` gives another compatible builder the regeneration command, proof boundary, stop condition, and next decision.
 
-## What it does not establish
+## Bounded Expo phone-preview proof
 
-- Expo bundling or simulator compilation.
-- Installation or operation on Otto's iPhone.
+The selected next proof is implemented under:
+
+```text
+universal-wrapper/phone-preview/
+```
+
+It reuses the same single Dream Intake behavior and adds only:
+
+- a minimal Expo SDK 54 application shell;
+- strict TypeScript checking;
+- Expo Doctor verification;
+- iOS and Android JavaScript bundle exports;
+- a physical-iPhone validation checklist.
+
+Run its automated verification from `universal-wrapper/phone-preview/`:
+
+```bash
+npm install
+npm run verify
+```
+
+Open the same screen in Expo Go with:
+
+```bash
+npm run phone
+```
+
+The physical-phone result remains pending until `PHONE_PREVIEW.md` is executed against an identified commit.
+
+## What is not yet established
+
+- Launch and interaction on Otto's physical iPhone.
+- Native `.ipa` or `.apk` compilation.
 - App Store or Google Play release.
 - Production security, privacy, identity, backend, payments, or support.
 - Arbitrary code understanding.
@@ -59,4 +90,4 @@ No production credentials, backend, live AI API, customer data, store account, o
 
 ## Stop condition
 
-This build stops after one screen, one adapter, one generated test suite, one reconstruction, one evidence receipt, and one continuation package. Additional screens, adapters, infrastructure, or deployment are separate decisions requiring path re-ranking.
+The founder proof and phone-preview extension remain limited to one screen, one adapter, one generated test suite, one reconstruction, one bundle-verification path, and one continuation package. Additional screens, adapters, infrastructure, or deployment are separate decisions requiring path re-ranking.
