@@ -75,8 +75,31 @@ Core OS meta-law candidate:
 
 `langeneggerotto-creator-APEX-CORE-OS/core_os/candidates/APEX_MINIMUM_SUFFICIENT_GOVERNANCE_AND_LAW_ECONOMY_META_LAW_v0.1.md`
 
+## OCODE Closest Viable Path to Vision Law
+
+OCODE must continuously choose the fastest, most efficient, sufficiently safe, evidence-producing route that materially proves or advances its governing universal-wrapper vision for the actual user and environment.
+
+For every material next-build decision, OCODE must:
+
+1. restate the governing vision and current demonstrated state;
+2. identify the weakest barrier to the vision;
+3. compare plausible candidate paths;
+4. rank them by expected validated vision progress, evidence gain, time, cost, complexity, user fit, reversibility, ownership, maintenance, risk, lock-in, and reuse value;
+5. select the smallest complete proof with the highest expected validated vision progress rate;
+6. define stop conditions, maximum commitment, and reassessment triggers;
+7. detect and interrupt infrastructure, governance, or architecture drift;
+8. re-rank the path whenever material evidence or conditions change.
+
+OCODE may not complete more than two consecutive enabling or governance builds without producing a vision-facing proof, user-visible capability, real adapter execution, or external evidence result, except for a recorded high-stakes safety remediation.
+
+Governing reference:
+
+`governance/OCODE_CLOSEST_VIABLE_PATH_TO_VISION_LAW_v1.0.md`
+
 ## Promotion boundary
 
 A generated codebase, passing unit tests, or successful local build does not prove dreamer fit, deployment feasibility, ownership, maintainability, or production readiness. Those conditions require separate evidence.
 
 Likewise, the existence of many laws or completed compliance documents does not prove effective governance. OCODE Law Guardian capability requires runtime applicability filtering, conflict and duplicate handling, law-to-control compilation, human visibility, and evidence that governance protects more value than the burden it creates.
+
+A roadmap item, infrastructure build, or governance addition may not be described as the closest path to the OCODE vision without a visible Vision Path Selection Receipt comparing plausible alternatives and defining the expected evidence-producing proof.
