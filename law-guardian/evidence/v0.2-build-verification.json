@@ -1,0 +1,43 @@
+{
+  "build": "OCODE_LAW_GUARDIAN_v0.2_REGISTRY_ADAPTER_AND_EVIDENCE_RECEIPT",
+  "verified_at": "2026-07-18T05:14:00Z",
+  "truth_status": "IMPLEMENTED_AND_GITHUB_ACTIONS_TESTED__PINNED_REGISTRY_ADAPTER__NOT_PRODUCTION_VALIDATED",
+  "repository": "langeneggerotto-creator/apex-ocode",
+  "pull_request": 4,
+  "verified_head_sha": "f4212af11c926a63e88838be99f70540a60855bb",
+  "workflow": {
+    "name": "OCODE Law Guardian v0.2",
+    "run_id": 29631884339,
+    "conclusion": "success"
+  },
+  "tests": {
+    "defined": 16,
+    "passed_by_ci": 16,
+    "failed_by_ci": 0
+  },
+  "verified_capabilities": [
+    "canonical registry and contract consistency validation",
+    "all 24 canonical laws mapped one-to-one",
+    "canonical laws compiled into fewer user-facing control groups",
+    "pinned versus stale snapshot truth status",
+    "registry and contract drift blocking",
+    "missing policy mapping blocking",
+    "Evidence Ledger compatible record generation",
+    "formal schema validation",
+    "truth boundary preventing runtime-enforcement overclaim"
+  ],
+  "cross_repository_contract": {
+    "repository": "langeneggerotto-creator/apex-evidence-ledger",
+    "path": "schemas/core-os-policy-evidence-record-v0.1.schema.json",
+    "source_blob_sha": "f892e5a1fe65be1a63b1b2c347a6d7ccffc4d85f"
+  },
+  "limitations": [
+    "Default canonical input is a pinned snapshot, not live private-repository synchronization",
+    "Evidence record is produced as a file but not written through an Evidence Ledger storage API",
+    "Runtime controls are selected but not executed",
+    "Policy mapping and burden/protection estimates require human calibration",
+    "No graphical Active Law Receipt interface",
+    "No production validation"
+  ],
+  "next_build": "OCODE_LAW_GUARDIAN_v0.3_AUTHENTICATED_SYNC_AND_EVIDENCE_LEDGER_WRITER"
+}
