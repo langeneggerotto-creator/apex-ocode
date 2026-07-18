@@ -1,0 +1,15 @@
+{
+  "name": "@apex/ocode-law-guardian",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Minimum-sufficient, risk-proportionate law selection and policy compilation for OCODE.",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "demo": "node src/cli.mjs examples/laws.json examples/prototype-context.json",
+    "demo:high-risk": "node src/cli.mjs examples/laws.json examples/high-risk-context.json"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

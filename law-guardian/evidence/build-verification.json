@@ -1,0 +1,35 @@
+{
+  "build": "OCODE_LAW_GUARDIAN_AND_POLICY_COMPILER_v0.1",
+  "verified_at": "2026-07-17",
+  "truth_status": "IMPLEMENTED_AND_LOCALLY_TESTED__LIMITED_VERTICAL_SLICE__NOT_PRODUCTION_VALIDATED",
+  "runtime": "Node.js v22.16.0",
+  "test_command": "npm test",
+  "tests": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0
+  },
+  "verified_behaviors": [
+    "low-risk reversible prototypes receive a minimum active law set",
+    "high-stakes constitutional protections cannot be removed due to burden",
+    "duplicate laws compile to one control group with source traceability",
+    "binding nonmandatory rules without failure modes are downgraded",
+    "expired temporary rules are inactive",
+    "material conflicts require human review",
+    "unknown risk is not treated as ready",
+    "receipts expose active controls, metrics, inactive laws, and appeal rights"
+  ],
+  "demo_results": {
+    "prototype": "PROCEED_WITH_CONTROLS",
+    "high_risk": "HOLD_FOR_HUMAN_REVIEW"
+  },
+  "limitations": [
+    "No semantic AI context classifier",
+    "No automatic Core OS registry adapter",
+    "No Evidence Ledger write connector",
+    "No user interface",
+    "No production or cross-repository runtime validation",
+    "Burden and protection values are configured estimates"
+  ],
+  "next_build": "OCODE_LAW_GUARDIAN_v0.2_REGISTRY_ADAPTER_AND_EVIDENCE_RECEIPT"
+}

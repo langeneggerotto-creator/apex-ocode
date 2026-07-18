@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://apex.local/ocode/law-guardian/law.schema.json",
+  "title": "OCODE Governed Law Record",
+  "type": "object",
+  "required": ["id", "title", "tier", "failureMode", "controls"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "tier": {"type": "integer", "minimum": 0, "maximum": 5},
+    "constitutional": {"type": "boolean"},
+    "mandatory": {"type": "boolean"},
+    "domains": {"type": "array", "items": {"type": "string"}},
+    "modes": {"type": "array", "items": {"type": "string"}},
+    "riskLevels": {"type": "array", "items": {"type": "string"}},
+    "triggers": {"type": "array", "items": {"type": "string"}},
+    "failureMode": {"type": "string", "minLength": 1},
+    "protectedValue": {"type": "string"},
+    "controls": {"type": "array", "items": {"type": "string"}},
+    "requiredEvidence": {"type": "array", "items": {"type": "string"}},
+    "mergeKey": {"type": "string"},
+    "conflictsWith": {"type": "array", "items": {"type": "string"}},
+    "burden": {"type": "number", "minimum": 0, "maximum": 10},
+    "protection": {"type": "number", "minimum": 0, "maximum": 10},
+    "reviewDate": {"type": ["string", "null"], "format": "date-time"},
+    "expiryDate": {"type": ["string", "null"], "format": "date-time"},
+    "source": {"type": "string"}
+  },
+  "additionalProperties": true
+}
