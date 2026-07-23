@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "ocode.scope-receipt.v0.6",
+  "build": "OCODE_v0.6_PERSISTENT_GOVERNED_TERMINAL_SESSION_KERNEL",
+  "decision": "BUILD_ONE_SMALL_STATE_KERNEL_BEFORE_REAL_TERMINAL_EXECUTION",
+  "included": [
+    "workspace confinement",
+    "command admission policy",
+    "persistent session lifecycle",
+    "atomic JSON storage",
+    "hash-linked evidence events",
+    "deterministic tests"
+  ],
+  "excluded": [
+    "process spawning",
+    "PTY allocation",
+    "WebSocket transport",
+    "terminal UI",
+    "container provisioning",
+    "network access",
+    "production readiness"
+  ],
+  "stopCondition": "Stop after the session state kernel and tests pass. Do not attach a real shell or user interface in this build.",
+  "truthStatus": "DESIGNED_FOR_VERIFICATION__CI_PENDING"
+}
