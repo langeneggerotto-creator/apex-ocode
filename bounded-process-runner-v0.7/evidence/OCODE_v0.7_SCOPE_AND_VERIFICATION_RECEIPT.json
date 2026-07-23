@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "ocode.scope-and-verification-receipt.v0.7",
+  "build": "OCODE_v0.7_BOUNDED_LINUX_PROCESS_RUNNER",
+  "baseBuild": "OCODE_v0.6_PERSISTENT_GOVERNED_TERMINAL_SESSION_KERNEL",
+  "decision": "ATTACH_ONE_NON_INTERACTIVE_FAIL_CLOSED_LINUX_PROCESS_RUNNER",
+  "implementedControls": [
+    "v0.6 command admission before spawn",
+    "shell-false direct process execution",
+    "logical and physical workspace cwd validation",
+    "user namespace",
+    "mount namespace",
+    "PID namespace",
+    "network namespace",
+    "chroot workspace boundary",
+    "read-only host toolchain mounts",
+    "private tmpfs",
+    "default and mandatory network denial",
+    "timeout termination",
+    "AbortSignal cancellation",
+    "combined output byte limit",
+    "structured execution result",
+    "session transcript evidence",
+    "fail-closed sandbox capability handling"
+  ],
+  "localVerification": {
+    "runtime": "Node.js v22.16.0",
+    "tests": 9,
+    "passed": 9,
+    "failed": 0,
+    "result": "PASS"
+  },
+  "githubActionsVerification": {
+    "workflow": "OCODE v0.7 Bounded Process Runner",
+    "runId": 29969800229,
+    "runner": "ubuntu-latest",
+    "result": "PASS"
+  },
+  "excluded": [
+    "PTY allocation",
+    "interactive shell",
+    "Studio interface",
+    "WebSocket transport",
+    "Windows sandbox backend",
+    "macOS sandbox backend",
+    "network-enabled execution",
+    "cgroup resource limits",
+    "seccomp filtering",
+    "remote execution",
+    "production readiness"
+  ],
+  "stopCondition": "Stop after one bounded non-interactive runner proves timeout, cancellation, output, workspace, and network boundaries. Do not add PTY or Studio UI in v0.7.",
+  "truthStatus": "IMPLEMENTED_AND_VERIFIED__LOCAL_AND_GITHUB_ACTIONS__NOT_PRODUCTION_READY"
+}

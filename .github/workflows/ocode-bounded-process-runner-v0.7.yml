@@ -1,0 +1,59 @@
+name: OCODE v0.7 Bounded Process Runner
+
+on:
+  pull_request:
+    paths:
+      - 'bounded-process-runner-v0.7/**'
+      - 'terminal-session-v0.6/**'
+      - '.github/workflows/ocode-bounded-process-runner-v0.7.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-bounded-process-runner:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bounded-process-runner-v0.7
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Probe required Linux namespace capability
+        id: namespace
+        shell: bash
+        run: |
+          uname -a
+          command -v unshare
+          command -v mount
+          command -v chroot
+          if unshare --user --map-root-user --mount --net --pid --fork true; then
+            echo 'mode=unprivileged' >> "$GITHUB_OUTPUT"
+          elif sudo unshare --user --map-root-user --mount --net --pid --fork true; then
+            echo 'mode=privileged-ci-worker' >> "$GITHUB_OUTPUT"
+          else
+            echo 'Neither unprivileged nor privileged Linux namespace execution is available.' >&2
+            exit 1
+          fi
+
+      - name: Verify bounded runner controls
+        shell: bash
+        run: |
+          if [ '${{ steps.namespace.outputs.mode }}' = 'unprivileged' ]; then
+            npm run verify
+          else
+            sudo env "PATH=$PATH" "$(command -v npm)" run verify
+          fi
+
+      - name: Verify scope boundary and evidence receipt
+        shell: bash
+        run: |
+          node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('evidence/OCODE_v0.7_SCOPE_AND_VERIFICATION_RECEIPT.json','utf8')); if(r.localVerification.result!=='PASS'||!r.excluded.includes('Studio interface')||!r.excluded.includes('PTY allocation')) process.exit(1);"
+          grep -q 'NO_STUDIO_UI' README.md
+          grep -q 'Network inheritance requests fail before spawn' README.md
