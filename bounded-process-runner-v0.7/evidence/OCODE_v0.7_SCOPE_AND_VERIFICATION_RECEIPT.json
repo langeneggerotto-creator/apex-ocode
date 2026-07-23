@@ -29,6 +29,12 @@
     "failed": 0,
     "result": "PASS"
   },
+  "githubActionsVerification": {
+    "workflow": "OCODE v0.7 Bounded Process Runner",
+    "runId": 29969800229,
+    "runner": "ubuntu-latest",
+    "result": "PASS"
+  },
   "excluded": [
     "PTY allocation",
     "interactive shell",
@@ -43,5 +49,5 @@
     "production readiness"
   ],
   "stopCondition": "Stop after one bounded non-interactive runner proves timeout, cancellation, output, workspace, and network boundaries. Do not add PTY or Studio UI in v0.7.",
-  "truthStatus": "IMPLEMENTED_AND_LOCALLY_VERIFIED__GITHUB_CI_PENDING"
+  "truthStatus": "IMPLEMENTED_AND_VERIFIED__LOCAL_AND_GITHUB_ACTIONS__NOT_PRODUCTION_READY"
 }
