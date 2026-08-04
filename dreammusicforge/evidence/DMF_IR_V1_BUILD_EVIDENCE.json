@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "ocode.dreammusicforge-build-evidence.v0.1",
+  "build": "DMF-OCODE-001-DMF-IR-V1",
+  "taskId": "DMF-OCODE-001",
+  "delegationContract": "dreammusicforge/governance/DELEGATION_CONTRACT.yaml",
+  "evidenceType": "DETERMINISTIC_TEST_EXECUTION_AND_SOURCE_MANIFEST",
+  "objective": "Implement dreammusicforge/dmf_ir (schema, validator, models, compiler, tests) as the canonical, provider-neutral DMF-IR v1 source of truth, additive to the existing runtime.py baseline.",
+  "sourceManifest": [
+    {"path": "dreammusicforge/dmf_ir/__init__.py", "lines": 31, "sha256": "ba929d8dc1ed0eb933ef3638e4d3d2b403fac5476e66456c25bd4dc29d05669f"},
+    {"path": "dreammusicforge/dmf_ir/schema.py", "lines": 101, "sha256": "d297583eee1448b9e76585cfb00fa9ee4a4e5b1829bbe77a133e6489bf942f32"},
+    {"path": "dreammusicforge/dmf_ir/models.py", "lines": 199, "sha256": "b11ca35b6c6857b0819b522a2a41dccdcb66c6065fa91ee1e438ad1ce9410e4e"},
+    {"path": "dreammusicforge/dmf_ir/validator.py", "lines": 195, "sha256": "e6257bdc8d65ee4297d80c3e3829a6c386df6dc3a730b93e57cc85d35bccf422"},
+    {"path": "dreammusicforge/dmf_ir/compiler.py", "lines": 117, "sha256": "ad78f18aaf32217622af9c76c5f4fa3e95e0bd084b4db27a082aa61af8bb9294"},
+    {"path": "dreammusicforge/dmf_ir/tests/test_dmf_ir.py", "lines": 211, "sha256": "b53ed7ac0b525f448b4b91402e918327b0b75254760a5b9f267e8fceb3d70e08"}
+  ],
+  "modifiedFiles": [
+    {"path": "dreammusicforge/TESTING.md", "change": "documented the second test-discovery command and the new DMF-IR test categories; did not alter the existing runtime.py test instructions"}
+  ],
+  "unmodifiedFiles": [
+    "dreammusicforge/runtime.py",
+    "dreammusicforge/tests/test_runtime.py",
+    "dreammusicforge/examples/begin_again_project.json",
+    "dreammusicforge/governance/DELEGATION_CONTRACT.yaml",
+    "dreammusicforge/__init__.py"
+  ],
+  "testLog": "dreammusicforge/evidence/dmf_ir_v1_test_log.txt",
+  "testSummary": {
+    "dreammusicforge/tests": {"command": "python -m unittest discover -s dreammusicforge/tests -v", "result": "6 passed, 0 failed"},
+    "dreammusicforge/dmf_ir/tests": {"command": "python -m unittest discover -s dreammusicforge/dmf_ir/tests -v", "result": "22 passed, 0 failed"}
+  },
+  "requiredTestsMapping": {
+    "DMF-IR validation": "DMFIRSchemaValidationTests + DMFIRNewSemanticChecksTests in dreammusicforge/dmf_ir/tests/test_dmf_ir.py",
+    "clip state inheritance": "DMFIRClipStateInheritanceTests in dreammusicforge/dmf_ir/tests/test_dmf_ir.py",
+    "Kling provider compilation": "DMFIRProviderNeutralCompilationTests in dreammusicforge/dmf_ir/tests/test_dmf_ir.py -- expressed provider-neutrally (the Continuity Compiler stage), plus test_runtime_still_validates_and_compiles_the_same_example re-running runtime.compile_kling_packages directly as a regression guard",
+    "final-frame handoff generation": "test_last_frame_seed_handoff_is_provider_neutral in dreammusicforge/dmf_ir/tests/test_dmf_ir.py"
+  },
+  "newChecksBeyondRuntimePy": [
+    "a continuity mode requiring a predecessor cannot appear on the first clip in the timeline",
+    "film.duration_seconds must match the last clip's end time",
+    "the music timeline must be contiguous (no gaps or overlaps) and must span the full film duration",
+    "a clip's source/destination reality-state timecodes must match the clip's own start/end",
+    "semantic and music events attached to a clip must actually overlap that clip's time window",
+    "required_reference_assets must resolve to a known character or world id",
+    "verification-contract pass_threshold must be in (0, 1]"
+  ],
+  "statusLabels": {
+    "dmf_ir.schema": "IMPLEMENTED",
+    "dmf_ir.models": "IMPLEMENTED",
+    "dmf_ir.validator": "TESTED",
+    "dmf_ir.compiler": "TESTED",
+    "runtime.py_migration_to_consume_dmf_ir": "PROPOSED",
+    "music_compiler": "ASPIRATIONAL",
+    "continuity_verifier_frame_face_pose_object_lighting": "ASPIRATIONAL",
+    "operator_gui": "ASPIRATIONAL"
+  },
+  "successCriteria": {
+    "allTestsPass": true,
+    "existingRuntimeContinuesToFunction": true,
+    "dmfIrValidatesDeterministically": true,
+    "compilerOutputRemainsProviderNeutral": true,
+    "noUnrelatedRepositoryChanges": true
+  },
+  "truthBoundary": "This evidence proves deterministic schema/semantic validation and provider-neutral compilation against one worked example (begin_again_project.json), run twice (once through the existing runtime.py path, once through the new dmf_ir path) with identical acceptance results. It does not prove: real Kling API integration, real generated media, real frame/face/pose/lighting verification, or any of the not-yet-implemented compilers listed in the module roadmap. runtime.py is unmodified and still owns actual Kling package generation; dmf_ir is an additive, stricter canonical layer other compilers can build on, not yet the thing runtime.py itself consumes."
+}

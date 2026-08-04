@@ -1,0 +1,43 @@
+=== dreammusicforge/tests ===
+test_action_limit_failure (test_runtime.DreamMusicForgeRuntimeTests.test_action_limit_failure) ... ok
+test_duration_limit_failure (test_runtime.DreamMusicForgeRuntimeTests.test_duration_limit_failure) ... ok
+test_last_frame_handoff (test_runtime.DreamMusicForgeRuntimeTests.test_last_frame_handoff) ... ok
+test_music_is_master_clock (test_runtime.DreamMusicForgeRuntimeTests.test_music_is_master_clock) ... ok
+test_state_inheritance_failure (test_runtime.DreamMusicForgeRuntimeTests.test_state_inheritance_failure) ... ok
+test_valid_project (test_runtime.DreamMusicForgeRuntimeTests.test_valid_project) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK
+
+=== dreammusicforge/dmf_ir/tests ===
+test_every_clip_imports_exactly_one_source_state (test_dmf_ir.DMFIRClipStateInheritanceTests.test_every_clip_imports_exactly_one_source_state) ... ok
+test_source_state_timecode_must_match_clip_start (test_dmf_ir.DMFIRClipStateInheritanceTests.test_source_state_timecode_must_match_clip_start) ... ok
+test_state_inheritance_failure (test_dmf_ir.DMFIRClipStateInheritanceTests.test_state_inheritance_failure) ... ok
+test_runtime_still_validates_and_compiles_the_same_example (test_dmf_ir.DMFIRExistingRuntimeStillWorksTests.test_runtime_still_validates_and_compiles_the_same_example) ... ok
+test_bad_pass_threshold_is_rejected (test_dmf_ir.DMFIRNewSemanticChecksTests.test_bad_pass_threshold_is_rejected) ... ok
+test_film_duration_must_match_last_clip_end (test_dmf_ir.DMFIRNewSemanticChecksTests.test_film_duration_must_match_last_clip_end) ... ok
+test_first_clip_cannot_require_a_previous_clip (test_dmf_ir.DMFIRNewSemanticChecksTests.test_first_clip_cannot_require_a_previous_clip) ... ok
+test_music_timeline_gap_is_rejected (test_dmf_ir.DMFIRNewSemanticChecksTests.test_music_timeline_gap_is_rejected) ... ok
+test_semantic_event_outside_clip_window_is_rejected (test_dmf_ir.DMFIRNewSemanticChecksTests.test_semantic_event_outside_clip_window_is_rejected) ... ok
+test_unknown_reference_asset_is_rejected (test_dmf_ir.DMFIRNewSemanticChecksTests.test_unknown_reference_asset_is_rejected) ... ok
+test_compile_orders_clips (test_dmf_ir.DMFIRProviderNeutralCompilationTests.test_compile_orders_clips) ... ok
+test_compile_rejects_invalid_project (test_dmf_ir.DMFIRProviderNeutralCompilationTests.test_compile_rejects_invalid_project) ... ok
+test_compiled_clip_resolves_full_objects_not_bare_ids (test_dmf_ir.DMFIRProviderNeutralCompilationTests.test_compiled_clip_resolves_full_objects_not_bare_ids) ... ok
+test_compiled_plan_carries_no_provider_specific_fields (test_dmf_ir.DMFIRProviderNeutralCompilationTests.test_compiled_plan_carries_no_provider_specific_fields)
+Provider-neutral compiler output check: nothing in the compiled ... ok
+test_first_clip_has_no_dependency (test_dmf_ir.DMFIRProviderNeutralCompilationTests.test_first_clip_has_no_dependency) ... ok
+test_last_frame_seed_handoff_is_provider_neutral (test_dmf_ir.DMFIRProviderNeutralCompilationTests.test_last_frame_seed_handoff_is_provider_neutral)
+Same continuity guarantee runtime.py's test_last_frame_handoff ... ok
+test_required_reference_ids_are_deduplicated_and_ordered (test_dmf_ir.DMFIRProviderNeutralCompilationTests.test_required_reference_ids_are_deduplicated_and_ordered) ... ok
+test_missing_nested_required_field_is_rejected (test_dmf_ir.DMFIRSchemaValidationTests.test_missing_nested_required_field_is_rejected) ... ok
+test_missing_top_level_field_is_rejected (test_dmf_ir.DMFIRSchemaValidationTests.test_missing_top_level_field_is_rejected) ... ok
+test_non_dict_project_is_rejected (test_dmf_ir.DMFIRSchemaValidationTests.test_non_dict_project_is_rejected) ... ok
+test_schema_version_is_optional (test_dmf_ir.DMFIRSchemaValidationTests.test_schema_version_is_optional) ... ok
+test_valid_project_passes_schema_and_semantics (test_dmf_ir.DMFIRSchemaValidationTests.test_valid_project_passes_schema_and_semantics) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.004s
+
+OK
