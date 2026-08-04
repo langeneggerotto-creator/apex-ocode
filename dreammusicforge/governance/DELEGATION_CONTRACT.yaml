@@ -1,0 +1,30 @@
+task_id: DMF-OCODE-001
+repository: langeneggerotto-creator/apex-ocode
+objective: Establish the governed DreamMusicForge compiler baseline inside OCode.
+authority_level: A3
+allowed_paths:
+  - dreammusicforge/**
+prohibited_paths:
+  - governance/**
+  - law-guardian/**
+  - CORE_OS_INHERITANCE.md
+allowed_commands:
+  - python -m unittest discover -s tests -v
+  - python -m src.cli
+reversibility: reversible
+required_tests:
+  - DMF-IR validation
+  - clip state inheritance
+  - Kling provider compilation
+  - final-frame handoff generation
+evidence_requirements:
+  - test logs
+  - build logs
+  - source manifest
+stop_conditions:
+  - path escape
+  - failed existing tests
+  - authority overreach
+rollback:
+  required: true
+  method: revert commit or delete dreammusicforge directory
