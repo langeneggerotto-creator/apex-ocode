@@ -1,0 +1,65 @@
+{
+  "film": {
+    "id": "DMF-FILM-001",
+    "title": "Begin Again",
+    "duration_seconds": 20,
+    "aspect_ratio": "9:16",
+    "frame_rate": 30,
+    "style_identity": "high-end cinematic photorealism"
+  },
+  "characters": [
+    {"id": "NOLA-001", "identity_locked": true, "wardrobe_id": "BLACK-01"}
+  ],
+  "worlds": [
+    {"id": "ROOFTOP-01", "persistent": true}
+  ],
+  "music_events": [
+    {"id": "MUS-001", "start": 0, "end": 10, "section": "intro"},
+    {"id": "MUS-002", "start": 10, "end": 20, "section": "verse"}
+  ],
+  "semantic_events": [
+    {"id": "SEM-001", "start": 0, "end": 10, "meaning": "Choose to begin"},
+    {"id": "SEM-002", "start": 10, "end": 20, "meaning": "Continue without perfection"}
+  ],
+  "reality_states": [
+    {"id": "STATE-000", "timecode": 0, "notebook": "closed", "emotion": "hesitation"},
+    {"id": "STATE-010", "timecode": 10, "notebook": "open", "emotion": "quiet commitment"},
+    {"id": "STATE-020", "timecode": 20, "notebook": "open", "new_line": true, "emotion": "calm focus"}
+  ],
+  "clips": [
+    {
+      "id": "CLIP-001",
+      "start": 0,
+      "end": 10,
+      "source_state_id": "STATE-000",
+      "destination_state_id": "STATE-010",
+      "semantic_event_ids": ["SEM-001"],
+      "music_event_ids": ["MUS-001"],
+      "primary_action": "open notebook after visible hesitation",
+      "secondary_actions": [],
+      "maximum_actions": 1,
+      "continuity_mode": "character_reference",
+      "required_reference_assets": ["NOLA-001", "ROOFTOP-01"],
+      "verification_contract_id": "VER-001"
+    },
+    {
+      "id": "CLIP-002",
+      "start": 10,
+      "end": 20,
+      "source_state_id": "STATE-010",
+      "destination_state_id": "STATE-020",
+      "semantic_event_ids": ["SEM-002"],
+      "music_event_ids": ["MUS-002"],
+      "primary_action": "draw one deliberate line",
+      "secondary_actions": [],
+      "maximum_actions": 1,
+      "continuity_mode": "last_frame_seed",
+      "required_reference_assets": [],
+      "verification_contract_id": "VER-002"
+    }
+  ],
+  "verification_contracts": [
+    {"id": "VER-001", "pass_threshold": 0.85, "reject_if": ["identity drift", "notebook already open"]},
+    {"id": "VER-002", "pass_threshold": 0.90, "reject_if": ["character redesign", "different notebook"]}
+  ]
+}
