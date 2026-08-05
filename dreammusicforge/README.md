@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -406,6 +406,48 @@ dict-shaped clips. `KLING_NEGATIVE_PROMPT_BASELINE` is copied from that
 same function verbatim. See `providers/kling/compiler.py`'s module
 docstring for the full mapping.
 
+Release 0.8 adds `generation/`, the layer that imports a rendered
+candidate file and makes it independently verifiable rather than merely
+asserted -- this release's acceptance test (spec section 19): "every
+imported candidate is traceable."
+
+```
+dreammusicforge/
+├── generation/
+│   ├── models.py    -- Candidate (spec section 6.10's schema, plus
+│   │                     file_size_bytes and imported_at -- see
+│   │                     models.py's docstring for why those two are
+│   │                     additions, not literally in the worked example)
+│   ├── schema.py     -- validate_candidate_schema(), including a
+│   │                     sha256-hex-format check on every hash field
+│   ├── intake.py       -- import_candidate(): reads real file size and
+│   │                     sha256 hash from disk, hashes the prompt and
+│   │                     every reference asset
+│   ├── errors.py         -- CandidateIntakeError (DMFError)
+│   └── ids.py              -- generate_candidate_id() + is_valid_*
+└── tests/generation/        -- 29 tests, one file per module above
+```
+
+```python
+from dreammusicforge.generation import import_candidate
+
+candidate = import_candidate(
+    render_task_id=render_task.id, provider="kling", model_version="kling-v1.6",
+    file_path=Path("renders/CANDIDATE-021-B-003.mp4"), prompt=kling_package.prompt,
+    imported_at="2026-08-05T12:00:00+00:00",
+)
+candidate.output_hash   # sha256 of the actual file bytes -- independently reproducible
+candidate.prompt_hash   # sha256 of the exact prompt text that produced it
+```
+
+Traceability here means what it says: `output_hash` is `hashlib.sha256`
+of the candidate file's real bytes (via `core/hashing.py`'s
+`hash_file()`, same stdlib-only function Release 0.1 built), not a
+value the caller supplies and this release trusts. `import_candidate()`
+fails closed on a missing candidate or reference file -- a `Candidate`
+whose hash can't be computed from a real file isn't traceable, so it's
+never returned.
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -435,9 +477,10 @@ docstring for the full mapping.
   `python -m unittest discover -s dreammusicforge/tests/capability_atlas`
   (47 tests), `python -m unittest discover -s
   dreammusicforge/tests/slicer` (57 tests), `python -m unittest discover
-  -s dreammusicforge/tests/providers/kling` (29 tests), and `python -m
-  dreammusicforge.apps.cli.main` from the repository root -- none require
-  an installation step.
+  -s dreammusicforge/tests/providers/kling` (29 tests), `python -m
+  unittest discover -s dreammusicforge/tests/generation` (29 tests), and
+  `python -m dreammusicforge.apps.cli.main` from the repository root --
+  none require an installation step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
   `is_valid_id(value, prefix)` in Release 0.2**, so the new `AUDIO-`,
   `SECTION-`, and `LYRIC-` id families in `music/ids.py` don't duplicate
@@ -701,9 +744,42 @@ performing filesystem writes outside `storage/sqlite_repository.py`
 No persistence layer, CLI, or `Project` integration -- same pattern as
 every release since 0.2.
 
+### What Release 0.8 deliberately does not include
+
+No media inspection. `Candidate.file_size_bytes` is filesystem metadata
+(`Path.stat().st_size`) only -- nothing here opens the video file,
+reads its duration, resolution, frame rate, or codec, or checks that it
+is in fact a valid video file at all. Section 19 names "media
+inspection" as Release 0.9's own deliverable ("Technical Verification"),
+and section 6.10's `candidate` schema itself has no stream-level fields
+-- adding them here would mean claiming a later release's integration.
+
+No verification. `verification_status` and `decision` both default to
+`"pending"` on import and stay there -- nothing in this release scores,
+accepts, or rejects a candidate. That's exactly spec Law 3.6
+("verification before canon"): a freshly imported candidate has no
+canonical standing yet, and Release 0.9's media inspection plus later
+releases' identity/costume/world/lip-sync checks (section 6.11's
+`verification_result`) are what would move it out of `"pending"`.
+
+`CANDIDATE_VERIFICATION_STATUSES` and `CANDIDATE_DECISIONS` are this
+release's own enums inferred from spec section 6.10/6.11's example
+values (`"pending"`, `"reject"`) -- the spec doesn't give a closed list
+for either, so `"passed"`/`"failed"` and `"accept"`/`"reject"` are this
+release's own naming choice, not a verified spec vocabulary.
+
+No persistence layer or CLI -- `Candidate` exists only as an in-memory
+dataclass returned by `generation/intake.py`, same pattern as every
+release since 0.2. Nothing here writes an evidence record to disk or a
+database either, even though "evidence" is half of this release's own
+name -- the *evidence* this release produces is the Candidate's own
+hash fields, verifiable against the file on disk at any time; a durable,
+queryable evidence ledger (spec section 8.12's "evidence and versioning
+service") is later work.
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, or Release 0.7 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, or Release 0.8 imports from, depends on, or
 modifies either.
