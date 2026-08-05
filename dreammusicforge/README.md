@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -250,6 +250,56 @@ make on its own, since a `FilmGenome` isn't part of the
 production graph" means here: the compiler imposes the order, callers
 don't have to pre-sort their input.
 
+Release 0.5 adds `capability_atlas/`, the layer that turns declared
+per-provider capabilities into a ranked, per-shot provider-fit report --
+this release's acceptance test (spec section 19): "shot requirements
+produce a provider-fit report."
+
+```
+dreammusicforge/
+├── capability_atlas/
+│   ├── models.py    -- RendererCapability, RendererCapabilityProfile,
+│   │                     ShotFitScore, ProviderFitReport
+│   ├── schema.py     -- dict-shaped schemas + validate_*_schema() for
+│   │                     capability and profile
+│   ├── scoring.py     -- score_capability_status() (a pure function
+│   │                     from Law 3.10's five-way status to a number),
+│   │                     evaluate_shot_fit(), rank_providers_for_shot()
+│   ├── errors.py       -- CapabilityAtlasValidationError (DMFError)
+│   └── builder.py       -- build_capability(), build_capability_profile()
+└── tests/capability_atlas/  -- 47 tests, one file per module above
+```
+
+```python
+from dreammusicforge.capability_atlas import build_capability, build_capability_profile, rank_providers_for_shot
+
+kling = build_capability_profile(
+    provider="kling", max_duration_seconds=15.0, max_character_count=3,
+    supported_camera_motions=("slow_push", "static"),
+    capabilities=(build_capability("identity", "verified"), build_capability("lip_sync", "measured")),
+)
+veo = build_capability_profile(
+    provider="veo", max_duration_seconds=6.0, max_character_count=1, supported_camera_motions=("slow_push",),
+)
+
+report = rank_providers_for_shot(shot, (veo, kling))  # shot from Release 0.4
+report.recommended_provider   # "kling" -- veo is disqualified (shot duration exceeds its 6s limit)
+```
+
+`evaluate_shot_fit()` treats a shot's `requirements` (duration derived
+from `timing`, `character_count`, `camera_motion`, `lip_sync_required`)
+as hard disqualifiers -- a provider that structurally cannot render the
+shot gets `overall_score` 0.0 outright, no partial credit. Providers that
+pass are scored on every capability *named in the shot's own
+`acceptance` dict* (spec section 6.8's threshold keys, e.g. `identity`,
+`lip_sync`): a capability the profile doesn't declare at all scores 0.0
+for that dimension rather than being silently skipped, so the report
+always shows exactly what evidence is and isn't behind a ranking.
+`score_capability_status()`'s numbers (100 / 80 / 55 / 0 / 0) are this
+release's own interpretation, not spec-mandated -- see
+`capability_atlas/scoring.py`'s module docstring for the reasoning,
+including why `unsupported` and `unknown` deliberately score the same.
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -275,9 +325,10 @@ don't have to pre-sort their input.
   dreammusicforge/tests/kernel` (61 tests), `python -m unittest discover
   -s dreammusicforge/tests/music` (108 tests), `python -m unittest
   discover -s dreammusicforge/tests/genome` (67 tests), `python -m
-  unittest discover -s dreammusicforge/tests/production` (56 tests), and
-  `python -m dreammusicforge.apps.cli.main` from the repository root --
-  none require an installation step.
+  unittest discover -s dreammusicforge/tests/production` (56 tests),
+  `python -m unittest discover -s dreammusicforge/tests/capability_atlas`
+  (47 tests), and `python -m dreammusicforge.apps.cli.main` from the
+  repository root -- none require an installation step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
   `is_valid_id(value, prefix)` in Release 0.2**, so the new `AUDIO-`,
   `SECTION-`, and `LYRIC-` id families in `music/ids.py` don't duplicate
@@ -430,9 +481,40 @@ check to one continuous clip-to-clip chain, not an ensemble-wide one.
 Worth revisiting if a later release's requirements need a different
 scope.
 
+### What Release 0.5 deliberately does not include
+
+No risk analysis or strategy selection -- `evaluate_shot_fit()`'s hard
+disqualifiers cover only the fields already on `ShotRequirements`
+(duration, character count, camera motion, lip sync); the fuller
+`risk_factors` vocabulary in spec section 7.3 (`identity_precision`,
+`prop_interaction`, `hand_complexity`, `transition_complexity`, and so
+on) and the five-way strategy selection (Direct Render / Controlled
+Continuation / Layered Compositing / Editorial Illusion / External
+Production Required) in section 7.4 are Video Slicer (0.6) work, not
+this release's. This release answers "which provider fits this shot,"
+not "how should this shot be broken into renderable pieces."
+
+No named-capability vocabulary is fixed or validated against a closed
+list. A capability's `name` can be any non-empty string; this release
+doesn't require providers to declare capabilities under a specific set
+of names, or cross-check that every name a shot's `acceptance` dict
+uses is one every profile recognizes. Score aggregation in
+`evaluate_shot_fit()` handles a missing name by scoring it 0.0, which
+is deliberately how an unrecognized or not-yet-declared capability name
+is meant to behave -- but there's no separate report of "this profile
+doesn't know about the capability names this project uses," which could
+be a useful addition later.
+
+No persistence layer or CLI, same gap as every release since 0.2:
+`RendererCapabilityProfile` and `ProviderFitReport` exist only as
+in-memory dataclasses. No `Project` integration either -- nothing here
+is wired to a `Project`, since the spec doesn't give `Project` a
+capability-atlas-shaped forward reference the way it does for
+`master_song_id`/`film_genome_id`/`production_graph_id`.
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, Release 0.3, or Release 0.4 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, Release 0.4, or Release 0.5 imports from, depends on, or
 modifies either.
