@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -448,6 +448,84 @@ fails closed on a missing candidate or reference file -- a `Candidate`
 whose hash can't be computed from a real file isn't traceable, so it's
 never returned.
 
+**Release 0.9 is the first release in this repository that depends on
+an external binary rather than stdlib alone.** It adds `verification/`,
+which shells out to `ffmpeg`/`ffprobe` to turn a rendered candidate
+file into an objective technical report -- this release's acceptance
+test (spec section 19): "objective technical report generated from
+video files."
+
+Why the dependency: Release 0.2's `music/wav_inspector.py` reads WAV
+files with stdlib `wave` because PCM WAV headers are trivial to parse
+by hand. There is no equivalent for the H.264-encoded video and
+AAC-encoded audio this release has to inspect -- Python's stdlib has no
+video or compressed-audio codec, and writing one is not in scope for a
+single release. `ffmpeg`/`ffprobe` were confirmed present in this
+environment and are the same tool already proven, in the sibling
+`agentic-twin` repository's own DreamMusicForge session, for exactly
+this kind of real diagnostic (`volumedetect`/`astats`/`silencedetect`).
+
+```
+dreammusicforge/
+├── verification/
+│   ├── models.py        -- MediaMetadata, DurationFrameRateCheck,
+│   │                         AudioRmsReport, SeamComparison,
+│   │                         ColorShiftReport, TechnicalReport
+│   ├── schema.py          -- dict-shaped schemas + validate_*_schema()
+│   ├── ffmpeg_runner.py     -- the ONE module that invokes ffmpeg/
+│   │                         ffprobe; every function builds its own
+│   │                         fixed argv from typed parameters, never
+│   │                         shell=True, never a caller-supplied
+│   │                         command string -- see its module
+│   │                         docstring for why that structural
+│   │                         narrowness *is* spec rule 18's "media
+│   │                         commands allowlisted"
+│   ├── inspector.py          -- inspect_media(): duration, frame rate,
+│   │                         resolution, codec, audio presence
+│   ├── frames.py               -- extract_frame(): a real decoded
+│   │                         still frame from a real timestamp
+│   ├── seam.py                  -- compare_seam(): SSIM between two
+│   │                         frames (spec 9.2's boundary check)
+│   ├── audio.py                  -- measure_audio_rms(): real RMS/peak
+│   │                         via ffmpeg's astats filter
+│   ├── color.py                   -- measure_color_shift(): YUV
+│   │                         average difference via signalstats
+│   ├── errors.py                   -- FfmpegNotAvailableError,
+│   │                         FfmpegRunError, TechnicalVerificationError
+│   └── report.py                    -- generate_technical_report():
+│                                    the orchestration
+└── tests/verification/                -- 56 tests. Needs `-t .` on the
+                                       discover command below, since
+                                       fixtures.py uses a relative
+                                       import other test packages in
+                                       this repo don't need
+```
+
+```python
+from dreammusicforge.verification import generate_technical_report
+
+report = generate_technical_report(
+    candidate_id=candidate.id, file_path=Path(candidate.file),
+    expected_duration_seconds=render_task.duration_seconds, expected_frame_rate=24.0,
+    previous_end_frame_path=previous_shots_last_frame,  # optional -- enables seam + color checks
+    frame_extraction_dir=Path("scratch/frames"),
+)
+
+report.passed     # bool
+report.failures   # e.g. ("audio: silent (RMS level -85.2 dB)",) -- human-readable, not just a score
+```
+
+Every number in a `TechnicalReport` is measured from the real file via
+one of the wrappers above, never asserted. `measure_audio_rms()` in
+particular generalizes the exact class of diagnostic (silent audio in a
+rendered clip, detected via `astats`' RMS level) that a real debugging
+session in the sibling `agentic-twin` repository used to root-cause a
+genuine "no audio in the stitched video" bug -- see `verification/
+audio.py`'s module docstring. `SSIM_SIMILARITY_THRESHOLD` (0.85),
+`SILENCE_RMS_THRESHOLD_DB` (-60), and `COLOR_SHIFT_THRESHOLD` (10.0) are
+this release's own thresholds, not spec-given numbers -- the spec
+requires each check exist, not a specific cutoff.
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -478,9 +556,11 @@ never returned.
   (47 tests), `python -m unittest discover -s
   dreammusicforge/tests/slicer` (57 tests), `python -m unittest discover
   -s dreammusicforge/tests/providers/kling` (29 tests), `python -m
-  unittest discover -s dreammusicforge/tests/generation` (29 tests), and
-  `python -m dreammusicforge.apps.cli.main` from the repository root --
-  none require an installation step.
+  unittest discover -s dreammusicforge/tests/generation` (29 tests),
+  `python -m unittest discover -s dreammusicforge/tests/verification -t .`
+  (56 tests -- needs `-t .`, see below, and needs ffmpeg/ffprobe on
+  PATH), and `python -m dreammusicforge.apps.cli.main` from the
+  repository root -- none require a pip install step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
   `is_valid_id(value, prefix)` in Release 0.2**, so the new `AUDIO-`,
   `SECTION-`, and `LYRIC-` id families in `music/ids.py` don't duplicate
@@ -777,9 +857,49 @@ hash fields, verifiable against the file on disk at any time; a durable,
 queryable evidence ledger (spec section 8.12's "evidence and versioning
 service") is later work.
 
+### What Release 0.9 deliberately does not include
+
+No identity, boundary-beyond-seam, or semantic checks. Spec section
+9.1's "Technical checks" list is what this release covers (file
+readable, duration, frame rate, resolution, codec, audio presence,
+silence, loudness) plus the seam/color piece of section 9.2's boundary
+checks. Section 9.2's other boundary checks (subject scale, pose
+difference, motion-vector difference), section 9.3's identity checks
+(face embedding similarity, costume feature matching), and section
+9.5's semantic checks (human review, confidence, pass/fail) all need
+either a trained model, a human reviewer, or both -- none of that
+exists in this repository, and faking a score for any of them would be
+exactly the placeholder logic spec section 22 forbids. Section 9.1's
+"black frames," "frozen frames," "dropped frames," and "clipping"
+checks are also not built -- each needs its own ffmpeg filter
+(`blackdetect`, `freezedetect`, a frame-count cross-check, and
+`astats`' clip-count field respectively) and its own threshold
+calibration; this release scoped to the checks spec section 19's own
+"Build" list names explicitly (media inspection, frame extraction, seam
+comparison, audio RMS, color shift, duration and frame-rate checks) and
+left the rest of 9.1's longer list as a stated gap rather than rushing
+partial coverage of all of it.
+
+No acceptance decision. `TechnicalReport.passed` is this release's own
+pass/fail roll-up of the checks it runs -- it is not spec section
+6.11's `verification_result` (identity/hair/costume/world/camera/
+lip_sync metrics, an overall score, a decision, a repair
+recommendation), which needs the identity/boundary/semantic checks this
+release doesn't have and is Release 0.10's job (Acceptance and Repair
+Engine).
+
+No `Candidate` integration. `generate_technical_report()` takes a
+`candidate_id` and a `file` path as plain arguments, not a
+`generation.Candidate` object -- wiring the two together (and writing
+`verification_status` back onto the `Candidate`) is straightforward but
+wasn't done here, to keep this release's diff scoped to what section 19
+names.
+
+No persistence layer or CLI, same pattern as every release since 0.2.
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, or Release 0.8 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, Release 0.8, or Release 0.9 imports from, depends on, or
 modifies either.
