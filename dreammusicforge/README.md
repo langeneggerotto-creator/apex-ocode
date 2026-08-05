@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -353,6 +353,59 @@ visual layers (`world_pass`, `performer_pass`, and `lip_sync_pass` when
 required) -- see "What Release 0.6 deliberately does not include" for
 why finer per-character layers aren't attempted.
 
+Release 0.7 adds `providers/kling/`, the first provider-specific
+package -- it turns a `RenderTask` (Release 0.6) plus its `Shot`
+(Release 0.4) into an operator-usable `KlingPackage`: a real prompt, a
+negative prompt, a selected mode, and a resolved reference manifest.
+This release's acceptance test (spec section 19): "each task produces
+an operator-usable Kling package."
+
+```
+dreammusicforge/
+├── providers/
+│   ├── __init__.py   -- namespace only; spec section 14's
+│   │                     provider-neutral VideoRenderer interface is
+│   │                     not implemented anywhere yet (see below)
+│   └── kling/
+│       ├── models.py    -- KlingProfile, KlingPackage
+│       ├── schema.py     -- dict-shaped schemas + validate_*_schema()
+│       ├── compiler.py    -- compile_kling_package(),
+│       │                     compile_kling_packages()
+│       ├── errors.py       -- KlingCompilerError (DMFError)
+│       └── ids.py            -- generate_kling_package_id() + is_valid_*
+└── tests/providers/kling/      -- 29 tests, one file per module above
+```
+
+```python
+from dreammusicforge.providers.kling import KlingProfile, compile_kling_packages
+
+profile = KlingProfile(max_duration_seconds=15.0)
+packages = compile_kling_packages(slice_result.render_tasks, shot, profile)  # render_tasks/shot from Releases 0.4-0.6
+
+packages[0].mode              # "image_to_video" or "video_extension"
+packages[0].prompt            # a full, structured prompt string
+packages[0].negative_prompt   # a fixed baseline negative-prompt list
+```
+
+Mode selection is one rule, deterministically applied: a `RenderTask`
+whose `required_assets` includes a `.mp4` reference is a continuation
+task (Release 0.6's `controlled_continuation` strategy chains every task
+after the first to the previous one's output file), so it compiles to
+`video_extension`; everything else compiles to `image_to_video`, since
+Performer/Costume/World reference assets (Release 0.3) are reference
+images. If the resulting mode isn't declared in the given `KlingProfile.
+supported_modes`, compilation fails closed instead of silently picking
+something unsupported.
+
+The prompt template is not invented from nothing: it adapts this same
+repository's pre-spec `runtime.py`'s `compile_kling_packages()` --
+same structural pattern (explicit continuity statement, explicit "do
+not perform future actions," explicit preservation list), rewritten
+against the new typed `Shot` fields instead of `runtime.py`'s
+dict-shaped clips. `KLING_NEGATIVE_PROMPT_BASELINE` is copied from that
+same function verbatim. See `providers/kling/compiler.py`'s module
+docstring for the full mapping.
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -381,7 +434,8 @@ why finer per-character layers aren't attempted.
   unittest discover -s dreammusicforge/tests/production` (56 tests),
   `python -m unittest discover -s dreammusicforge/tests/capability_atlas`
   (47 tests), `python -m unittest discover -s
-  dreammusicforge/tests/slicer` (57 tests), and `python -m
+  dreammusicforge/tests/slicer` (57 tests), `python -m unittest discover
+  -s dreammusicforge/tests/providers/kling` (29 tests), and `python -m
   dreammusicforge.apps.cli.main` from the repository root -- none require
   an installation step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
@@ -609,9 +663,47 @@ No persistence layer or CLI, and no `Project` integration, same pattern
 as every release since 0.2: `SliceResult` and everything inside it exist
 only as in-memory dataclasses returned by `slicer/builder.py`.
 
+### What Release 0.7 deliberately does not include
+
+No actual Kling API call. `compile_kling_package()` produces the
+package -- prompt, negative prompt, mode, reference manifest, duration
+check -- entirely offline; nothing in this release submits it anywhere,
+polls a job, or downloads a result. That's Release 0.8 (Candidate Intake
+and Evidence) and beyond, and it's also exactly the kind of "claim an
+integration that was not executed" spec section 22's rule 14 forbids --
+this release only compiles the request, it doesn't send it.
+
+No `providers.base.VideoRenderer` interface (spec section 14). No
+release has named it as a required deliverable yet, and implementing
+it now would mean inventing `ProviderRequest`/`ProviderJob`/
+`ProviderJobStatus`/`RenderedAsset` shapes with no spec example or
+concrete caller to ground them in -- speculative scaffolding this
+session has avoided everywhere else, and section 22 explicitly forbids
+placeholder implementations labeled complete. `providers/kling/` stands
+on its own as a set of plain functions rather than implementing an
+unbuilt interface.
+
+`KLING_MODES` (`text_to_video`, `image_to_video`, `start_end_frame`,
+`video_extension`) is this release's own list. The spec shows one mode
+in its section 6.9 example (`image_to_video`) and doesn't give a closed
+vocabulary; the other three are standard, widely-documented Kling
+capability names, not a verified account of what a specific Kling API
+version supports. `KlingProfile.supported_modes` exists precisely so a
+real deployment can narrow (or correct) this list without changing code.
+
+No file I/O. `KlingPackage.prompt` and `.negative_prompt` hold generated
+text directly, not file paths (`prompts/RENDER-021-B.txt`, as spec
+section 6.9 shows) -- writing prompt files is a decision this release
+leaves to the caller, consistent with the rest of this repository never
+performing filesystem writes outside `storage/sqlite_repository.py`
+(Release 0.1) and the CLI's own explicit `project init` command.
+
+No persistence layer, CLI, or `Project` integration -- same pattern as
+every release since 0.2.
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, or Release 0.6 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, or Release 0.7 imports from, depends on, or
 modifies either.
