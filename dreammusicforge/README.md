@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -75,7 +75,7 @@ dreammusicforge/
 │   └── builder.py           -- build_master_song(), build_beats_for_song(),
 │                              assemble_timeline() -- the assembly layer
 │                              that ties the modules above together
-└── tests/music/              -- 105 tests, one file per module above
+└── tests/music/              -- 108 tests, one file per module above
 ```
 
 ```python
@@ -100,6 +100,76 @@ see "What Release 0.2 deliberately does not include" below.
 before returning it and raises `TimelineValidationError` (carrying every
 problem found, not just the first) if it wouldn't pass.
 
+Release 0.3 adds `genome/`, the layer that turns performer, costume, and
+world definitions plus declared genome-level facts (transformation arc,
+camera language, color language, motifs, continuity invariants) into a
+validated `FilmGenome` -- this release's acceptance test (spec section
+19): "a complete Film Genome can be created and validated."
+
+```
+dreammusicforge/
+├── genome/
+│   ├── models.py    -- Performer, Costume, World, CameraLanguage,
+│   │                     ColorLanguage, FilmGenome (frozen dataclasses,
+│   │                     field shapes match spec section 6.3-6.6's
+│   │                     example YAML exactly)
+│   ├── schema.py     -- dict-shaped schemas + validate_*_schema() for
+│   │                     each model; FilmGenome's validator also
+│   │                     rejects a no-op transformation (from == to),
+│   │                     duplicate motifs, and duplicate invariants
+│   ├── ids.py          -- generate_performer_id/generate_costume_id/
+│   │                     generate_world_id/generate_genome_id + is_valid_*
+│   ├── errors.py        -- GenomeValidationError (DMFError)
+│   └── builder.py        -- build_performer(), build_costume(),
+│                          build_world(), assemble_film_genome()
+└── tests/genome/          -- 67 tests, one file per module above
+```
+
+```python
+from dreammusicforge.genome import (
+    build_performer, build_costume, build_world, assemble_film_genome,
+    CameraLanguage, ColorLanguage,
+)
+
+performer = build_performer(
+    display_name="Nola",
+    reference_assets=("face_front.png", "full_body_front.png"),
+    immutable={"apparent_age": "late 20s", "face_geometry": "oval, high cheekbones",
+               "body_proportions": "average, athletic", "skin_tone": "warm olive",
+               "eye_color": "dark brown", "identifying_features": "small mole above lip"},
+    mutable_by_contract={"expression": "varies by shot", "pose": "varies by shot",
+                          "gaze": "varies by shot", "costume": "varies by shot",
+                          "hair_configuration": "varies by shot"},
+)
+costume = build_costume(
+    topology={"neckline": "symmetrical_square", "sleeves": "none"},
+    material="satin", references={"front": "costume_front.png"}, embroidery="geometric_gold",
+)
+world = build_world(
+    type="physical_theatrical_stage", references={"wide": "stage_wide.png"},
+    geometry="proscenium stage, 12m wide", palette="deep blue with amber accents",
+    lighting="single key light, cool wash", atmosphere="light haze",
+)
+
+genome = assemble_film_genome(
+    transformation_from="concealment", transformation_to="self-expression",
+    performers=(performer,), costumes=(costume,), worlds=(world,),
+    camera_language=CameraLanguage(lens_vocabulary=("35mm", "50mm"), movement_vocabulary=("slow_push", "controlled_orbit")),
+    color_language=ColorLanguage(opening="amber_crimson", development="blue_pearl", climax="red_gold"),
+    motifs=("threshold", "circular_opening", "hand_to_heart"),
+    invariants=("lead_performer_identity", "master_song", "narrative_transformation"),
+)
+```
+
+`assemble_film_genome()` derives `performer_ids`/`costume_ids`/`world_ids`
+directly from the `Performer`/`Costume`/`World` objects it's given, so a
+`FilmGenome` built through it cannot reference a nonexistent entity --
+spec Law 3.7 ("fail closed" on missing references) enforced structurally,
+by construction, rather than by an after-the-fact existence check. See
+`genome/schema.py`'s module docstring for the boundary that leaves stated
+(referential integrity for a `FilmGenome` loaded from a dict of unknown
+provenance, rather than built through this function).
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -123,7 +193,8 @@ problem found, not just the first) if it wouldn't pass.
   has not been run against it in this environment. What has been verified
   to work, repeatedly, is `python -m unittest discover -s
   dreammusicforge/tests/kernel` (61 tests), `python -m unittest discover
-  -s dreammusicforge/tests/music` (105 tests), and `python -m
+  -s dreammusicforge/tests/music` (108 tests), `python -m unittest
+  discover -s dreammusicforge/tests/genome` (67 tests), and `python -m
   dreammusicforge.apps.cli.main` from the repository root -- none require
   an installation step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
@@ -153,6 +224,33 @@ problem found, not just the first) if it wouldn't pass.
   section/lyric boundaries against the `MasterSong`'s own
   `duration_seconds` -- a section ending after the song ends is not yet
   caught. Worth adding once a release actually needs that guarantee.
+- **Genome entity ids don't match the spec's own example ids.** Spec
+  section 6.4-6.6's YAML shows human-authored-looking ids like
+  `COSTUME-RED-001` and `WORLD-BLUE-STAGE-001`. This release keeps the
+  same machine-generated `PREFIX-<8 hex chars>` convention established
+  in `core/ids.py` and extended in `music/ids.py` (`generate_id()` /
+  `is_valid_id()`) rather than inventing a second id format -- the
+  spec's YAML is illustrative of the *shape* of the data, not a format
+  requirement, and one consistent id convention across the whole
+  application is worth more than matching an example's cosmetics.
+- **`Performer.immutable` and `.mutable_by_contract` are `dict[str, str]`
+  free-text fields, not enums.** Spec section 6.4's YAML shows keys like
+  `apparent_age` and `expression` with no value (a template, not a
+  closed vocabulary), so this release validates that every required key
+  is present with a non-empty descriptive string and does not invent a
+  fixed set of allowed values for any of them -- that would be scope the
+  spec doesn't authorize here.
+- **`FilmGenome`'s referential integrity is structural, not a runtime
+  check.** `assemble_film_genome()` builds `performer_ids`/
+  `costume_ids`/`world_ids` directly from the `Performer`/`Costume`/
+  `World` objects passed to it, so there's no code path in this release
+  where a `FilmGenome` built through the public API could reference an
+  entity that doesn't exist. `validate_film_genome_schema()` alone (e.g.
+  on a dict loaded from storage in a later release) can only check that
+  referenced ids are well-formed, not that they exist -- stated in
+  `genome/schema.py`'s module docstring as an intentional boundary this
+  release doesn't close, since closing it needs a registry of real
+  entities to check against, which doesn't exist yet.
 
 ### What Release 0.2 deliberately does not include
 
@@ -173,15 +271,46 @@ serialize `.to_dict()` itself. Wiring that up is straightforward
 (`storage/sqlite_repository.py`'s `ProjectRepository` is a template for
 exactly this) but wasn't part of this release's authorized scope.
 
-Film Genome (0.3), Production Graph (0.4), Renderer Capability
-Atlas (0.5), Video Slicer (0.6), provider compilers (0.7+), verification,
-repair, assembly, and the Operator Studio web interface (0.15) remain
-unbuilt, per the spec's own phased plan -- none of that is stubbed out
-here, per the spec's own rule against labeling provisional logic as
-production logic.
+Production Graph (0.4), Renderer Capability Atlas (0.5), Video Slicer
+(0.6), provider compilers (0.7+), verification, repair, assembly, and
+the Operator Studio web interface (0.15) remain unbuilt, per the spec's
+own phased plan -- none of that is stubbed out here, per the spec's own
+rule against labeling provisional logic as production logic.
+
+### What Release 0.3 deliberately does not include
+
+No `Project` integration: `Project.film_genome_id` (added in Release
+0.1) is still an unresolved forward reference -- nothing in this release
+writes a `FilmGenome`'s id back onto a `Project`, and there's no CLI
+subcommand to build a genome interactively. No persistence layer either,
+same gap as Release 0.2's `MasterSong`/`Timeline`: `Performer`, `Costume`,
+`World`, and `FilmGenome` exist only as in-memory dataclasses returned by
+`genome/builder.py`.
+
+No prop, movement-language, or motif-registry entities as separate
+first-class models. The spec's architecture diagram (section 5) shows
+`genome/prop/`, `genome/movement_language/`, and `genome/motif_registry/`
+as their own subpackages, but section 19's Release 0.3 "Build" list names
+only performer, costume, world, motif, camera language, and invariants --
+and the one worked example (section 6.3's `film_genome` YAML) represents
+`props` as a flat list on `World` and `motifs` as a flat list of strings
+on `FilmGenome`, with no richer structure shown for either. This release
+follows the worked example rather than the architecture diagram where
+they disagree, consistent with Release 0.1/0.2's "flat modules, not
+premature subpackages" choice (see "Design choices worth knowing about"
+above) -- promote to real entities if a later release's requirements
+demand it.
+
+No continuity *enforcement*: `invariants` on `FilmGenome` is a validated
+list of non-empty, unique strings (e.g. `lead_performer_identity`,
+`master_song`), but nothing in this release checks that a shot, clip, or
+generated asset actually honors a declared invariant -- that's
+Production Graph (0.4) and the verification stages named in the spec's
+pipeline diagram (section 2), not this one.
 
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1 or Release 0.2 imports from, depends on, or modifies either.
+Release 0.1, Release 0.2, or Release 0.3 imports from, depends on, or
+modifies either.
