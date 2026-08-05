@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -170,6 +170,86 @@ by construction, rather than by an after-the-fact existence check. See
 (referential integrity for a `FilmGenome` loaded from a dict of unknown
 provenance, rather than built through this function).
 
+Release 0.4 adds `production/`, the layer that turns `Sequence`,
+`SemanticEvent`, and `Shot` definitions plus a `FilmGenome` into a
+validated, time-ordered `ProductionGraph` -- this release's acceptance
+test (spec section 19): "project compiles into an ordered production
+graph."
+
+```
+dreammusicforge/
+├── production/
+│   ├── models.py    -- SemanticEvent, Sequence, Shot (with nested
+│   │                     ShotTiming/ShotPurpose/ShotRequirements/
+│   │                     ShotContinuity), ProductionGraph
+│   ├── schema.py     -- dict-shaped schemas + validate_*_schema() for
+│   │                     each model; ProductionGraph's validator is
+│   │                     where Release 0.4's "dependencies" and
+│   │                     "transition relationships" deliverables live:
+│   │                     no two shots may overlap in time, every shot's
+│   │                     sequence_id/semantic_event_id must resolve
+│   │                     inside the same graph, and consecutive
+│   │                     same-performer shots in the same sequence must
+│   │                     chain state (one shot's destination_state must
+│   │                     equal the next shot's inherited_state)
+│   ├── ids.py          -- generate_sequence_id/generate_semantic_event_id/
+│   │                     generate_shot_id/generate_graph_id + is_valid_*
+│   ├── errors.py        -- ProductionGraphValidationError (DMFError)
+│   └── builder.py        -- build_semantic_event(), build_sequence(),
+│                          build_shot(), assemble_production_graph()
+└── tests/production/      -- 56 tests, one file per module above
+```
+
+```python
+from dreammusicforge.production import build_semantic_event, build_sequence, build_shot, assemble_production_graph
+from dreammusicforge.production.models import ShotTiming, ShotPurpose, ShotRequirements, ShotContinuity
+
+event = build_semantic_event(
+    start_seconds=42.0, end_seconds=48.5, meaning="confidence becomes declaration",
+    transformation_from="uncertainty", transformation_to="agency",
+    intended_viewer_inference=("she has chosen to be seen",), required_visible_evidence=("direct gaze",),
+)
+sequence = build_sequence(song_section="chorus_1", start_seconds=40.0, end_seconds=60.0)
+
+shot = build_shot(
+    sequence_id=sequence.id,
+    timing=ShotTiming(start_seconds=42.0, end_seconds=48.5, song_section="chorus_1", lyric_ids=("LYRIC-018",)),
+    purpose=ShotPurpose(semantic_event_id=event.id, narrative_function="declaration", editorial_function="chorus_hero_shot"),
+    requirements=ShotRequirements(
+        performer_id=performer.id, costume_id=costume.id, world_id=world.id,
+        lip_sync_required=True, choreography_complexity="medium", camera_motion="slow_push", character_count=1,
+    ),
+    continuity=ShotContinuity(inherited_state="concealed", permitted_mutations=("gaze",), destination_state="revealed"),
+    acceptance={"identity": 95.0, "camera_intent": 90.0},
+)
+
+graph = assemble_production_graph(film_genome=genome, sequences=(sequence,), semantic_events=(event,), shots=(shot,))
+```
+
+`Shot` deliberately carries only `timing`/`purpose`/`requirements`/
+`continuity`/`acceptance` -- not `renderer_risk`, `slice_strategy`,
+`slices`, or `editing`, even though spec section 6.8's worked example
+shows all of those on one `shot` object. Those fields are Video Slicer
+(0.6) outputs that come *after* Production Graph in the pipeline (spec
+section 2); producing them here would mean claiming a later release's
+integration. `ShotContinuity` (`inherited_state`/`permitted_mutations`/
+`destination_state`) is this release's own addition, not shown in
+section 6.8's YAML -- it exists to satisfy Law 3.5's explicit
+requirement that "every shot must declare: inherited state; permitted
+mutations; expected destination state" and mirrors the
+`source_state_id`/`destination_state_id` chaining this same
+repository's pre-spec `runtime.py` already validates for exactly this
+purpose (see `production/models.py`'s module docstring).
+
+`assemble_production_graph()` checks that every shot's
+`requirements.performer_id`/`costume_id`/`world_id` actually exists in
+the given `FilmGenome` -- the one check `production/schema.py` cannot
+make on its own, since a `FilmGenome` isn't part of the
+`production_graph` dict -- and sorts the resulting `shots` by
+`timing.start_seconds`, which is what "compiles into an *ordered*
+production graph" means here: the compiler imposes the order, callers
+don't have to pre-sort their input.
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -194,9 +274,10 @@ provenance, rather than built through this function).
   to work, repeatedly, is `python -m unittest discover -s
   dreammusicforge/tests/kernel` (61 tests), `python -m unittest discover
   -s dreammusicforge/tests/music` (108 tests), `python -m unittest
-  discover -s dreammusicforge/tests/genome` (67 tests), and `python -m
-  dreammusicforge.apps.cli.main` from the repository root -- none require
-  an installation step.
+  discover -s dreammusicforge/tests/genome` (67 tests), `python -m
+  unittest discover -s dreammusicforge/tests/production` (56 tests), and
+  `python -m dreammusicforge.apps.cli.main` from the repository root --
+  none require an installation step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
   `is_valid_id(value, prefix)` in Release 0.2**, so the new `AUDIO-`,
   `SECTION-`, and `LYRIC-` id families in `music/ids.py` don't duplicate
@@ -271,11 +352,11 @@ serialize `.to_dict()` itself. Wiring that up is straightforward
 (`storage/sqlite_repository.py`'s `ProjectRepository` is a template for
 exactly this) but wasn't part of this release's authorized scope.
 
-Production Graph (0.4), Renderer Capability Atlas (0.5), Video Slicer
-(0.6), provider compilers (0.7+), verification, repair, assembly, and
-the Operator Studio web interface (0.15) remain unbuilt, per the spec's
-own phased plan -- none of that is stubbed out here, per the spec's own
-rule against labeling provisional logic as production logic.
+Renderer Capability Atlas (0.5), Video Slicer (0.6), provider compilers
+(0.7+), verification, repair, assembly, and the Operator Studio web
+interface (0.15) remain unbuilt, per the spec's own phased plan -- none
+of that is stubbed out here, per the spec's own rule against labeling
+provisional logic as production logic.
 
 ### What Release 0.3 deliberately does not include
 
@@ -304,13 +385,54 @@ demand it.
 No continuity *enforcement*: `invariants` on `FilmGenome` is a validated
 list of non-empty, unique strings (e.g. `lead_performer_identity`,
 `master_song`), but nothing in this release checks that a shot, clip, or
-generated asset actually honors a declared invariant -- that's
-Production Graph (0.4) and the verification stages named in the spec's
-pipeline diagram (section 2), not this one.
+generated asset actually honors a declared invariant. Release 0.4 adds
+structural shot-to-shot continuity checking (state chaining), but it
+still isn't tied back to `FilmGenome.invariants` by name -- that linkage,
+and checking a *generated asset* against either, is verification-stage
+work (spec pipeline diagram, section 2), still not built.
+
+### What Release 0.4 deliberately does not include
+
+No `renderer_risk`, `slice_strategy`, `slices`, or `editing` on `Shot`,
+even though spec section 6.8's worked example shows all of them on one
+`shot` object -- those are Video Slicer (0.6) outputs that come after
+Production Graph compilation in the pipeline (spec section 2). Building
+them here would mean claiming a later release's integration before that
+release exists; see `production/models.py`'s module docstring for the
+same point made in more detail.
+
+No cross-check between a `Shot.timing.lyric_ids` and an actual
+`Timeline` (Release 0.2) -- `lyric_ids` is validated for shape (a list of
+non-empty strings) but not for whether each id resolves to a real
+`LyricLine`. Wiring `production/builder.py` to accept a `Timeline`
+alongside the `FilmGenome` it already takes would close this the same
+way `assemble_production_graph()` already closes the performer/costume/
+world case; it just wasn't done in this pass, to keep the release's
+diff to one new cross-package integration point (genome) rather than
+two (genome and music) at once.
+
+No `Project` integration: `Project.production_graph_id` (added in
+Release 0.1) is still an unresolved forward reference, same gap as
+`film_genome_id` in Release 0.3. No persistence layer or CLI either --
+`Sequence`, `SemanticEvent`, `Shot`, and `ProductionGraph` exist only as
+in-memory dataclasses returned by `production/builder.py`.
+
+The same-sequence, same-performer scope for state-chaining is this
+release's own interpretation, not something spec section 19's terse
+"dependencies; transition relationships" bullet points spell out
+precisely. A chain is enforced only between shots that share both a
+`sequence_id` and a `requirements.performer_id` -- two shots featuring
+different performers, or shots in different sequences, are not required
+to chain state. This was chosen because nothing in the spec text
+describes a *global*, cross-performer, cross-sequence state machine, and
+this same repository's pre-spec `runtime.py` scopes its own equivalent
+check to one continuous clip-to-clip chain, not an ensemble-wide one.
+Worth revisiting if a later release's requirements need a different
+scope.
 
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, or Release 0.3 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, or Release 0.4 imports from, depends on, or
 modifies either.

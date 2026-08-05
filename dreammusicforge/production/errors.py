@@ -1,0 +1,16 @@
+"""Typed errors for the production package, extending core.errors'
+DMFError hierarchy rather than starting a parallel one."""
+from __future__ import annotations
+
+from ..core.errors import DMFError
+
+
+class ProductionGraphValidationError(DMFError):
+    """Raised when a Sequence/SemanticEvent/Shot/ProductionGraph fails
+    validation. Carries every problem found, same discipline as
+    core.errors.ProjectValidationError, music.errors.TimelineValidationError,
+    and genome.errors.GenomeValidationError."""
+
+    def __init__(self, errors: list[str]):
+        self.errors = list(errors)
+        super().__init__("; ".join(self.errors) if self.errors else "production graph validation failed")
