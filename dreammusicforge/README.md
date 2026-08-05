@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -526,6 +526,74 @@ audio.py`'s module docstring. `SSIM_SIMILARITY_THRESHOLD` (0.85),
 this release's own thresholds, not spec-given numbers -- the spec
 requires each check exist, not a specific cutoff.
 
+Release 0.10 adds `repair/`, which turns a Release 0.9 `TechnicalReport`
+into an accept/reject decision and -- for a rejected candidate -- a
+bounded repair plan. This release's acceptance test (spec section 19):
+"failed candidate produces a bounded repair plan." It's grounded in a
+real failure, not a synthetic one: the user uploaded two actual Kling
+AI 3.0 clips meant to be visually identical (same performer, same
+costume, same hair, same stage) that weren't -- running Release 0.9's
+real seam comparison against them measured SSIM 0.674, and this
+release's default `continuity` threshold (70.0 on a 0-100 scale) is set
+so that exact real number correctly triggers a reject. See
+`repair/classifier.py`'s test suite, which uses those real measured
+numbers directly rather than a made-up example.
+
+```
+dreammusicforge/
+├── repair/
+│   ├── models.py    -- Defect (spec section 8.9's schema), RepairPlan
+│   │                     and VerificationResult (spec section 6.11's
+│   │                     schema)
+│   ├── schema.py     -- dict-shaped schemas + validate_*_schema(),
+│   │                     including cross-field rules (reject requires
+│   │                     a repair plan and at least one critical
+│   │                     failure; accept requires neither)
+│   ├── scoring.py      -- score_technical_report(): turns a Release
+│   │                     0.9 TechnicalReport into the automated half
+│   │                     of section 6.11's metrics dict (duration_
+│   │                     frame_rate, audio, continuity, color_continuity)
+│   ├── classifier.py    -- DEFAULT_CRITICAL_THRESHOLDS,
+│   │                     METRIC_RECOMMENDATIONS, classify_failures()
+│   ├── errors.py          -- AcceptanceRepairError (DMFError)
+│   └── builder.py          -- build_repair_plan(), evaluate_candidate()
+│                            -- the accept/reject workflow
+└── tests/repair/            -- 57 tests, one file per module above
+```
+
+```python
+from dreammusicforge.repair import score_technical_report, evaluate_candidate
+
+metrics = score_technical_report(technical_report)  # from Release 0.9
+result = evaluate_candidate(candidate_id=candidate.id, shot_id=shot.id, metrics=metrics)
+
+result.decision          # "accept" or "reject"
+result.repair.action     # e.g. "regenerate" -- present only when rejected
+result.repair.preserve   # metrics that passed and must not be touched during repair
+```
+
+Section 6.11's own worked example doesn't just show generic actions --
+it repairs a `lip_sync` failure with `dedicated_lip_sync_pass`, a name
+that isn't in section 8.9's six-action list at all. `METRIC_RECOMMENDATIONS`
+reuses that exact mapping for `lip_sync` rather than forcing every
+failure through the generic vocabulary; `REPAIR_ACTIONS` is seeded from
+section 8.9 but isn't schema-enforced as a closed list, since the spec's
+own two examples don't agree on one. A rejected candidate with more than
+one defect -- or any single defect whose top recommendation is itself
+`regenerate` -- collapses to one `regenerate` action rather than several
+partial fixes attempted at once; that's what "bounded" means here: one
+shot, one action, an explicit `preserve` list naming what must survive.
+
+The six metrics section 6.11's example shows beyond what this release
+can compute automatically (`identity`, `hair`, `costume`, `world`,
+`camera`, `lip_sync`) are intentionally not fabricated by
+`score_technical_report()` -- spec section 9.3 explicitly defers those
+to "adapter interfaces and manual scoring" until real models exist.
+`evaluate_candidate()`'s `metrics` parameter accepts them the moment a
+caller supplies them (manually, or from a future adapter) -- the
+threshold/classification/repair machinery already works for any named
+metric, not just the four this release measures itself.
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -559,7 +627,8 @@ requires each check exist, not a specific cutoff.
   unittest discover -s dreammusicforge/tests/generation` (29 tests),
   `python -m unittest discover -s dreammusicforge/tests/verification -t .`
   (56 tests -- needs `-t .`, see below, and needs ffmpeg/ffprobe on
-  PATH), and `python -m dreammusicforge.apps.cli.main` from the
+  PATH), `python -m unittest discover -s dreammusicforge/tests/repair`
+  (57 tests), and `python -m dreammusicforge.apps.cli.main` from the
   repository root -- none require a pip install step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
   `is_valid_id(value, prefix)` in Release 0.2**, so the new `AUDIO-`,
@@ -897,9 +966,47 @@ names.
 
 No persistence layer or CLI, same pattern as every release since 0.2.
 
+### What Release 0.10 deliberately does not include
+
+No shot-selection ranking. Spec section 8.10 describes ranking multiple
+candidates for the same shot against each other ("a beautiful candidate
+with a critical continuity failure must rank below a less beautiful
+candidate that preserves the canonical film") -- this release evaluates
+one candidate at a time (`evaluate_candidate()`), producing an
+accept/reject decision and a repair plan for it alone. Comparing several
+candidates for the same shot and picking a winner is Release 0.10's
+"accept/reject workflow" applied per-candidate, not the separate
+ranking-across-candidates step 8.10 describes -- that's a defensible
+reading of section 19's own Build list, which says "accept/reject
+workflow," not "candidate ranking," but it's a real scope line worth
+naming rather than leaving implicit.
+
+No identity/hair/costume/world/camera/lip_sync metrics computed
+automatically -- `score_technical_report()` produces only what Release
+0.9 can measure (`duration_frame_rate`, `audio`, `continuity`,
+`color_continuity`); the six qualitative metrics spec section 6.11's
+own worked example shows need a trained model or a human reviewer this
+repository doesn't have (section 9.3). `evaluate_candidate()`'s
+`metrics` parameter is deliberately open to whatever a caller supplies,
+so this isn't a hard wall, but nothing here computes those six on its
+own.
+
+No actual repair *execution*. A `RepairPlan` names an action
+(`regenerate`, `dedicated_lip_sync_pass`, ...) and what to preserve --
+nothing in this release re-prompts a provider, re-renders a shot, or
+feeds a repair plan back into Release 0.6's slicer or Release 0.7's
+Kling compiler to produce a new `RenderTask`/`KlingPackage`. That
+closes-the-loop integration is real future work, not yet built.
+
+No `Candidate` integration -- same gap as Release 0.9: `evaluate_candidate()`
+takes a `candidate_id` as a plain string, not a `generation.Candidate`
+object, and nothing writes the resulting `decision` back onto a stored
+`Candidate.decision`/`.verification_status` field (both would still
+read `"pending"` from Release 0.8). No persistence layer or CLI either.
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, Release 0.8, or Release 0.9 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, Release 0.8, Release 0.9, or Release 0.10 imports from, depends on, or
 modifies either.
