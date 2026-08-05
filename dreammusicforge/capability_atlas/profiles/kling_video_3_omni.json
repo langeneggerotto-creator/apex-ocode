@@ -1,0 +1,22 @@
+{
+  "renderer_id": "kling-video-3-omni",
+  "display_name": "Kling VIDEO 3.0 Omni",
+  "max_duration_seconds": 15,
+  "profile_status": "ASSUMED_UNTIL_BENCHMARKED",
+  "capabilities": {
+    "individual_cinematic_quality": {"score": 90, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "identity": {"score": 78, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "hair": {"score": 65, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "wardrobe": {"score": 68, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "stage": {"score": 72, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "camera_continuity": {"score": 63, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "lighting_continuity": {"score": 70, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "lip_sync": {"score": 76, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "audio_continuity": {"score": 42, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "solo_choreography": {"score": 78, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "ensemble_choreography": {"score": 50, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "start_frame_adherence": {"score": 80, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "end_frame_targeting": {"score": 72, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"},
+    "multi_world_long_form_memory": {"score": 25, "evidence_status": "ASSUMED_UNTIL_BENCHMARKED"}
+  }
+}
