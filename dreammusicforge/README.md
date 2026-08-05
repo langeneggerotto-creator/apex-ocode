@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -594,6 +594,87 @@ caller supplies them (manually, or from a future adapter) -- the
 threshold/classification/repair machinery already works for any named
 metric, not just the four this release measures itself.
 
+Release 0.11 adds `assembly/`, which turns a set of accepted candidates
+into one finished video with the canonical master song as its audio
+track. This release's acceptance test (spec section 19): "accepted
+shots assemble into one video with uninterrupted song."
+
+```
+dreammusicforge/
+├── assembly/
+│   ├── models.py    -- Transition (spec section 8.6's schema),
+│   │                     AssembledClip, ExportManifest
+│   ├── schema.py     -- dict-shaped schemas + validate_*_schema(),
+│   │                     including an overlap check across the final
+│   │                     timeline
+│   ├── ffmpeg_runner.py -- the one module that invokes ffmpeg for this
+│   │                     package (normalize / concat / mux), each
+│   │                     function building its own fixed argv, same
+│   │                     allowlisting discipline as Release 0.9's
+│   │                     verification/ffmpeg_runner.py -- a separate
+│   │                     copy, not a shared import, since the two
+│   │                     packages invoke ffmpeg for different purposes
+│   ├── pipeline.py       -- normalize_clip(), concatenate_clips(),
+│   │                     replace_audio() -- thin typed wrappers
+│   ├── errors.py           -- AssemblyError (DMFError)
+│   └── builder.py           -- assemble_film(): the orchestration
+└── tests/assembly/            -- 33 tests, one file per module above
+    (needs ffmpeg on PATH)
+```
+
+```python
+from dreammusicforge.assembly import assemble_film
+
+manifest = assemble_film(
+    master_song=master_song,                                    # Release 0.2
+    accepted=((candidate_a, result_a), (candidate_b, result_b)), # Releases 0.8 + 0.10, decision == "accept"
+    shots_by_candidate_id={candidate_a.id: shot_a, candidate_b.id: shot_b},
+    output_width=1080, output_height=1920, output_frame_rate=30.0,
+    work_dir=Path("scratch/assembly"), output_path=Path("final.mp4"),
+    created_at="2026-08-05T00:00:00+00:00",
+)
+manifest.output_hash            # sha256 of the real final file
+manifest.total_duration_seconds
+```
+
+The audio in the final file is **never** a concatenation of each clip's
+own audio track -- it's one continuous pull from the master song file,
+replacing whatever audio the individual Kling candidates carried
+entirely (spec Law 3.9, "master audio remains external"; Law 3.2,
+"music is the master clock"). That's a deliberate departure from how
+the two real reference stitch files this session reviewed were built
+(each concatenated its clips' own audio, which resets or jumps at every
+cut) -- `replace_audio()` fixes that structurally rather than leaving it
+to chance.
+
+`assemble_film()` fails closed on three things a caller might get
+wrong: a candidate whose `VerificationResult.decision` isn't `"accept"`
+(Release 0.10) never reaches ffmpeg; a `VerificationResult` that doesn't
+actually belong to the candidate it's paired with is rejected the same
+way; and a requested `Transition` whose type isn't one this release
+actually executes raises rather than silently falling back to a hard
+cut without saying so. Of spec section 8.6's ten named transition types,
+only `hard_cut` is executed -- the other nine (dissolve, dip to black,
+foreground wipe, ...) need real compositing this repository doesn't
+have yet. That's not a gap invented for convenience: this session's own
+real reference video (a professionally produced ~4-minute music video
+reviewed earlier) used exactly this technique -- hard cuts between
+fully distinct scenes, no attempt to bridge them -- to move between
+its chapters, which is also the strategy this session settled on for
+handling Kling's identity/costume/world drift across separately
+generated clips. `hard_cut` being the one implemented type isn't a
+placeholder; it's the one this pipeline's own real evidence says is
+load-bearing.
+
+One real bug surfaced by running this against two differently-sourced
+real-shaped clips (not caught by any unit test in isolation): scaling
+two clips to identical pixel dimensions isn't enough for ffmpeg's
+concat filter to accept them if their sources had different sample
+aspect ratios -- `normalize_clip()` now forces `setsar=1` explicitly.
+`tests/assembly/test_pipeline.py`'s
+`test_joins_clips_with_originally_different_aspect_ratios` is the
+regression test for it.
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -628,8 +709,10 @@ metric, not just the four this release measures itself.
   `python -m unittest discover -s dreammusicforge/tests/verification -t .`
   (56 tests -- needs `-t .`, see below, and needs ffmpeg/ffprobe on
   PATH), `python -m unittest discover -s dreammusicforge/tests/repair`
-  (57 tests), and `python -m dreammusicforge.apps.cli.main` from the
-  repository root -- none require a pip install step.
+  (57 tests), `python -m unittest discover -s
+  dreammusicforge/tests/assembly -t .` (33 tests -- also needs `-t .`
+  and ffmpeg on PATH), and `python -m dreammusicforge.apps.cli.main`
+  from the repository root -- none require a pip install step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
   `is_valid_id(value, prefix)` in Release 0.2**, so the new `AUDIO-`,
   `SECTION-`, and `LYRIC-` id families in `music/ids.py` don't duplicate
@@ -1004,9 +1087,47 @@ object, and nothing writes the resulting `decision` back onto a stored
 `Candidate.decision`/`.verification_status` field (both would still
 read `"pending"` from Release 0.8). No persistence layer or CLI either.
 
+### What Release 0.11 deliberately does not include
+
+Nine of spec section 8.6's ten transition types are declared and
+schema-validated but never executed -- `dissolve`, `dip_to_black`,
+`foreground_wipe`, `motion_match`, `graphic_match`, `color_bridge`,
+`light_flash`, `blur_transition`, and `beat_cut` all need real video
+compositing (cross-fades, masking, timed graphic overlays) this
+repository doesn't have yet. `assemble_film()` fails closed on them
+rather than silently rendering a hard cut and calling it something
+else. Real compositing work is Release 0.13's territory (Masking and
+Compositing) and beyond.
+
+No lip-sync application (Release 0.12), no color grading or final audio
+mixing beyond the one master-song swap (Release 0.14) -- clips are
+normalized to a common resolution and frame rate, nothing more.
+`normalize_clip()` doesn't attempt any color, exposure, or white-balance
+matching between clips from different generations, even though that's
+part of what a real "finishing" pass would do.
+
+No verification of the *assembled* output against the project's overall
+target duration or the master song's actual runtime -- `assemble_film()`
+produces whatever duration the accepted clips sum to; nothing checks
+that against `Project.target_duration_seconds` (Release 0.1) or flags a
+film that's running short or long relative to the song. That check
+belongs with an `ExportManifest` a `Project` can be validated against,
+which needs the `Project` integration this release (like every release
+since 0.2) doesn't have.
+
+No re-running Release 0.9's technical verification against the
+*assembled* file itself -- only the individual candidates that went
+into it were verified (Release 0.9/0.10, before assembly). The real
+gap this closes was named honestly back in Release 0.8's section of
+this README: per-candidate verification and final-delivery verification
+are different checks, and this release only does the former's
+consumer, not the latter's producer.
+
+No persistence layer or CLI, same pattern as every release since 0.2.
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, Release 0.8, Release 0.9, or Release 0.10 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, Release 0.8, Release 0.9, Release 0.10, or Release 0.11 imports from, depends on, or
 modifies either.
