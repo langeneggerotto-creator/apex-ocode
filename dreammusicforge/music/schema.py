@@ -7,6 +7,8 @@ not just the first; empty list means valid.
 """
 from __future__ import annotations
 
+from collections import Counter
+
 from .models import SECTION_TYPES
 
 MASTER_SONG_SCHEMA_VERSION = "0.2.0"
@@ -261,6 +263,11 @@ def validate_timeline_schema(data: dict) -> list[str]:
                 f"lyric lines {previous['id']!r} and {current['id']!r} overlap "
                 f"({previous['end_seconds']} > {current['start_seconds']})"
             )
+
+    index_counts = Counter(beat["index"] for beat in beats)
+    duplicate_indices = sorted(index for index, count in index_counts.items() if count > 1)
+    if duplicate_indices:
+        errors.append(f"beat index values must be unique, duplicated: {duplicate_indices}")
 
     ordered_beat_times = [beat["time"] for beat in sorted(beats, key=lambda item: item["index"])]
     if ordered_beat_times != sorted(ordered_beat_times):

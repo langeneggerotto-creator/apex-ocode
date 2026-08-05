@@ -162,7 +162,18 @@ transcription or forced alignment, no stem separation -- `stems` on
 `MasterSong` is a dict of paths a human or an earlier pipeline stage
 supplies, not something this release produces. All of that is exactly the
 kind of DSP work the spec defers to later stages; nothing here claims to
-do it. Film Genome (0.3), Production Graph (0.4), Renderer Capability
+do it.
+
+Unlike Release 0.1, there is no persistence layer or CLI for this
+release's domain objects: `MasterSong` and `Timeline` exist only as
+in-memory dataclasses returned by `music/builder.py` -- there is no
+`MasterSongRepository` and no `dmf` CLI subcommand to build, save, or
+load one. A caller that wants to persist a `MasterSong` today has to
+serialize `.to_dict()` itself. Wiring that up is straightforward
+(`storage/sqlite_repository.py`'s `ProjectRepository` is a template for
+exactly this) but wasn't part of this release's authorized scope.
+
+Film Genome (0.3), Production Graph (0.4), Renderer Capability
 Atlas (0.5), Video Slicer (0.6), provider compilers (0.7+), verification,
 repair, assembly, and the Operator Studio web interface (0.15) remain
 unbuilt, per the spec's own phased plan -- none of that is stubbed out

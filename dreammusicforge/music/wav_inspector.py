@@ -37,7 +37,7 @@ def inspect_wav(path: Path) -> WavMetadata:
             sample_rate = handle.getframerate()
             channels = handle.getnchannels()
             sample_width = handle.getsampwidth()
-    except (wave.Error, EOFError) as exc:
+    except (wave.Error, EOFError, OSError) as exc:
         raise AudioInspectionError(f"{path} is not a readable WAV file: {exc}") from exc
 
     if sample_rate <= 0:

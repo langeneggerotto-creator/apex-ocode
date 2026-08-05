@@ -186,6 +186,19 @@ class TimelineSchemaTests(unittest.TestCase):
     def test_empty_timeline_is_valid(self):
         self.assertEqual(validate_timeline_schema({"master_song_id": "AUDIO-deadbeef"}), [])
 
+    def test_duplicate_beat_indices_are_rejected(self):
+        data = copy.deepcopy(VALID_TIMELINE)
+        data["beats"] = [
+            {"index": 0, "time": 0.0, "bar": 1, "beat_in_bar": 1},
+            {"index": 0, "time": 0.5, "bar": 1, "beat_in_bar": 2},
+        ]
+        errors = validate_timeline_schema(data)
+        self.assertTrue(any("duplicated" in e for e in errors))
+
+    def test_unique_beat_indices_are_accepted(self):
+        data = copy.deepcopy(VALID_TIMELINE)
+        self.assertEqual(validate_timeline_schema(data), [])
+
 
 if __name__ == "__main__":
     unittest.main()

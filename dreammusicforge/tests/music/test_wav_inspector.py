@@ -4,6 +4,7 @@ import tempfile
 import unittest
 import wave
 from pathlib import Path
+from unittest import mock
 
 from dreammusicforge.music.errors import AudioInspectionError
 from dreammusicforge.music.wav_inspector import inspect_wav
@@ -73,6 +74,17 @@ class InspectWavFailureTests(unittest.TestCase):
         _write_empty_wav(path)
         with self.assertRaises(AudioInspectionError):
             inspect_wav(path)
+
+    def test_os_error_from_wave_open_becomes_audio_inspection_error(self):
+        """A file that exists (passes is_file()) but can't actually be
+        opened -- permission denied, a disk I/O error, a file replaced
+        mid-read -- must still surface as the typed AudioInspectionError,
+        not a bare OSError leaking past this module's boundary."""
+        path = self.dir / "song.wav"
+        _write_wav(path, seconds=1.0)
+        with mock.patch("wave.open", side_effect=OSError("permission denied")):
+            with self.assertRaises(AudioInspectionError):
+                inspect_wav(path)
 
 
 if __name__ == "__main__":
