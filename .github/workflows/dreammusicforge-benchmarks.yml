@@ -1,0 +1,32 @@
+name: DreamMusicForge Benchmarks
+
+on:
+  pull_request:
+    paths:
+      - "dreammusicforge/**"
+      - ".github/workflows/dreammusicforge-benchmarks.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "dreammusicforge/**"
+      - ".github/workflows/dreammusicforge-benchmarks.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run DreamMusicForge tests
+        run: python -m unittest discover -s dreammusicforge/tests -v
+      - name: Run passing benchmark fixture
+        run: |
+          python -m dreammusicforge.benchmark_cli \
+            dreammusicforge/benchmarks/benchmark_006_sustained_phrase.json \
+            dreammusicforge/providers/kling/profile_v0.1.json \
+            dreammusicforge/benchmarks/example_metrics_pass.json \
+            --evidence-out /tmp/dmf-evidence.json \
+            --profile-out /tmp/dmf-profile.json
