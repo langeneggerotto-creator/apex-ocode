@@ -1,0 +1,18 @@
+{
+  "provider_id": "kling",
+  "provider_version": "current-user-access-profile",
+  "max_duration_seconds": 15,
+  "evidence_status": "ASSUMED_UNTIL_BENCHMARKED",
+  "capabilities": {
+    "image_to_video": true,
+    "last_frame_seed": true,
+    "character_reference": true,
+    "world_reference": true,
+    "native_audio": true,
+    "video_extension": false,
+    "start_end_frames": false
+  },
+  "measured_scores": {},
+  "measured_averages": {},
+  "benchmark_history": []
+}
