@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -300,6 +300,59 @@ release's own interpretation, not spec-mandated -- see
 `capability_atlas/scoring.py`'s module docstring for the reasoning,
 including why `unsupported` and `unknown` deliberately score the same.
 
+Release 0.6 adds `slicer/`, the layer that turns a `Shot` and its
+`ProviderFitReport` (Release 0.5) into a validated `SliceResult` of
+executable render tasks -- this release's acceptance test (spec section
+19): "complex shot becomes executable render tasks."
+
+```
+dreammusicforge/
+├── slicer/
+│   ├── models.py    -- RiskFactors, TemporalSlice, VisualLayer,
+│   │                     MotionLayer, FallbackPlan, RenderTask,
+│   │                     StrategyDecision, SliceResult
+│   ├── schema.py     -- dict-shaped schemas + validate_*_schema() for
+│   │                     each model
+│   ├── risk.py         -- compute_risk_factors(): deterministic risk
+│   │                     scoring built from Shot + RendererCapabilityProfile
+│   │                     + ShotFitScore (Release 0.5's own output)
+│   ├── strategy.py      -- select_strategy(): four of spec section
+│   │                     7.4's five named strategies, computed
+│   │                     deterministically (see below for the fifth)
+│   ├── errors.py          -- SlicerValidationError (DMFError)
+│   └── builder.py          -- slice_shot(): the top-level orchestration
+└── tests/slicer/            -- 57 tests, one file per module above
+```
+
+```python
+from dreammusicforge.capability_atlas import rank_providers_for_shot
+from dreammusicforge.slicer import slice_shot
+
+report = rank_providers_for_shot(shot, (kling, veo))  # shot/profiles from Releases 0.4-0.5
+result = slice_shot(shot, report, {"kling": kling, "veo": veo})
+
+result.strategy       # "direct_render" | "controlled_continuation" | "layered_compositing" | "external_production_required"
+result.render_tasks   # one or more RenderTask, each with a RENDER-* id, provider, duration, required_assets
+```
+
+`select_strategy()` never returns `editorial_illusion`: spec section
+7.4's own "Select when" bullets for it ("symbolic imagery can replace
+literal complexity," "cutaways can conceal defects") are creative
+judgments with no computable signal in this repository's domain model.
+Auto-selecting it would mean fabricating a proxy for a human creative
+call -- exactly the placeholder logic spec section 22 forbids labeling
+complete. `controlled_continuation` is selected only when a provider was
+disqualified *purely* for exceeding the shot's duration and it declares
+positive-evidence support for a continuation-style capability
+(`video_extension`/`last_frame_seed`, reusing this same repository's
+pre-spec `runtime.py` continuity-mode vocabulary) -- `slice_shot()` then
+chunks the shot into as many `<= max_duration_seconds` pieces as needed,
+chaining each `RenderTask` after the first to the previous one's output
+file. `layered_compositing` produces a small, deliberately modest set of
+visual layers (`world_pass`, `performer_pass`, and `lip_sync_pass` when
+required) -- see "What Release 0.6 deliberately does not include" for
+why finer per-character layers aren't attempted.
+
 ### Design choices worth knowing about
 
 - **Flat modules, not subpackages, for `core/ids`, `core/hashing`,
@@ -327,8 +380,10 @@ including why `unsupported` and `unknown` deliberately score the same.
   discover -s dreammusicforge/tests/genome` (67 tests), `python -m
   unittest discover -s dreammusicforge/tests/production` (56 tests),
   `python -m unittest discover -s dreammusicforge/tests/capability_atlas`
-  (47 tests), and `python -m dreammusicforge.apps.cli.main` from the
-  repository root -- none require an installation step.
+  (47 tests), `python -m unittest discover -s
+  dreammusicforge/tests/slicer` (57 tests), and `python -m
+  dreammusicforge.apps.cli.main` from the repository root -- none require
+  an installation step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
   `is_valid_id(value, prefix)` in Release 0.2**, so the new `AUDIO-`,
   `SECTION-`, and `LYRIC-` id families in `music/ids.py` don't duplicate
@@ -512,9 +567,51 @@ is wired to a `Project`, since the spec doesn't give `Project` a
 capability-atlas-shaped forward reference the way it does for
 `master_song_id`/`film_genome_id`/`production_graph_id`.
 
+### What Release 0.6 deliberately does not include
+
+`editorial_illusion` is never auto-selected -- see the walkthrough above
+and `slicer/strategy.py`'s module docstring for why: it requires a
+creative/symbolic judgment call this system has no way to make. A
+future release could add it once there's an actual creative-review input
+(a human decision, or some other real signal) to drive the choice; until
+then, shots that might suit it fall through to whichever of the other
+four strategies the deterministic rules produce.
+
+`layered_compositing`'s visual layers are deliberately coarse: always
+`world_pass` and `performer_pass`, plus `lip_sync_pass` when required --
+not the finer per-character layers spec section 6.8's worked example
+shows (`dancers_left`, `dancers_right`). Producing those would need
+choreography/blocking data (who stands where, which characters group
+together) that isn't in the `Shot` model this release has to work with;
+inventing plausible-sounding layer names without that data would be
+exactly the kind of fabrication section 22 forbids. `motion_layers`
+is similarly minimal -- one `primary_motion` layer per shot, because
+`camera_motion` is the only motion-related field `ShotRequirements`
+carries.
+
+`RenderTask.mode`, `.prompt_file`, and `.negative_prompt_file` are
+always `None` in this release's output, even though spec section 6.9's
+`render_task` YAML shows all three populated. Section 19 names "mode
+selection" and "prompt generation" as explicit Release 0.7 (Kling
+Compiler) deliverables; populating them here would mean claiming a
+later release's integration before it exists (spec section 22, rule 14).
+
+No fallback planning beyond `external_production_required`. Spec section
+19 lists "fallback planning" as its own deliverable, and this release
+covers the one case that's unambiguous from the data available (no
+provider can render the shot at all) with a `FallbackPlan`. A richer
+fallback system -- e.g. re-attempting with a relaxed strategy after a
+render fails verification -- needs Release 0.9-0.10's verification and
+repair machinery to have something concrete to react to; it doesn't
+exist yet.
+
+No persistence layer or CLI, and no `Project` integration, same pattern
+as every release since 0.2: `SliceResult` and everything inside it exist
+only as in-memory dataclasses returned by `slicer/builder.py`.
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, Release 0.3, Release 0.4, or Release 0.5 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, or Release 0.6 imports from, depends on, or
 modifies either.
