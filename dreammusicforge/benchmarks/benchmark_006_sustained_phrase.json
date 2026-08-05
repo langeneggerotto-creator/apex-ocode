@@ -1,0 +1,57 @@
+{
+  "benchmark_id": "DMF-B006",
+  "name": "Sustained Phrase Continuity",
+  "duration_seconds": 20,
+  "purpose": "Determine whether one performer, one song phrase, one camera path, and one physical reality can remain continuous across two provider-limited generations.",
+  "required_capabilities": [
+    "image_to_video",
+    "last_frame_seed",
+    "character_reference"
+  ],
+  "immutable_invariants": [
+    "performer identity",
+    "face geometry",
+    "body proportions",
+    "hair topology",
+    "wardrobe topology",
+    "jewelry",
+    "stage geometry",
+    "song timeline",
+    "camera axis"
+  ],
+  "segments": [
+    {
+      "id": "SEG-001",
+      "start": 0,
+      "end": 10,
+      "source_state_id": "STATE-000",
+      "destination_state_id": "STATE-010",
+      "primary_action": "Raise right hand from waist to lower chest while sustaining one lyric phrase.",
+      "continuity_mode": "character_reference"
+    },
+    {
+      "id": "SEG-002",
+      "start": 10,
+      "end": 20,
+      "source_state_id": "STATE-010",
+      "destination_state_id": "STATE-020",
+      "primary_action": "Continue the same hand movement from lower chest to heart while the same phrase resolves.",
+      "continuity_mode": "last_frame_seed"
+    }
+  ],
+  "dimensions": {
+    "identity": {"weight": 0.18, "threshold": 95},
+    "hair": {"weight": 0.08, "threshold": 98},
+    "wardrobe": {"weight": 0.10, "threshold": 98},
+    "stage": {"weight": 0.08, "threshold": 95},
+    "camera": {"weight": 0.10, "threshold": 92},
+    "lighting": {"weight": 0.07, "threshold": 90},
+    "audio": {"weight": 0.12, "threshold": 98},
+    "lip_sync": {"weight": 0.10, "threshold": 90},
+    "pose": {"weight": 0.07, "threshold": 92},
+    "seam_invisibility": {"weight": 0.10, "threshold": 90}
+  },
+  "promotion_rule": "Every dimension must meet its threshold. Weighted average alone cannot override a critical failure.",
+  "complexity_level": 1,
+  "next_level_unlock": "Add one secondary camera variable only after three consecutive passing runs."
+}
