@@ -1,0 +1,159 @@
+{
+  "all_mandatory_gates_passed": true,
+  "bite": "Bite 3 - Tasks and runtime profiles - v3.3",
+  "bugs_found_and_fixed_during_this_bite": [
+    "Cancelling a still-QUEUED job only marked intent (a set membership) without transitioning its state; with all worker slots busy, the job could report QUEUED for an arbitrarily long time after being cancelled. Fixed: cancel() now removes a still-queued job from the queue and transitions it to CANCELLED synchronously.",
+    "The job state machine didn't allow LEASED -> FAILED, only LEASED -> RUNNING/CANCELLED \u2014 so a job whose sandboxed process failed to even start (e.g. an untrusted workspace) crashed the worker thread trying to record that outcome. Fixed by adding the direct LEASED -> FAILED transition for exactly that case."
+  ],
+  "gates": {
+    "adversarial_and_functional_tests": {
+      "command": "python3 -m pytest tests/ -v (against the clean-installed package)",
+      "exit_code": 0,
+      "junit_summary": {
+        "available": true,
+        "cases": [
+          {
+            "name": "tests.test_executor::test_valid_transition_sequence",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_executor::test_leased_can_fail_directly_without_running",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_executor::test_invalid_transition_rejected",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_executor::test_terminal_state_has_no_further_transitions",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_executor::test_executor_start_wait_cleanup",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_executor::test_executor_untrusted_workspace_refused",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_functional_positive_path",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_concurrency_limit_enforced",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_cancel_queued_job_never_runs",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_cancel_running_job",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_timeout_transitions_to_timed_out",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_isolation_still_enforced_inside_a_job",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_untrusted_workspace_refused",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_logs_are_secret_scrubbed_in_evidence",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_daemon_client_submit_status_logs_list_shutdown",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manager_daemon::test_daemon_reachable_from_separate_client_connections",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_valid_manifest_parses",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_default_timeout_applied",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_unknown_task_raises_keyerror_like",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_invalid_json_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_missing_tasks_key_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_unknown_task_type_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_missing_command_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_empty_command_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_non_string_command_element_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_non_positive_timeout_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_manifest::test_resource_limit_overrides_parsed",
+            "status": "passed"
+          }
+        ],
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "total": 27
+      },
+      "log_tail": "============================= test session starts ==============================\nplatform linux -- Python 3.11.15, pytest-9.1.1, pluggy-1.6.0 -- /tmp/tmp.9E7ZnahLfa/ocode-tasks-install-proof/bin/python3\ncachedir: .pytest_cache\nrootdir: /workspace/apex-ocode/tasks-v3.3\nconfigfile: pyproject.toml\ncollecting ... collected 27 items\n\ntests/test_executor.py::test_valid_transition_sequence PASSED            [  3%]\ntests/test_executor.py::test_leased_can_fail_directly_without_running PASSED [  7%]\ntests/test_executor.py::test_invalid_transition_rejected PASSED          [ 11%]\ntests/test_executor.py::test_terminal_state_has_no_further_transitions PASSED [ 14%]\ntests/test_executor.py::test_executor_start_wait_cleanup PASSED          [ 18%]\ntests/test_executor.py::test_executor_untrusted_workspace_refused PASSED [ 22%]\ntests/test_manager_daemon.py::test_functional_positive_path PASSED       [ 25%]\ntests/test_manager_daemon.py::test_concurrency_limit_enforced PASSED     [ 29%]\ntests/test_manager_daemon.py::test_cancel_queued_job_never_runs PASSED   [ 33%]\ntests/test_manager_daemon.py::test_cancel_running_job PASSED             [ 37%]\ntests/test_manager_daemon.py::test_timeout_transitions_to_timed_out PASSED [ 40%]\ntests/test_manager_daemon.py::test_isolation_still_enforced_inside_a_job PASSED [ 44%]\ntests/test_manager_daemon.py::test_untrusted_workspace_refused PASSED    [ 48%]\ntests/test_manager_daemon.py::test_logs_are_secret_scrubbed_in_evidence PASSED [ 51%]\ntests/test_manager_daemon.py::test_daemon_client_submit_status_logs_list_shutdown PASSED [ 55%]\ntests/test_manager_daemon.py::test_daemon_reachable_from_separate_client_connections PASSED [ 59%]\ntests/test_manifest.py::test_valid_manifest_parses PASSED                [ 62%]\ntests/test_manifest.py::test_default_timeout_applied PASSED              [ 66%]\ntests/test_manifest.py::test_unknown_task_raises_keyerror_like PASSED    [ 70%]\ntests/test_manifest.py::test_invalid_json_fails_closed PASSED            [ 74%]\ntests/test_manifest.py::test_missing_tasks_key_fails_closed PASSED       [ 77%]\ntests/test_manifest.py::test_unknown_task_type_fails_closed PASSED       [ 81%]\ntests/test_manifest.py::test_missing_command_fails_closed PASSED         [ 85%]\ntests/test_manifest.py::test_empty_command_fails_closed PASSED           [ 88%]\ntests/test_manifest.py::test_non_string_command_element_fails_closed PASSED [ 92%]\ntests/test_manifest.py::test_non_positive_timeout_fails_closed PASSED    [ 96%]\ntests/test_manifest.py::test_resource_limit_overrides_parsed PASSED      [100%]\n\n--- generated xml file: /workspace/apex-ocode/tasks-v3.3/evidence/.junit.xml ---\n============================== 27 passed in 5.95s ==============================\n",
+      "passed": true
+    },
+    "clean_environment_install": {
+      "command": "tasks-v3.3/scripts/install_clean_env.sh",
+      "exit_code": 0,
+      "log_tail": "== creating clean venv at /tmp/tmp.9E7ZnahLfa/ocode-tasks-install-proof ==\n== installing Bite 1 dependency (/workspace/apex-ocode/sandbox-workspace-trust-v3.1) into clean venv ==\n== installing /workspace/apex-ocode/tasks-v3.3 into clean venv ==\n== import proof ==\nimport OK: /tmp/tmp.9E7ZnahLfa/ocode-tasks-install-proof/lib/python3.11/site-packages/ocode_tasks/__init__.py\n== CLI proof ==\nCLI OK\n/tmp/tmp.9E7ZnahLfa/ocode-tasks-install-proof\n",
+      "passed": true
+    },
+    "rollback_demonstration": {
+      "command": "tasks-v3.3/scripts/rollback_demo.sh",
+      "exit_code": 0,
+      "log_tail": "== before rollback ==\npresent: /tmp/tmp.r0iycAOq1x/ocode-tasks-rollback-proof/lib/python3.11/site-packages/ocode_tasks/__init__.py\nbite1 present: /tmp/tmp.r0iycAOq1x/ocode-tasks-rollback-proof/lib/python3.11/site-packages/ocode_sandbox/__init__.py\n== rolling back Bite 3 only (pip uninstall) ==\n== after rollback ==\nconfirmed: ocode_tasks no longer importable after uninstall\nbite1 still present, unaffected: /tmp/tmp.r0iycAOq1x/ocode-tasks-rollback-proof/lib/python3.11/site-packages/ocode_sandbox/__init__.py\n== repository-level rollback ==\ngit revert <bite-3-commit-sha> removes this entire additive directory\n(tasks-v3.3/) with no other tracked file depending on it.\nROLLBACK DEMONSTRATION: PASS\n",
+      "passed": true
+    },
+    "specification_gate": {
+      "command": "python3 scripts/ocode_spec_gate.py",
+      "exit_code": 0,
+      "passed": true
+    }
+  },
+  "generated_at": 1786040426.2754056,
+  "next_eligible_bite": "Bite 4 - Professional editor foundation - v3.4 (not started)",
+  "residual_risks": [
+    "Concurrency-limit enforcement is per-daemon-instance; normal CLI usage always targets one well-known socket path per workspace, so this is not reachable in practice, but is not enforced across hypothetical multiple daemon instances for the same workspace.",
+    "No graceful cancellation (single hard kill of the sandboxed process tree) \u2014 a deliberate scope decision for batch/build/test jobs, not an oversight; see PLAN.md.",
+    "Primitives verified inside this nested development container only, same caveat as Bites 1 and 2."
+  ],
+  "schema_version": "ocode.bite-evidence-manifest.v1",
+  "truth_label": "LOCALLY_VERIFIED"
+}

@@ -1,0 +1,3 @@
+# Local monorepo dependency: install Bite 1's package before this one.
+-e ../sandbox-workspace-trust-v3.1
+-e .

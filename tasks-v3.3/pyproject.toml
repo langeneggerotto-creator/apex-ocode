@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ocode-tasks"
+version = "0.1.0"
+description = "OCode Bite 3 - declarative tasks, structured job states, and a concurrency-limited job manager (local mode)"
+requires-python = ">=3.9"
+dependencies = [
+    "ocode-sandbox>=0.1.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
