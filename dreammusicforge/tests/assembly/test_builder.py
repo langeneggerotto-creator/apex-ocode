@@ -125,9 +125,9 @@ class AssembleFilmTests(FfmpegRequiredTestCase):
             )
 
     def test_non_executable_transition_type_raises(self):
-        dissolve = Transition(
-            source_shot_id="SHOT-1", destination_shot_id="SHOT-2", transition_type="dissolve",
-            duration_seconds=1.0, musical_anchor="phrase end", visual_bridge="cross-fade", semantic_purpose="soften the cut",
+        dip_to_black = Transition(
+            source_shot_id="SHOT-1", destination_shot_id="SHOT-2", transition_type="dip_to_black",
+            duration_seconds=1.0, musical_anchor="phrase end", visual_bridge="fade through black", semantic_purpose="soften the cut",
         )
         with self.assertRaises(AssemblyError):
             assemble_film(
@@ -136,7 +136,73 @@ class AssembleFilmTests(FfmpegRequiredTestCase):
                 shots_by_candidate_id={"CANDIDATE-1": self.shot1, "CANDIDATE-2": self.shot2},
                 output_width=480, output_height=854, output_frame_rate=24.0,
                 work_dir=self.dir / "work", output_path=self.dir / "final.mp4", created_at="2026-08-05T00:00:00+00:00",
-                transitions=(dissolve,),
+                transitions=(dip_to_black,),
+            )
+
+    def test_dissolve_transition_crossfades_and_shortens_total_duration(self):
+        """Added after reviewing a real professionally-produced
+        reference video in this session: it relies on more than hard
+        cuts, so `dissolve` is now executed via ffmpeg's `xfade` filter
+        rather than failing closed like the other eight named
+        transition types still do."""
+        dissolve_duration = 1.0
+        dissolve = Transition(
+            source_shot_id="SHOT-1", destination_shot_id="SHOT-2", transition_type="dissolve",
+            duration_seconds=dissolve_duration, musical_anchor="phrase end", visual_bridge="cross-fade", semantic_purpose="soften the cut",
+        )
+        output_path = self.dir / "final.mp4"
+        manifest = assemble_film(
+            master_song=self.master_song,
+            accepted=((self.candidate1, _accepted_result("CANDIDATE-1")), (self.candidate2, _accepted_result("CANDIDATE-2"))),
+            shots_by_candidate_id={"CANDIDATE-1": self.shot1, "CANDIDATE-2": self.shot2},
+            output_width=480, output_height=854, output_frame_rate=24.0,
+            work_dir=self.dir / "work", output_path=output_path, created_at="2026-08-05T00:00:00+00:00",
+            transitions=(dissolve,),
+        )
+
+        self.assertEqual(len(manifest.transitions), 1)
+        # Clip 1 is 3s, clip 2 is 4s; a 1s crossfade overlaps them, so
+        # the assembled timeline should be shorter than a plain 7s
+        # hard-cut concatenation of the same two clips.
+        self.assertLess(manifest.total_duration_seconds, 7.0)
+        second_clip = next(c for c in manifest.clips if c.candidate_id == "CANDIDATE-2")
+        self.assertAlmostEqual(second_clip.start_seconds_in_final, 3.0 - dissolve_duration, delta=0.5)
+
+        media = inspect_media(output_path)
+        self.assertTrue(media.has_audio)
+        audio = measure_audio_rms(output_path)
+        self.assertFalse(audio.silent)
+
+    def test_dissolve_duration_not_shorter_than_either_clip_raises(self):
+        too_long_dissolve = Transition(
+            source_shot_id="SHOT-1", destination_shot_id="SHOT-2", transition_type="dissolve",
+            duration_seconds=10.0,  # longer than either 3s/4s source clip
+            musical_anchor="phrase end", visual_bridge="cross-fade", semantic_purpose="soften the cut",
+        )
+        with self.assertRaises(AssemblyError):
+            assemble_film(
+                master_song=self.master_song,
+                accepted=((self.candidate1, _accepted_result("CANDIDATE-1")), (self.candidate2, _accepted_result("CANDIDATE-2"))),
+                shots_by_candidate_id={"CANDIDATE-1": self.shot1, "CANDIDATE-2": self.shot2},
+                output_width=480, output_height=854, output_frame_rate=24.0,
+                work_dir=self.dir / "work", output_path=self.dir / "final.mp4", created_at="2026-08-05T00:00:00+00:00",
+                transitions=(too_long_dissolve,),
+            )
+
+    def test_transition_not_matching_an_adjacent_pair_raises(self):
+        stray = Transition(
+            source_shot_id="SHOT-1", destination_shot_id="SHOT-999",  # SHOT-999 doesn't exist in this assembly
+            transition_type="hard_cut", duration_seconds=0.0,
+            musical_anchor="phrase end", visual_bridge="none", semantic_purpose="n/a",
+        )
+        with self.assertRaises(AssemblyError):
+            assemble_film(
+                master_song=self.master_song,
+                accepted=((self.candidate1, _accepted_result("CANDIDATE-1")), (self.candidate2, _accepted_result("CANDIDATE-2"))),
+                shots_by_candidate_id={"CANDIDATE-1": self.shot1, "CANDIDATE-2": self.shot2},
+                output_width=480, output_height=854, output_frame_rate=24.0,
+                work_dir=self.dir / "work", output_path=self.dir / "final.mp4", created_at="2026-08-05T00:00:00+00:00",
+                transitions=(stray,),
             )
 
     def test_hard_cut_transition_is_accepted(self):

@@ -14,6 +14,15 @@ compositing, and it's also the exact technique this session's own real
 reference video used to move between deliberately distinct scenes (see
 README.md's "Design choices" section for the grounding).
 
+`dissolve` was added to EXECUTABLE_TRANSITION_TYPES after reviewing a
+real professionally-produced reference video: it relies on more than
+hard cuts to move between chapters, and a crossfade (ffmpeg's `xfade`
+filter) is the one other transition in spec section 8.6's list that
+needs no additional compositing input beyond the two adjacent clips
+themselves -- unlike foreground_wipe/motion_match/graphic_match/etc.,
+which need extra assets or motion analysis this repository doesn't
+have yet. The remaining eight transition types still fail closed.
+
 `ExportManifest` is this release's own addition -- the spec names
 "export manifest" as a Build deliverable (section 19) but gives no
 worked YAML example the way sections 6.1-6.11 do for other entities.
@@ -34,7 +43,7 @@ TRANSITION_TYPES = (
     "graphic_match", "color_bridge", "light_flash", "blur_transition", "beat_cut",
 )
 
-EXECUTABLE_TRANSITION_TYPES = ("hard_cut",)
+EXECUTABLE_TRANSITION_TYPES = ("hard_cut", "dissolve")
 
 
 @dataclass(frozen=True)

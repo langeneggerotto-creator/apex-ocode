@@ -197,7 +197,7 @@ dreammusicforge/
 │   ├── errors.py        -- ProductionGraphValidationError (DMFError)
 │   └── builder.py        -- build_semantic_event(), build_sequence(),
 │                          build_shot(), assemble_production_graph()
-└── tests/production/      -- 56 tests, one file per module above
+└── tests/production/      -- 64 tests, one file per module above
 ```
 
 ```python
@@ -615,10 +615,11 @@ dreammusicforge/
 │   │                     copy, not a shared import, since the two
 │   │                     packages invoke ffmpeg for different purposes
 │   ├── pipeline.py       -- normalize_clip(), concatenate_clips(),
+│   │                     concatenate_clips_with_transitions(),
 │   │                     replace_audio() -- thin typed wrappers
 │   ├── errors.py           -- AssemblyError (DMFError)
 │   └── builder.py           -- assemble_film(): the orchestration
-└── tests/assembly/            -- 33 tests, one file per module above
+└── tests/assembly/            -- 39 tests, one file per module above
     (needs ffmpeg on PATH)
 ```
 
@@ -700,7 +701,7 @@ regression test for it.
   dreammusicforge/tests/kernel` (61 tests), `python -m unittest discover
   -s dreammusicforge/tests/music` (108 tests), `python -m unittest
   discover -s dreammusicforge/tests/genome` (67 tests), `python -m
-  unittest discover -s dreammusicforge/tests/production` (56 tests),
+  unittest discover -s dreammusicforge/tests/production` (64 tests),
   `python -m unittest discover -s dreammusicforge/tests/capability_atlas`
   (47 tests), `python -m unittest discover -s
   dreammusicforge/tests/slicer` (57 tests), `python -m unittest discover
@@ -710,7 +711,7 @@ regression test for it.
   (56 tests -- needs `-t .`, see below, and needs ffmpeg/ffprobe on
   PATH), `python -m unittest discover -s dreammusicforge/tests/repair`
   (57 tests), `python -m unittest discover -s
-  dreammusicforge/tests/assembly -t .` (33 tests -- also needs `-t .`
+  dreammusicforge/tests/assembly -t .` (39 tests -- also needs `-t .`
   and ffmpeg on PATH), and `python -m dreammusicforge.apps.cli.main`
   from the repository root -- none require a pip install step.
 - **`core/ids.py` gained generic `generate_id(prefix)` /
@@ -1089,15 +1090,16 @@ read `"pending"` from Release 0.8). No persistence layer or CLI either.
 
 ### What Release 0.11 deliberately does not include
 
-Nine of spec section 8.6's ten transition types are declared and
-schema-validated but never executed -- `dissolve`, `dip_to_black`,
-`foreground_wipe`, `motion_match`, `graphic_match`, `color_bridge`,
-`light_flash`, `blur_transition`, and `beat_cut` all need real video
-compositing (cross-fades, masking, timed graphic overlays) this
-repository doesn't have yet. `assemble_film()` fails closed on them
-rather than silently rendering a hard cut and calling it something
-else. Real compositing work is Release 0.13's territory (Masking and
-Compositing) and beyond.
+Eight of spec section 8.6's ten transition types are declared and
+schema-validated but never executed -- `dip_to_black`, `foreground_wipe`,
+`motion_match`, `graphic_match`, `color_bridge`, `light_flash`,
+`blur_transition`, and `beat_cut` all need real video compositing
+(masking, timed graphic overlays, motion analysis) this repository
+doesn't have yet. `assemble_film()` fails closed on them rather than
+silently rendering a hard cut and calling it something else. Real
+compositing work is Release 0.13's territory (Masking and Compositing)
+and beyond. (`dissolve` was added to the executed set after Release
+0.11 shipped -- see "Editorial chapters" below.)
 
 No lip-sync application (Release 0.12), no color grading or final audio
 mixing beyond the one master-song swap (Release 0.14) -- clips are
@@ -1124,6 +1126,86 @@ are different checks, and this release only does the former's
 consumer, not the latter's producer.
 
 No persistence layer or CLI, same pattern as every release since 0.2.
+
+## Editorial chapters: per-sequence camera/color language and a second executable transition
+
+Added after Release 0.11, not part of the spec's original numbered
+release plan -- prompted by reviewing a real, professionally-produced
+reference video in this session and extracting general editorial
+technique from it (structure and pacing only, not its specific
+content): the piece moves through distinct visual chapters, each with
+its own camera vocabulary and color grading, and it relies on more than
+hard cuts to move between them.
+
+**Per-sequence camera/color language** (`production/models.py`,
+`production/builder.py`). `Sequence` gained two optional fields,
+`camera_language: CameraLanguage | None` and `color_language:
+ColorLanguage | None`, defaulting to `None` -- "use the film's default."
+`FilmGenome.camera_language`/`.color_language` (spec section 6.3's
+shape) are unchanged and still the film-wide baseline. A sequence that
+wants to look or move differently from the rest of the film -- a
+chapter change -- declares its own; `production.resolve_camera_language(
+sequence, film_genome)` / `resolve_color_language(sequence, film_genome)`
+return the override if present, otherwise the film's default. Nothing
+before this release could express "this chapter looks different," even
+though every FilmGenome already has the vocabulary (`CameraLanguage`,
+`ColorLanguage`) to describe how.
+
+**`dissolve` is now executed** (`assembly/models.py`,
+`assembly/ffmpeg_runner.py`, `assembly/pipeline.py`,
+`assembly/builder.py`). `EXECUTABLE_TRANSITION_TYPES` grew from
+`("hard_cut",)` to `("hard_cut", "dissolve")` -- the one other transition
+in spec section 8.6's list that needs no additional compositing input
+beyond the two adjacent clips themselves. `assemble_film()` now resolves
+one `(transition_type, duration_seconds)` per adjacent shot pair in the
+final chronological order (defaulting to an implicit hard cut when the
+caller declares no `Transition` for that pair, so every existing caller
+that never passes `transitions` is unaffected), validates that a
+declared `Transition` actually corresponds to an adjacent pair and that
+a dissolve's `duration_seconds` fits inside both of its neighboring
+clips, and picks the ffmpeg path accordingly: a pure hard-cut sequence
+still calls the original, unchanged `concatenate_clips()`; anything with
+at least one dissolve calls the new `concatenate_clips_with_transitions()`,
+which builds a mixed `concat`/`xfade` filter chain that can combine both
+styles across an arbitrary number of clips, not just two.
+
+A crossfade makes its two adjacent clips overlap in the final timeline
+by design -- that's what a dissolve *is* -- so `AssembledClip.
+start_seconds_in_final` bookkeeping and `assembly/schema.py`'s
+overlap check both had to change: the schema now permits exactly the
+overlap a declared dissolve transition explains (within a 0.5s
+tolerance for ffmpeg re-encode drift) and still rejects anything else.
+
+**A real ffmpeg bug found by actually running a 3-clip mixed chain**,
+not by unit-testing `xfade` in isolation: ffmpeg's `concat` filter
+output carries a different internal timebase than a raw decoded input,
+and `xfade` refuses to run when its two inputs don't share one
+("First input link main timebase ... do not match the corresponding
+second input link xfade timebase"). Fixed by passing every stream --
+both raw inputs and `concat` outputs -- through an explicit `fps=`
+filter before it can reach an `xfade` node, which resets it to one
+known, constant timebase. `tests/assembly/test_pipeline.py`'s
+`test_three_clip_chain_mixes_hard_cut_and_dissolve` is the regression
+test.
+
+### What this deliberately does not include
+
+The other eight named transition types (`dip_to_black`,
+`foreground_wipe`, `motion_match`, `graphic_match`, `color_bridge`,
+`light_flash`, `blur_transition`, `beat_cut`) still fail closed --
+`dissolve` was the only one that needed no additional compositing input
+beyond the two clips already being assembled. No ensemble/multi-performer
+identity locking -- everything this session has actually run end to end
+(hope, burgundy, rooftop) is a single performer; a real
+multiple-dancers-on-stage sequence is untested ground and a harder
+version of the same identity-drift problem `repair/` already handles
+for one performer at a time. No genome-level validation that a
+sequence's override and the film's default share any relationship
+(e.g. a shared lens) -- a sequence can currently declare a wildly
+inconsistent camera language from its film with no warning; that's a
+deliberate choice (chapters *should* be allowed to look different) but
+means this doesn't catch an override that's a typo rather than an
+intentional chapter change.
 
 ## The original, pre-spec governed baseline
 

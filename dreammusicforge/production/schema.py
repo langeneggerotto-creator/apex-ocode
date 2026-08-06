@@ -100,6 +100,25 @@ def validate_sequence_schema(data: dict) -> list[str]:
     if _is_number(start) and _is_number(end) and start >= end:
         errors.append(f"sequence start_seconds ({start}) must be before end_seconds ({end})")
 
+    camera_language = data.get("camera_language")
+    if camera_language is not None:
+        if not isinstance(camera_language, dict):
+            errors.append("sequence camera_language, if present, must be an object")
+        else:
+            for field_name in ("lens_vocabulary", "movement_vocabulary"):
+                value = camera_language.get(field_name, [])
+                if not isinstance(value, list) or not all(_is_non_empty_str(item) for item in value):
+                    errors.append(f"sequence camera_language.{field_name} must be a list of non-empty strings")
+
+    color_language = data.get("color_language")
+    if color_language is not None:
+        if not isinstance(color_language, dict):
+            errors.append("sequence color_language, if present, must be an object")
+        else:
+            for field_name in ("opening", "development", "climax"):
+                if not _is_non_empty_str(color_language.get(field_name)):
+                    errors.append(f"sequence color_language.{field_name} must be a non-empty string")
+
     return errors
 
 

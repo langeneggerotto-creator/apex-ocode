@@ -16,7 +16,7 @@ compiler imposes the order, callers don't have to pre-sort their input.
 """
 from __future__ import annotations
 
-from ..genome.models import FilmGenome
+from ..genome.models import CameraLanguage, ColorLanguage, FilmGenome
 from .errors import ProductionGraphValidationError
 from .ids import generate_graph_id, generate_semantic_event_id, generate_sequence_id, generate_shot_id
 from .models import (
@@ -57,18 +57,36 @@ def build_sequence(
     start_seconds: float,
     end_seconds: float,
     sequence_id: str | None = None,
+    camera_language: CameraLanguage | None = None,
+    color_language: ColorLanguage | None = None,
 ) -> Sequence:
     sequence = Sequence(
         id=sequence_id or generate_sequence_id(),
         song_section=song_section,
         start_seconds=start_seconds,
         end_seconds=end_seconds,
+        camera_language=camera_language,
+        color_language=color_language,
     )
 
     errors = validate_sequence_schema(sequence.to_dict())
     if errors:
         raise ProductionGraphValidationError(errors)
     return sequence
+
+
+def resolve_camera_language(sequence: Sequence, film_genome: FilmGenome) -> CameraLanguage:
+    """A sequence's own camera_language if it declared one (a chapter
+    that deliberately moves differently from the rest of the film),
+    otherwise the film's default -- see Sequence's docstring for why
+    this override exists."""
+    return sequence.camera_language if sequence.camera_language is not None else film_genome.camera_language
+
+
+def resolve_color_language(sequence: Sequence, film_genome: FilmGenome) -> ColorLanguage:
+    """A sequence's own color_language if it declared one, otherwise
+    the film's default -- see resolve_camera_language()."""
+    return sequence.color_language if sequence.color_language is not None else film_genome.color_language
 
 
 def build_shot(

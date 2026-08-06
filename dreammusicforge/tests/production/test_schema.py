@@ -78,6 +78,28 @@ class SequenceSchemaTests(unittest.TestCase):
         errors = validate_sequence_schema(data)
         self.assertTrue(any("start_seconds" in e for e in errors))
 
+    def test_valid_camera_and_color_language_overrides_have_no_errors(self):
+        data = dict(
+            VALID_SEQUENCE,
+            camera_language={"lens_vocabulary": ["85mm"], "movement_vocabulary": ["handheld"]},
+            color_language={"opening": "teal", "development": "teal", "climax": "crimson"},
+        )
+        self.assertEqual(validate_sequence_schema(data), [])
+
+    def test_missing_camera_language_is_valid_none_means_use_film_default(self):
+        data = dict(VALID_SEQUENCE, camera_language=None, color_language=None)
+        self.assertEqual(validate_sequence_schema(data), [])
+
+    def test_malformed_camera_language_is_rejected(self):
+        data = dict(VALID_SEQUENCE, camera_language={"lens_vocabulary": "not-a-list", "movement_vocabulary": []})
+        errors = validate_sequence_schema(data)
+        self.assertTrue(any("camera_language.lens_vocabulary" in e for e in errors))
+
+    def test_malformed_color_language_is_rejected(self):
+        data = dict(VALID_SEQUENCE, color_language={"opening": "teal", "development": ""})
+        errors = validate_sequence_schema(data)
+        self.assertTrue(any("color_language" in e for e in errors))
+
 
 class ShotSchemaTests(unittest.TestCase):
     def test_valid_shot_has_no_errors(self):

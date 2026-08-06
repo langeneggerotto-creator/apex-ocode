@@ -4,7 +4,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from dreammusicforge.assembly.pipeline import concatenate_clips, normalize_clip, replace_audio
+from dreammusicforge.assembly.errors import AssemblyError
+from dreammusicforge.assembly.pipeline import concatenate_clips, concatenate_clips_with_transitions, normalize_clip, replace_audio
 from dreammusicforge.verification import inspect_media, measure_audio_rms
 
 from .fixtures import FfmpegRequiredTestCase, make_clip, make_wav_tone
@@ -80,6 +81,58 @@ class ConcatenateClipsTests(FfmpegRequiredTestCase):
         media = inspect_media(output)
         self.assertEqual(media.width, 512)
         self.assertEqual(media.height, 910)
+
+
+class ConcatenateClipsWithTransitionsTests(FfmpegRequiredTestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_pure_dissolve_pair_crossfades_and_shortens_duration(self):
+        clip1 = make_clip(self.dir / "a.mp4", color="red", duration=3.0, size="480x854")
+        clip2 = make_clip(self.dir / "b.mp4", color="blue", duration=3.0, size="480x854")
+        norm1, norm2 = self.dir / "a-norm.mp4", self.dir / "b-norm.mp4"
+        normalize_clip(clip1, norm1, 480, 854, 24.0)
+        normalize_clip(clip2, norm2, 480, 854, 24.0)
+
+        output = self.dir / "concat.mp4"
+        concatenate_clips_with_transitions((norm1, norm2), (3.0, 3.0), (("dissolve", 1.0),), 24.0, output)
+        media = inspect_media(output)
+        # 3s + 3s with a 1s crossfade overlap = 5s, not the naive 6s.
+        self.assertAlmostEqual(media.duration_seconds, 5.0, delta=0.5)
+
+    def test_three_clip_chain_mixes_hard_cut_and_dissolve(self):
+        """A chapter boundary within one assembled sequence: clip1->clip2
+        is a hard cut, clip2->clip3 is a dissolve -- both styles in one
+        filter graph, the general case assembly/builder.py relies on."""
+        clip1 = make_clip(self.dir / "a.mp4", color="red", duration=2.0, size="480x854")
+        clip2 = make_clip(self.dir / "b.mp4", color="green", duration=2.0, size="480x854")
+        clip3 = make_clip(self.dir / "c.mp4", color="blue", duration=2.0, size="480x854")
+        norms = []
+        for src, name in ((clip1, "a"), (clip2, "b"), (clip3, "c")):
+            norm = self.dir / f"{name}-norm.mp4"
+            normalize_clip(src, norm, 480, 854, 24.0)
+            norms.append(norm)
+
+        output = self.dir / "concat.mp4"
+        concatenate_clips_with_transitions(
+            tuple(norms), (2.0, 2.0, 2.0), (("hard_cut", 0.0), ("dissolve", 0.5)), 24.0, output,
+        )
+        media = inspect_media(output)
+        # 2+2+2 naive = 6s, minus the one 0.5s dissolve overlap = 5.5s.
+        self.assertAlmostEqual(media.duration_seconds, 5.5, delta=0.5)
+
+    def test_mismatched_pair_transitions_length_raises(self):
+        clip1 = make_clip(self.dir / "a.mp4", duration=2.0, size="480x854")
+        clip2 = make_clip(self.dir / "b.mp4", duration=2.0, size="480x854")
+        norm1, norm2 = self.dir / "a-norm.mp4", self.dir / "b-norm.mp4"
+        normalize_clip(clip1, norm1, 480, 854, 24.0)
+        normalize_clip(clip2, norm2, 480, 854, 24.0)
+        with self.assertRaises(AssemblyError):
+            concatenate_clips_with_transitions((norm1, norm2), (2.0, 2.0), (), 24.0, self.dir / "concat.mp4")
 
 
 class ReplaceAudioTests(FfmpegRequiredTestCase):

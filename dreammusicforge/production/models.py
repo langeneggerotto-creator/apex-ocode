@@ -34,6 +34,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from ..genome.models import CameraLanguage, ColorLanguage
+
 
 @dataclass(frozen=True)
 class SemanticEvent:
@@ -74,10 +76,23 @@ class SemanticEvent:
 
 @dataclass(frozen=True)
 class Sequence:
+    """camera_language/color_language are optional per-sequence
+    overrides of the FilmGenome's film-wide defaults -- added after
+    reviewing a real professionally-produced reference video in this
+    session: a multi-chapter piece visibly changes its camera vocabulary
+    and color grading at chapter (sequence) boundaries, not just once
+    for the whole film. FilmGenome.camera_language/color_language stay
+    the film-wide baseline (spec section 6.3's shape, unchanged); a
+    Sequence may declare its own to represent "this chapter looks and
+    moves differently." None means "use the film's default" -- see
+    production/builder.py's resolve_camera_language()/
+    resolve_color_language()."""
     id: str
     song_section: str
     start_seconds: float
     end_seconds: float
+    camera_language: CameraLanguage | None = None
+    color_language: ColorLanguage | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -85,15 +100,21 @@ class Sequence:
             "song_section": self.song_section,
             "start_seconds": self.start_seconds,
             "end_seconds": self.end_seconds,
+            "camera_language": self.camera_language.to_dict() if self.camera_language else None,
+            "color_language": self.color_language.to_dict() if self.color_language else None,
         }
 
     @staticmethod
     def from_dict(data: dict) -> "Sequence":
+        camera_language = data.get("camera_language")
+        color_language = data.get("color_language")
         return Sequence(
             id=data["id"],
             song_section=data["song_section"],
             start_seconds=float(data["start_seconds"]),
             end_seconds=float(data["end_seconds"]),
+            camera_language=CameraLanguage.from_dict(camera_language) if camera_language else None,
+            color_language=ColorLanguage.from_dict(color_language) if color_language else None,
         )
 
 

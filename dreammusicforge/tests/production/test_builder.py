@@ -6,6 +6,7 @@ from dreammusicforge.genome.builder import assemble_film_genome, build_costume, 
 from dreammusicforge.genome.models import CameraLanguage, ColorLanguage
 from dreammusicforge.production.builder import (
     assemble_production_graph, build_semantic_event, build_sequence, build_shot,
+    resolve_camera_language, resolve_color_language,
 )
 from dreammusicforge.production.errors import ProductionGraphValidationError
 from dreammusicforge.production.models import ShotContinuity, ShotPurpose, ShotRequirements, ShotTiming
@@ -53,6 +54,41 @@ class BuildSequenceTests(unittest.TestCase):
     def test_end_before_start_raises(self):
         with self.assertRaises(ProductionGraphValidationError):
             build_sequence(song_section="chorus_1", start_seconds=60.0, end_seconds=40.0)
+
+    def test_camera_and_color_language_overrides_are_stored(self):
+        camera = CameraLanguage(lens_vocabulary=("85mm",), movement_vocabulary=("handheld",))
+        color = ColorLanguage(opening="teal", development="teal", climax="crimson")
+        sequence = build_sequence(
+            song_section="bridge", start_seconds=40.0, end_seconds=60.0, camera_language=camera, color_language=color,
+        )
+        self.assertEqual(sequence.camera_language, camera)
+        self.assertEqual(sequence.color_language, color)
+
+
+class ResolveSequenceLanguageTests(unittest.TestCase):
+    """Editorial-chapter support added after reviewing a real
+    professionally-produced reference video in this session: distinct
+    chapters of one film can have their own camera/color language, not
+    just the film-wide default."""
+
+    def setUp(self):
+        self.genome, _, _, _ = _build_genome()
+
+    def test_sequence_without_override_falls_back_to_film_default(self):
+        sequence = build_sequence(song_section="chorus_1", start_seconds=40.0, end_seconds=60.0)
+        self.assertEqual(resolve_camera_language(sequence, self.genome), self.genome.camera_language)
+        self.assertEqual(resolve_color_language(sequence, self.genome), self.genome.color_language)
+
+    def test_sequence_with_override_takes_precedence_over_film_default(self):
+        camera = CameraLanguage(lens_vocabulary=("85mm",), movement_vocabulary=("handheld",))
+        color = ColorLanguage(opening="teal", development="teal", climax="crimson")
+        sequence = build_sequence(
+            song_section="bridge", start_seconds=40.0, end_seconds=60.0, camera_language=camera, color_language=color,
+        )
+        self.assertEqual(resolve_camera_language(sequence, self.genome), camera)
+        self.assertEqual(resolve_color_language(sequence, self.genome), color)
+        self.assertNotEqual(camera, self.genome.camera_language)
+        self.assertNotEqual(color, self.genome.color_language)
 
 
 class BuildShotTests(unittest.TestCase):

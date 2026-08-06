@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import unittest
 
+from dreammusicforge.genome.models import CameraLanguage, ColorLanguage
 from dreammusicforge.production.models import (
     ProductionGraph, SemanticEvent, Sequence, Shot, ShotContinuity, ShotPurpose, ShotRequirements, ShotTiming,
 )
@@ -17,7 +18,10 @@ SEMANTIC_EVENT_DATA = {
     "required_visible_evidence": ["direct gaze", "forward step"],
 }
 
-SEQUENCE_DATA = {"id": "SEQ-deadbeef", "song_section": "chorus_1", "start_seconds": 40.0, "end_seconds": 60.0}
+SEQUENCE_DATA = {
+    "id": "SEQ-deadbeef", "song_section": "chorus_1", "start_seconds": 40.0, "end_seconds": 60.0,
+    "camera_language": None, "color_language": None,
+}
 
 SHOT_DATA = {
     "id": "SHOT-deadbeef",
@@ -57,6 +61,15 @@ class SequenceRoundTripTests(unittest.TestCase):
     def test_from_dict_then_to_dict_round_trips(self):
         sequence = Sequence.from_dict(SEQUENCE_DATA)
         self.assertEqual(sequence.to_dict(), SEQUENCE_DATA)
+
+    def test_camera_and_color_language_overrides_round_trip(self):
+        data = dict(SEQUENCE_DATA)
+        data["camera_language"] = CameraLanguage(lens_vocabulary=("85mm",), movement_vocabulary=("handheld",)).to_dict()
+        data["color_language"] = ColorLanguage(opening="teal", development="teal", climax="crimson").to_dict()
+        sequence = Sequence.from_dict(data)
+        self.assertEqual(sequence.camera_language, CameraLanguage(lens_vocabulary=("85mm",), movement_vocabulary=("handheld",)))
+        self.assertEqual(sequence.color_language, ColorLanguage(opening="teal", development="teal", climax="crimson"))
+        self.assertEqual(sequence.to_dict(), data)
 
 
 class ShotRoundTripTests(unittest.TestCase):

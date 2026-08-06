@@ -7,7 +7,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .ffmpeg_runner import run_ffmpeg_concat, run_ffmpeg_normalize, run_ffmpeg_replace_audio
+from .ffmpeg_runner import (
+    run_ffmpeg_concat, run_ffmpeg_concat_with_transitions, run_ffmpeg_normalize, run_ffmpeg_replace_audio,
+)
 
 
 def normalize_clip(input_path: Path, output_path: Path, width: int, height: int, frame_rate: float) -> Path:
@@ -17,6 +19,17 @@ def normalize_clip(input_path: Path, output_path: Path, width: int, height: int,
 
 def concatenate_clips(clip_paths: tuple[Path, ...], output_path: Path) -> Path:
     run_ffmpeg_concat(clip_paths, output_path)
+    return output_path
+
+
+def concatenate_clips_with_transitions(
+    clip_paths: tuple[Path, ...],
+    clip_durations: tuple[float, ...],
+    pair_transitions: tuple[tuple[str, float], ...],
+    frame_rate: float,
+    output_path: Path,
+) -> Path:
+    run_ffmpeg_concat_with_transitions(clip_paths, clip_durations, pair_transitions, frame_rate, output_path)
     return output_path
 
 

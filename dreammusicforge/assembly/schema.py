@@ -124,13 +124,30 @@ def validate_export_manifest_schema(data: dict) -> list[str]:
         errors.extend(f"transitions[{index}]: {error}" for error in validate_transition_schema(transition))
 
     if isinstance(clips, list) and len(clips) >= 2:
+        # A `dissolve` transition deliberately makes its two adjacent
+        # clips overlap in the final timeline (that's what a crossfade
+        # is), so overlap alone isn't an error -- only overlap that no
+        # declared dissolve transition explains is. The 0.5s tolerance
+        # absorbs float/frame-rounding drift between the Transition's
+        # declared duration_seconds and ffmpeg's actual re-encoded
+        # timing, without being loose enough to miss a real bug.
+        dissolve_durations_by_shot_pair = {
+            (t["source_shot_id"], t["destination_shot_id"]): t["duration_seconds"]
+            for t in transitions if isinstance(t, dict) and t.get("transition_type") == "dissolve"
+        }
+        overlap_tolerance_seconds = 0.5
         ordered = sorted(clips, key=lambda item: item.get("start_seconds_in_final", 0))
         for previous, current in zip(ordered, ordered[1:]):
             previous_end = previous["start_seconds_in_final"] + previous["normalized_duration_seconds"]
-            if current["start_seconds_in_final"] < previous_end:
+            overlap = previous_end - current["start_seconds_in_final"]
+            if overlap <= 0:
+                continue
+            expected_overlap = dissolve_durations_by_shot_pair.get((previous["shot_id"], current["shot_id"]))
+            if expected_overlap is None or abs(overlap - expected_overlap) > overlap_tolerance_seconds:
                 errors.append(
                     f"clips {previous['candidate_id']!r} and {current['candidate_id']!r} overlap in the final "
-                    f"timeline ({previous_end} > {current['start_seconds_in_final']})"
+                    f"timeline ({previous_end} > {current['start_seconds_in_final']}) with no matching dissolve "
+                    "transition to explain it"
                 )
 
     return errors
