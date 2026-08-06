@@ -1,0 +1,28 @@
+name: OCode Platform Specification Gate
+
+on:
+  pull_request:
+    paths:
+      - "CLAUDE.md"
+      - "ocode-platform-spec/**"
+      - "scripts/ocode_spec_gate.py"
+      - ".github/workflows/ocode-platform-spec-gate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "CLAUDE.md"
+      - "ocode-platform-spec/**"
+      - "scripts/ocode_spec_gate.py"
+
+jobs:
+  specification-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate OCode specification contract
+        run: python scripts/ocode_spec_gate.py
