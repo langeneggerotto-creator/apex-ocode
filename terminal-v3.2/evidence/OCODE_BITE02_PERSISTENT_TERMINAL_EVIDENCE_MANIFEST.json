@@ -1,0 +1,100 @@
+{
+  "all_mandatory_gates_passed": true,
+  "bite": "Bite 2 - Persistent integrated terminal - v3.2",
+  "bugs_found_and_fixed_during_this_bite": [
+    "argparse.REMAINDER-adjacent CLI arg-splitting bug carried the same class of fix forward from Bite 1: the 'start' subcommand's command is now split off at a literal '--' before argparse ever sees it.",
+    "PID-namespace-1 signal immunity (pid_namespaces(7)): the sandboxed target always landed on PID 1 of its namespace, where the kernel drops any default-disposition signal outright rather than queuing it \u2014 fixed by forking a minimal init/reaper (_pty_init.py) so the real target runs on PID 2+.",
+    "Signal-handler inheritance across fork(): a signal forwarded to the freshly-forked target could be caught by its still-inherited (not yet reset) Python-level handler and silently absorbed before the real program even started \u2014 fixed by blocking the forwarded signals in the parent before fork() (inherited atomically, so there is no window at all) and only unblocking in the child after resetting dispositions to default.",
+    "Client protocol livelock: awaiting a specific reply type re-read from a queue it had just written the same skipped message into, looping on it forever \u2014 fixed by having the reply-wait path read directly off the wire instead of through the pending-message queue.",
+    "Unsynchronized concurrent socket writes: the daemon's output-reader thread and a client-request-handling thread could both call send() on the same connection concurrently, interleaving bytes mid-line \u2014 fixed with a per-connection send lock.",
+    "escalated/exit_code race between the client-request handler thread (which signals and tracks escalation) and the reader thread (which independently detects process exit via PTY EOF) \u2014 fixed by setting the escalation flag synchronously at the moment SIGKILL is decided (via a callback), not from the signaling call's return value, and by making the reader thread the sole authority that reaps and reports the final exit code."
+  ],
+  "gates": {
+    "adversarial_and_functional_tests": {
+      "command": "python3 -m pytest tests/ -v (against the clean-installed package)",
+      "exit_code": 0,
+      "junit_summary": {
+        "available": true,
+        "cases": [
+          {
+            "name": "tests.test_daemon_client::test_reconnect_preserves_scrollback_across_separate_clients",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_daemon_client::test_resize_changes_real_pty_winsize",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_daemon_client::test_idle_timeout_stops_session_automatically",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_daemon_client::test_isolation_still_enforced_inside_a_terminal_session",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_daemon_client::test_untrusted_workspace_refused_before_daemon_spawns_anything",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_daemon_client::test_stop_via_daemon_escalates_for_unresponsive_shell",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_daemon_client::test_cli_daemon_survives_launching_process_exit",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_session::test_untrusted_workspace_refused_before_any_process_spawns",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_session::test_spawn_discovers_real_child_pid_and_stop_cleans_up",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_session::test_graceful_stop_honored_when_target_traps_sigterm",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_session::test_forced_escalation_for_process_that_ignores_sigterm",
+            "status": "passed"
+          }
+        ],
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "total": 11
+      },
+      "log_tail": "============================= test session starts ==============================\nplatform linux -- Python 3.11.15, pytest-9.1.1, pluggy-1.6.0 -- /tmp/tmp.2IOSRMe4Zm/ocode-terminal-install-proof/bin/python3\ncachedir: .pytest_cache\nrootdir: /workspace/apex-ocode/terminal-v3.2\nconfigfile: pyproject.toml\ncollecting ... collected 11 items\n\ntests/test_daemon_client.py::test_reconnect_preserves_scrollback_across_separate_clients PASSED [  9%]\ntests/test_daemon_client.py::test_resize_changes_real_pty_winsize PASSED [ 18%]\ntests/test_daemon_client.py::test_idle_timeout_stops_session_automatically PASSED [ 27%]\ntests/test_daemon_client.py::test_isolation_still_enforced_inside_a_terminal_session PASSED [ 36%]\ntests/test_daemon_client.py::test_untrusted_workspace_refused_before_daemon_spawns_anything PASSED [ 45%]\ntests/test_daemon_client.py::test_stop_via_daemon_escalates_for_unresponsive_shell PASSED [ 54%]\ntests/test_daemon_client.py::test_cli_daemon_survives_launching_process_exit PASSED [ 63%]\ntests/test_session.py::test_untrusted_workspace_refused_before_any_process_spawns PASSED [ 72%]\ntests/test_session.py::test_spawn_discovers_real_child_pid_and_stop_cleans_up PASSED [ 81%]\ntests/test_session.py::test_graceful_stop_honored_when_target_traps_sigterm PASSED [ 90%]\ntests/test_session.py::test_forced_escalation_for_process_that_ignores_sigterm PASSED [100%]\n\n- generated xml file: /workspace/apex-ocode/terminal-v3.2/evidence/.junit.xml --\n============================= 11 passed in 18.69s ==============================\n",
+      "passed": true
+    },
+    "clean_environment_install": {
+      "command": "terminal-v3.2/scripts/install_clean_env.sh",
+      "exit_code": 0,
+      "log_tail": "== creating clean venv at /tmp/tmp.2IOSRMe4Zm/ocode-terminal-install-proof ==\n== installing Bite 1 dependency (/workspace/apex-ocode/sandbox-workspace-trust-v3.1) into clean venv ==\n== installing /workspace/apex-ocode/terminal-v3.2 into clean venv ==\n== import proof ==\nimport OK: /tmp/tmp.2IOSRMe4Zm/ocode-terminal-install-proof/lib/python3.11/site-packages/ocode_terminal/__init__.py\n== CLI proof ==\nCLI OK\n/tmp/tmp.2IOSRMe4Zm/ocode-terminal-install-proof\n",
+      "passed": true
+    },
+    "rollback_demonstration": {
+      "command": "terminal-v3.2/scripts/rollback_demo.sh",
+      "exit_code": 0,
+      "log_tail": "== before rollback ==\npresent: /tmp/tmp.4VqLUloT6I/ocode-terminal-rollback-proof/lib/python3.11/site-packages/ocode_terminal/__init__.py\nbite1 present: /tmp/tmp.4VqLUloT6I/ocode-terminal-rollback-proof/lib/python3.11/site-packages/ocode_sandbox/__init__.py\n== rolling back Bite 2 only (pip uninstall) ==\n== after rollback ==\nconfirmed: ocode_terminal no longer importable after uninstall\nbite1 still present, unaffected: /tmp/tmp.4VqLUloT6I/ocode-terminal-rollback-proof/lib/python3.11/site-packages/ocode_sandbox/__init__.py\n== repository-level rollback ==\ngit revert <bite-2-commit-sha> removes this entire additive directory\n(terminal-v3.2/) with no other tracked file depending on it \u2014 it adds no\nfiles inside sandbox-workspace-trust-v3.1/ and modifies none of its behavior.\nROLLBACK DEMONSTRATION: PASS\n",
+      "passed": true
+    },
+    "specification_gate": {
+      "command": "python3 scripts/ocode_spec_gate.py",
+      "exit_code": 0,
+      "passed": true
+    }
+  },
+  "generated_at": 1786037178.2872906,
+  "next_eligible_bite": "Bite 3 - Tasks and runtime profiles - v3.3 (not started)",
+  "residual_risks": [
+    "Daemon process lifetime has no init-system supervision in local mode; a stale socket after an out-of-band kill is detected as a connection failure by the client, not hidden as a hang.",
+    "Scrollback and input history are capped, in-memory only; a daemon crash loses them (not persisted to disk).",
+    "No authentication on the Unix domain socket beyond filesystem permissions (mode 0600); acceptable for local single-user mode, not for later multi-user bites.",
+    "Primitives verified inside this nested development container only, same caveat as Bite 1."
+  ],
+  "schema_version": "ocode.bite-evidence-manifest.v1",
+  "truth_label": "LOCALLY_VERIFIED"
+}
