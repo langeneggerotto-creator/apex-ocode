@@ -1,0 +1,160 @@
+{
+  "all_mandatory_gates_passed": true,
+  "bite": "Bite 4 - Professional editor foundation - v3.4",
+  "gates": {
+    "adversarial_and_functional_tests": {
+      "command": "python3 -m pytest tests/ -v (backend + real headless-Chromium Playwright e2e)",
+      "exit_code": 0,
+      "junit_summary": {
+        "available": true,
+        "cases": [
+          {
+            "name": "tests.test_editor_e2e::test_open_edit_dirty_save_clears",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_editor_e2e::test_multiple_tabs_independent_content",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_editor_e2e::test_split_pane_independent_editing",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_editor_e2e::test_search_and_replace_all",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_editor_e2e::test_diff_editor_shows_real_computed_diff",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_editor_e2e::test_unsaved_change_recovery_after_reload",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_editor_e2e::test_accessibility_tab_roles_and_labels",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_dotdot_path_escape_rejected",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_absolute_path_rejected",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_symlink_escape_rejected",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_protected_metadata_directory_blocked",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_protected_dir_excluded_from_tree",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_binary_file_refused",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_write_with_correct_hash_succeeds",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_stale_hash_write_rejected_and_file_unchanged",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_write_new_file_creates_it",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_write_expecting_existing_file_that_is_missing_conflicts",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_atomic_write_leaves_no_temp_file_on_success",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_http_tree_and_read",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_http_write_round_trip",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_http_path_escape_rejected_with_403",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_http_conflict_returns_409",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_fileservice::test_http_untrusted_workspace_refused_everywhere",
+            "status": "passed"
+          }
+        ],
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "total": 23
+      },
+      "log_tail": "============================= test session starts ==============================\nplatform linux -- Python 3.11.15, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3\ncachedir: .pytest_cache\nrootdir: /workspace/apex-ocode/editor-v3.4\ncollecting ... collected 23 items\n\ntests/test_editor_e2e.py::test_open_edit_dirty_save_clears PASSED        [  4%]\ntests/test_editor_e2e.py::test_multiple_tabs_independent_content PASSED  [  8%]\ntests/test_editor_e2e.py::test_split_pane_independent_editing PASSED     [ 13%]\ntests/test_editor_e2e.py::test_search_and_replace_all PASSED             [ 17%]\ntests/test_editor_e2e.py::test_diff_editor_shows_real_computed_diff PASSED [ 21%]\ntests/test_editor_e2e.py::test_unsaved_change_recovery_after_reload PASSED [ 26%]\ntests/test_editor_e2e.py::test_accessibility_tab_roles_and_labels PASSED [ 30%]\ntests/test_fileservice.py::test_dotdot_path_escape_rejected PASSED       [ 34%]\ntests/test_fileservice.py::test_absolute_path_rejected PASSED            [ 39%]\ntests/test_fileservice.py::test_symlink_escape_rejected PASSED           [ 43%]\ntests/test_fileservice.py::test_protected_metadata_directory_blocked PASSED [ 47%]\ntests/test_fileservice.py::test_protected_dir_excluded_from_tree PASSED  [ 52%]\ntests/test_fileservice.py::test_binary_file_refused PASSED               [ 56%]\ntests/test_fileservice.py::test_write_with_correct_hash_succeeds PASSED  [ 60%]\ntests/test_fileservice.py::test_stale_hash_write_rejected_and_file_unchanged PASSED [ 65%]\ntests/test_fileservice.py::test_write_new_file_creates_it PASSED         [ 69%]\ntests/test_fileservice.py::test_write_expecting_existing_file_that_is_missing_conflicts PASSED [ 73%]\ntests/test_fileservice.py::test_atomic_write_leaves_no_temp_file_on_success PASSED [ 78%]\ntests/test_fileservice.py::test_http_tree_and_read PASSED                [ 82%]\ntests/test_fileservice.py::test_http_write_round_trip PASSED             [ 86%]\ntests/test_fileservice.py::test_http_path_escape_rejected_with_403 PASSED [ 91%]\ntests/test_fileservice.py::test_http_conflict_returns_409 PASSED         [ 95%]\ntests/test_fileservice.py::test_http_untrusted_workspace_refused_everywhere PASSED [100%]\n\n-- generated xml file: /workspace/apex-ocode/editor-v3.4/evidence/.junit.xml ---\n============================= 23 passed in 22.17s ==============================\n",
+      "passed": true
+    },
+    "clean_environment_install": {
+      "command": "editor-v3.4/scripts/install_clean_env.sh",
+      "exit_code": 0,
+      "log_tail": "== copying bite into scratch dir (simulating a fresh clone) ==\n== creating clean venv and installing Bite 1 dependency ==\n== vendoring Monaco from npm (no runtime CDN dependency) ==\nmonaco-editor vendored to /tmp/tmp.tToOXgAv2O/ocode-editor-install-proof/frontend/vendor/monaco\n24M\t/tmp/tmp.tToOXgAv2O/ocode-editor-install-proof/frontend/vendor/monaco\n== proving the backend server starts and serves the app ==\nbackend serve proof: OK\n/tmp/tmp.tToOXgAv2O/ocode-editor-install-proof\n/tmp/tmp.zaOerxfhxP/ocode-editor-venv\n",
+      "passed": true
+    },
+    "rollback_demonstration": {
+      "command": "editor-v3.4/scripts/rollback_demo.sh",
+      "exit_code": 0,
+      "log_tail": "== copying repo into scratch dir ==\n== before rollback: Bite 4 present ==\neditor-v3.4/ present: OK\n== rolling back (what git revert of the bite-4 commit does) ==\n== after rollback ==\nconfirmed: editor-v3.4/ fully removed\n== Bite 1 unaffected: its own gate still passes after Bite 4's removal ==\nBite 1 gate: PASS (unaffected by Bite 4's presence or removal)\nROLLBACK DEMONSTRATION: PASS\n",
+      "passed": true
+    },
+    "specification_gate": {
+      "command": "python3 scripts/ocode_spec_gate.py",
+      "exit_code": 0,
+      "passed": true
+    }
+  },
+  "generated_at": 1786041941.6131868,
+  "next_eligible_bite": "Bite 5 - Source-control workspace - v3.5 (not started)",
+  "residual_risks": [
+    "Single-process local HTTP server, no auth beyond the trust check; binds to 127.0.0.1 only, acceptable for local single-user mode.",
+    "Optimistic concurrency rejects a stale write outright rather than merging; the client must reload and reapply (deliberate scope decision, matches 'merge conflict handling' being out of scope).",
+    "Vendored Monaco assets are not committed to git (restored deterministically by scripts/vendor_monaco.sh from a pinned npm version) \u2014 documented, not a hidden manual step.",
+    "Browser automation evidence was gathered in this development container's headless Chromium only, same environment-generalization caveat as the primitive-level testing in Bites 1-3."
+  ],
+  "schema_version": "ocode.bite-evidence-manifest.v1",
+  "scope_notes": {
+    "explicitly_out_of_scope_or_scaffolded": [
+      "Diagnostics and symbols: no language server exists; not wired to any real data source",
+      "Rename, references, LSP-backed hover/completion, breadcrumbs: not implemented at all, not even as empty UI",
+      "The LSP broker itself: not built (the single largest deferred piece relative to the full platform spec's vision for this bite)",
+      "Merge conflict handling: not implemented",
+      "Binary viewers: binary files are refused with a clear message, not rendered"
+    ],
+    "implemented_and_evidenced": [
+      "Real monaco-editor integration (vendored from npm, no runtime CDN)",
+      "Multi-tab per pane, independent models per tab",
+      "Split panes (two independent editor groups)",
+      "Unsaved-state dirty indicator, beforeunload guard, localStorage-based draft recovery across reload",
+      "Search and replace (Monaco's built-in find/replace widget), verified with a real Replace-All producing the expected buffer",
+      "Diff editor showing a real computed diff between live and last-saved content (not a static mock)",
+      "Format-document action wired (JSON, via Monaco's built-in formatter)",
+      "Accessibility: ARIA roles/labels on toolbar and tab strip, verified via a real accessibility-tree query in headless Chromium",
+      "Backend file service: path-escape and symlink protection, protected-metadata-directory exclusion, atomic writes, content-hash optimistic concurrency, workspace-trust gating reusing Bite 1 unmodified"
+    ]
+  },
+  "truth_label": "LOCALLY_VERIFIED"
+}
