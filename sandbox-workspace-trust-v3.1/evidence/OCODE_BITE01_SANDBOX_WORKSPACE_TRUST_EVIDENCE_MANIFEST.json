@@ -1,0 +1,120 @@
+{
+  "all_mandatory_gates_passed": true,
+  "bite": "Bite 1 - Sandbox and workspace trust - v3.1",
+  "gates": {
+    "adversarial_and_functional_tests": {
+      "command": "python3 -m pytest tests/ -v (against the clean-installed package)",
+      "exit_code": 0,
+      "junit_summary": {
+        "available": true,
+        "cases": [
+          {
+            "name": "tests.test_isolation::test_untrusted_workspace_is_refused",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_isolation::test_functional_positive_path",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_isolation::test_network_egress_denied_by_default",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_isolation::test_filesystem_write_outside_workspace_denied",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_isolation::test_protected_metadata_hidden",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_isolation::test_memory_limit_enforced",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_isolation::test_pid_limit_enforced",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_isolation::test_privilege_escalation_blocked",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_isolation::test_cgroup_unavailable_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_untrusted_workspace_has_no_record",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_establish_then_verify_round_trip",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_establish_requires_nonempty_actor",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_establish_requires_existing_workspace",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_tampered_trust_marker_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_wrong_schema_version_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_trusted_false_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_malformed_json_fails_closed",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_trust::test_revoke_removes_marker",
+            "status": "passed"
+          }
+        ],
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "total": 18
+      },
+      "log_tail": "============================= test session starts ==============================\nplatform linux -- Python 3.11.15, pytest-9.1.1, pluggy-1.6.0 -- /tmp/tmp.JdrBgLwDLW/ocode-sandbox-install-proof/bin/python3\ncachedir: .pytest_cache\nrootdir: /workspace/apex-ocode/sandbox-workspace-trust-v3.1\nconfigfile: pyproject.toml\ncollecting ... collected 18 items\n\ntests/test_isolation.py::test_untrusted_workspace_is_refused PASSED      [  5%]\ntests/test_isolation.py::test_functional_positive_path PASSED            [ 11%]\ntests/test_isolation.py::test_network_egress_denied_by_default PASSED    [ 16%]\ntests/test_isolation.py::test_filesystem_write_outside_workspace_denied PASSED [ 22%]\ntests/test_isolation.py::test_protected_metadata_hidden PASSED           [ 27%]\ntests/test_isolation.py::test_memory_limit_enforced PASSED               [ 33%]\ntests/test_isolation.py::test_pid_limit_enforced PASSED                  [ 38%]\ntests/test_isolation.py::test_privilege_escalation_blocked PASSED        [ 44%]\ntests/test_isolation.py::test_cgroup_unavailable_fails_closed PASSED     [ 50%]\ntests/test_trust.py::test_untrusted_workspace_has_no_record PASSED       [ 55%]\ntests/test_trust.py::test_establish_then_verify_round_trip PASSED        [ 61%]\ntests/test_trust.py::test_establish_requires_nonempty_actor PASSED       [ 66%]\ntests/test_trust.py::test_establish_requires_existing_workspace PASSED   [ 72%]\ntests/test_trust.py::test_tampered_trust_marker_fails_closed PASSED      [ 77%]\ntests/test_trust.py::test_wrong_schema_version_fails_closed PASSED       [ 83%]\ntests/test_trust.py::test_trusted_false_fails_closed PASSED              [ 88%]\ntests/test_trust.py::test_malformed_json_fails_closed PASSED             [ 94%]\ntests/test_trust.py::test_revoke_removes_marker PASSED                   [100%]\n\n- generated xml file: /workspace/apex-ocode/sandbox-workspace-trust-v3.1/evidence/.junit.xml -\n============================== 18 passed in 6.56s ==============================\n",
+      "passed": true
+    },
+    "clean_environment_install": {
+      "command": "sandbox-workspace-trust-v3.1/scripts/install_clean_env.sh",
+      "exit_code": 0,
+      "log_tail": "== creating clean venv at /tmp/tmp.JdrBgLwDLW/ocode-sandbox-install-proof ==\n== installing /workspace/apex-ocode/sandbox-workspace-trust-v3.1 into clean venv ==\n== import proof ==\nimport OK: /tmp/tmp.JdrBgLwDLW/ocode-sandbox-install-proof/lib/python3.11/site-packages/ocode_sandbox/__init__.py\n== CLI proof ==\nCLI OK\n/tmp/tmp.JdrBgLwDLW/ocode-sandbox-install-proof\n",
+      "passed": true
+    },
+    "rollback_demonstration": {
+      "command": "sandbox-workspace-trust-v3.1/scripts/rollback_demo.sh",
+      "exit_code": 0,
+      "log_tail": "== before rollback ==\npresent: /tmp/tmp.JDQnLlWtEX/ocode-sandbox-rollback-proof/lib/python3.11/site-packages/ocode_sandbox/__init__.py\n== rolling back (pip uninstall) ==\n== after rollback ==\nconfirmed: ocode_sandbox no longer importable after uninstall\n== repository-level rollback ==\ngit revert <bite-1-commit-sha> removes this entire additive directory\n(sandbox-workspace-trust-v3.1/) with no other tracked file depending on it.\nROLLBACK DEMONSTRATION: PASS\n",
+      "passed": true
+    },
+    "specification_gate": {
+      "command": "python3 scripts/ocode_spec_gate.py",
+      "exit_code": 0,
+      "passed": true
+    }
+  },
+  "generated_at": 1786029137.3827944,
+  "next_eligible_bite": "Bite 2 - Persistent integrated terminal - v3.2 (not started)",
+  "residual_risks": [
+    "Primitives verified inside a nested development container, not an independent bare-metal or typical end-user Linux host.",
+    "cgroup v1 legacy hierarchies used (this host does not delegate v2 memory/pids controllers); the runner also supports v2 but that path has not been exercised against a real v2-only host.",
+    "No user-namespace UID remapping; isolation relies on capability bounding-set clearing + no_new_privs rather than uid separation.",
+    "Seccomp is a deny-list (defense-in-depth), not a strict allow-list."
+  ],
+  "schema_version": "ocode.bite-evidence-manifest.v1",
+  "truth_label": "LOCALLY_VERIFIED"
+}

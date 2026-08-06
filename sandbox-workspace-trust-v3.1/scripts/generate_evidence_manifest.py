@@ -1,0 +1,117 @@
+"""Assemble evidence/OCODE_BITE01_SANDBOX_WORKSPACE_TRUST_EVIDENCE_MANIFEST.json from
+the actual exit codes and captured output of the run just performed by
+run_tests_and_evidence.sh. Every value here comes from os.environ set by that script
+or from parsing the JUnit XML it produced — nothing in this file is asserted without
+a corresponding executed command.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import time
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+EVIDENCE_DIR = Path(os.environ["EVIDENCE_DIR"])
+JUNIT_XML = Path(os.environ["JUNIT_XML"])
+
+
+def parse_junit(path: Path) -> dict:
+    if not path.is_file():
+        return {"available": False}
+    tree = ET.parse(path)
+    root = tree.getroot()
+    suite = root.find("testsuite") if root.tag != "testsuite" else root
+    if suite is None:
+        return {"available": False}
+    cases = []
+    for case in suite.findall("testcase"):
+        status = "passed"
+        if case.find("failure") is not None:
+            status = "failed"
+        elif case.find("skipped") is not None:
+            status = "skipped"
+        elif case.find("error") is not None:
+            status = "error"
+        cases.append({"name": f"{case.get('classname')}::{case.get('name')}", "status": status})
+    return {
+        "available": True,
+        "total": int(suite.get("tests", 0)),
+        "failures": int(suite.get("failures", 0)),
+        "errors": int(suite.get("errors", 0)),
+        "skipped": int(suite.get("skipped", 0)),
+        "cases": cases,
+    }
+
+
+def tail(path_env: str, n_chars: int = 4000) -> str:
+    path = Path(os.environ[path_env])
+    if not path.is_file():
+        return ""
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return text[-n_chars:]
+
+
+def main() -> int:
+    gate_exit = int(os.environ["GATE_EXIT"])
+    install_exit = int(os.environ["INSTALL_EXIT"])
+    test_exit = int(os.environ["TEST_EXIT"])
+    rollback_exit = int(os.environ["ROLLBACK_EXIT"])
+
+    junit = parse_junit(JUNIT_XML)
+    all_pass = gate_exit == 0 and install_exit == 0 and test_exit == 0 and rollback_exit == 0
+
+    manifest = {
+        "schema_version": "ocode.bite-evidence-manifest.v1",
+        "bite": "Bite 1 - Sandbox and workspace trust - v3.1",
+        "generated_at": time.time(),
+        "gates": {
+            "specification_gate": {
+                "command": "python3 scripts/ocode_spec_gate.py",
+                "exit_code": gate_exit,
+                "passed": gate_exit == 0,
+            },
+            "clean_environment_install": {
+                "command": "sandbox-workspace-trust-v3.1/scripts/install_clean_env.sh",
+                "exit_code": install_exit,
+                "passed": install_exit == 0,
+                "log_tail": tail("INSTALL_LOG"),
+            },
+            "adversarial_and_functional_tests": {
+                "command": "python3 -m pytest tests/ -v (against the clean-installed package)",
+                "exit_code": test_exit,
+                "passed": test_exit == 0,
+                "junit_summary": junit,
+                "log_tail": tail("TEST_LOG"),
+            },
+            "rollback_demonstration": {
+                "command": "sandbox-workspace-trust-v3.1/scripts/rollback_demo.sh",
+                "exit_code": rollback_exit,
+                "passed": rollback_exit == 0,
+                "log_tail": tail("ROLLBACK_LOG"),
+            },
+        },
+        "all_mandatory_gates_passed": all_pass,
+        "truth_label": "LOCALLY_VERIFIED" if all_pass else "IMPLEMENTED_NOT_EXECUTED",
+        "residual_risks": [
+            "Primitives verified inside a nested development container, not an "
+            "independent bare-metal or typical end-user Linux host.",
+            "cgroup v1 legacy hierarchies used (this host does not delegate v2 "
+            "memory/pids controllers); the runner also supports v2 but that path "
+            "has not been exercised against a real v2-only host.",
+            "No user-namespace UID remapping; isolation relies on capability "
+            "bounding-set clearing + no_new_privs rather than uid separation.",
+            "Seccomp is a deny-list (defense-in-depth), not a strict allow-list.",
+        ],
+        "next_eligible_bite": "Bite 2 - Persistent integrated terminal - v3.2 (not started)",
+    }
+
+    out_path = EVIDENCE_DIR / "OCODE_BITE01_SANDBOX_WORKSPACE_TRUST_EVIDENCE_MANIFEST.json"
+    out_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(f"evidence manifest written: {out_path}")
+    return 0 if all_pass else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
