@@ -1,0 +1,57 @@
+{
+  "module_id": "DMF-OS-ANALYSIS-ENGINE",
+  "name": "DreamMusicForge Analysis Engine",
+  "version": "1.0",
+  "status": "CANONICAL",
+  "role": "evidence-driven multi-pass analysis, continuity auditing, renderer feasibility analysis, compiler synthesis, and benchmark learning",
+  "truth_labels": ["VERIFIED", "MEASURED", "INFERRED", "POSSIBLE", "UNKNOWN"],
+  "passes": [
+    "INGEST_EVIDENCE_FREEZE",
+    "TECHNICAL_ANALYSIS",
+    "VISUAL_PRODUCTION_ANALYSIS",
+    "PERFORMANCE_ANALYSIS",
+    "MUSIC_EDITORIAL_ANALYSIS",
+    "CONTINUITY_SEAM_AUDIT",
+    "PRODUCTION_RENDERER_FEASIBILITY",
+    "COMPILER_SYNTHESIS",
+    "FINAL_SYNTHESIS"
+  ],
+  "continuity_model": [
+    "PIXEL_CONTINUITY",
+    "STATE_CONTINUITY",
+    "CAUSAL_CONTINUITY",
+    "SEMANTIC_CONTINUITY"
+  ],
+  "music_continuity_model": [
+    "AUDIO_CONTINUITY",
+    "MUSICAL_CONTINUITY",
+    "VOCAL_CONTINUITY",
+    "PERFORMANCE_CONTINUITY"
+  ],
+  "required_outputs": [
+    "machine_readable_pass_json",
+    "human_readable_pass_report",
+    "final_benchmark_report",
+    "film_genome",
+    "production_graph",
+    "shot_contracts",
+    "transition_contracts",
+    "renderer_tasks",
+    "assembly_tasks",
+    "verification_contracts",
+    "engineering_backlog"
+  ],
+  "canonical_benchmark": {
+    "run_id": "DMF-RUN-REF-20260806-001",
+    "source_sha256": "ab8e29aadc249d5e6cb29b06ea5c3a033de90491cbb6c2b1d305b59d3a4a28a5",
+    "report_path": "dreammusicforge/benchmarks/DMF-RUN-REF-20260806-001/FINAL_BENCHMARK_REPORT.md"
+  },
+  "governing_rules": [
+    "verification_before_canon",
+    "evidence_before_promotion",
+    "provider_neutrality",
+    "fail_closed_on_unsupported_claims",
+    "music_is_master_clock",
+    "explicit_continuity"
+  ]
+}
