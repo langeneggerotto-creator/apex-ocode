@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>OCode Source Control</title>
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <span id="branch-label" aria-live="polite">…</span>
+      <select id="branch-select" aria-label="Switch branch"></select>
+      <button id="btn-new-branch" aria-label="Create new branch">New branch</button>
+      <span id="status-msg" role="status" aria-live="polite"></span>
+    </header>
+
+    <div id="conflict-banner" class="hidden" role="alert">
+      <span>Merge/rebase/cherry-pick stopped with conflicts.</span>
+      <button id="btn-abort">Abort</button>
+    </div>
+
+    <main>
+      <section id="changes-panel" aria-label="Changes">
+        <div class="file-group">
+          <h3>Staged</h3>
+          <ul id="list-staged" class="file-list" data-action="unstage"></ul>
+        </div>
+        <div class="file-group">
+          <h3>Unstaged</h3>
+          <ul id="list-unstaged" class="file-list" data-action="stage"></ul>
+        </div>
+        <div class="file-group">
+          <h3>Untracked</h3>
+          <ul id="list-untracked" class="file-list" data-action="stage"></ul>
+        </div>
+        <div class="file-group">
+          <h3>Conflicted</h3>
+          <ul id="list-conflicted" class="file-list" data-action="resolve"></ul>
+        </div>
+
+        <div id="commit-box">
+          <textarea id="commit-message" aria-label="Commit message" placeholder="Commit message"></textarea>
+          <button id="btn-commit">Commit</button>
+        </div>
+      </section>
+
+      <section id="diff-panel" aria-label="Diff view">
+        <div id="diff-header">
+          <span id="diff-file-label">No file selected</span>
+        </div>
+        <pre id="diff-content" aria-label="Unified diff"></pre>
+      </section>
+
+      <aside id="side-panel" aria-label="History, stash, tags">
+        <div id="tab-bar" role="tablist">
+          <button class="tab-btn active" data-tab="history" role="tab" aria-selected="true">History</button>
+          <button class="tab-btn" data-tab="stash" role="tab" aria-selected="false">Stash</button>
+          <button class="tab-btn" data-tab="tags" role="tab" aria-selected="false">Tags</button>
+        </div>
+
+        <div id="tab-history" class="tab-content" role="tabpanel">
+          <ul id="list-history" class="entry-list"></ul>
+        </div>
+
+        <div id="tab-stash" class="tab-content hidden" role="tabpanel">
+          <button id="btn-stash-save">Stash changes</button>
+          <ul id="list-stash" class="entry-list"></ul>
+        </div>
+
+        <div id="tab-tags" class="tab-content hidden" role="tabpanel">
+          <button id="btn-new-tag">New tag</button>
+          <ul id="list-tags" class="entry-list"></ul>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

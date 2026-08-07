@@ -1,0 +1,179 @@
+{
+  "all_mandatory_gates_passed": true,
+  "bite": "Bite 5 - Source-control workspace - v3.5",
+  "gates": {
+    "adversarial_and_functional_tests": {
+      "command": "python3 -m pytest tests/ -v (backend + real headless-Chromium Playwright e2e, against real git repositories this suite creates and tears down)",
+      "exit_code": 0,
+      "junit_summary": {
+        "available": true,
+        "cases": [
+          {
+            "name": "tests.test_git_e2e::test_status_view_and_staging_moves_between_lists",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_git_e2e::test_commit_via_ui_creates_real_commit_on_disk",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_git_e2e::test_branch_switch_via_ui_changes_checked_out_branch",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_git_e2e::test_diff_view_renders_real_diff_content",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_git_e2e::test_real_merge_conflict_shown_and_keep_ours_resolves_it",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_hooks_are_disabled",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_external_diff_is_disabled",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_no_hang_on_blocking_pager",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_status_stage_unstage_commit_round_trip",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_diff_shows_expected_content",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_branch_lifecycle",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_tag_create_and_list",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_stash_round_trip",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_restore_discards_only_targeted_path",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_cherry_pick_applies_commit_onto_another_branch",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_rebase_fast_forwardable",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_merge_conflict_list_and_resolve_ours_and_theirs",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_merge_abort_clears_conflict_state",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_untrusted_workspace_refuses_before_spawning_git",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_path_escape_rejected",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_symlink_escape_rejected",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_protected_metadata_directory_hidden_and_blocked",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_invalid_ref_rejected_before_spawning_git",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_git_operation_error_surfaces_stdout_when_stderr_empty",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_http_status_stage_commit_round_trip",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_http_bad_ref_returns_400",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_http_path_escape_returns_403",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_http_protected_dir_returns_403",
+            "status": "passed"
+          },
+          {
+            "name": "tests.test_gitservice::test_http_untrusted_workspace_refused",
+            "status": "passed"
+          }
+        ],
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "total": 29
+      },
+      "log_tail": "============================= test session starts ==============================\nplatform linux -- Python 3.11.15, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3\ncachedir: .pytest_cache\nrootdir: /workspace/apex-ocode/git-workspace-v3.5\ncollecting ... collected 29 items\n\ntests/test_git_e2e.py::test_status_view_and_staging_moves_between_lists PASSED [  3%]\ntests/test_git_e2e.py::test_commit_via_ui_creates_real_commit_on_disk PASSED [  6%]\ntests/test_git_e2e.py::test_branch_switch_via_ui_changes_checked_out_branch PASSED [ 10%]\ntests/test_git_e2e.py::test_diff_view_renders_real_diff_content PASSED   [ 13%]\ntests/test_git_e2e.py::test_real_merge_conflict_shown_and_keep_ours_resolves_it PASSED [ 17%]\ntests/test_gitservice.py::test_hooks_are_disabled PASSED                 [ 20%]\ntests/test_gitservice.py::test_external_diff_is_disabled PASSED          [ 24%]\ntests/test_gitservice.py::test_no_hang_on_blocking_pager PASSED          [ 27%]\ntests/test_gitservice.py::test_status_stage_unstage_commit_round_trip PASSED [ 31%]\ntests/test_gitservice.py::test_diff_shows_expected_content PASSED        [ 34%]\ntests/test_gitservice.py::test_branch_lifecycle PASSED                   [ 37%]\ntests/test_gitservice.py::test_tag_create_and_list PASSED                [ 41%]\ntests/test_gitservice.py::test_stash_round_trip PASSED                   [ 44%]\ntests/test_gitservice.py::test_restore_discards_only_targeted_path PASSED [ 48%]\ntests/test_gitservice.py::test_cherry_pick_applies_commit_onto_another_branch PASSED [ 51%]\ntests/test_gitservice.py::test_rebase_fast_forwardable PASSED            [ 55%]\ntests/test_gitservice.py::test_merge_conflict_list_and_resolve_ours_and_theirs PASSED [ 58%]\ntests/test_gitservice.py::test_merge_abort_clears_conflict_state PASSED  [ 62%]\ntests/test_gitservice.py::test_untrusted_workspace_refuses_before_spawning_git PASSED [ 65%]\ntests/test_gitservice.py::test_path_escape_rejected PASSED               [ 68%]\ntests/test_gitservice.py::test_symlink_escape_rejected PASSED            [ 72%]\ntests/test_gitservice.py::test_protected_metadata_directory_hidden_and_blocked PASSED [ 75%]\ntests/test_gitservice.py::test_invalid_ref_rejected_before_spawning_git PASSED [ 79%]\ntests/test_gitservice.py::test_git_operation_error_surfaces_stdout_when_stderr_empty PASSED [ 82%]\ntests/test_gitservice.py::test_http_status_stage_commit_round_trip PASSED [ 86%]\ntests/test_gitservice.py::test_http_bad_ref_returns_400 PASSED           [ 89%]\ntests/test_gitservice.py::test_http_path_escape_returns_403 PASSED       [ 93%]\ntests/test_gitservice.py::test_http_protected_dir_returns_403 PASSED     [ 96%]\ntests/test_gitservice.py::test_http_untrusted_workspace_refused PASSED   [100%]\n\n- generated xml file: /workspace/apex-ocode/git-workspace-v3.5/evidence/.junit.xml -\n============================= 29 passed in 20.19s ==============================\n",
+      "passed": true
+    },
+    "clean_environment_install": {
+      "command": "git-workspace-v3.5/scripts/install_clean_env.sh",
+      "exit_code": 0,
+      "log_tail": "== copying bite into scratch dir (simulating a fresh clone) ==\n== creating clean venv and installing Bite 1 dependency ==\n== proving the backend server starts, serves the UI, and drives real git ==\nbackend serve + real git proof: OK\n/tmp/tmp.6q8ZAfbtlb/ocode-git-workspace-install-proof\n/tmp/tmp.x0NXzPvYlg/ocode-git-workspace-venv\n",
+      "passed": true
+    },
+    "rollback_demonstration": {
+      "command": "git-workspace-v3.5/scripts/rollback_demo.sh",
+      "exit_code": 0,
+      "log_tail": "== copying repo into scratch dir ==\n== before rollback: Bite 5 present ==\ngit-workspace-v3.5/ present: OK\n== rolling back (what git revert of the bite-5 commit does) ==\n== after rollback ==\nconfirmed: git-workspace-v3.5/ fully removed\n== Bites 1-4 directories intact after Bite 5's removal ==\nsandbox-workspace-trust-v3.1/: present, untouched\nterminal-v3.2/: present, untouched\ntasks-v3.3/: present, untouched\neditor-v3.4/: present, untouched\n== spot check: Bite 1's own gate still passes (same check Bite 4 used) ==\nBite 1 gate: PASS (unaffected by Bite 5's presence or removal)\nROLLBACK DEMONSTRATION: PASS\n",
+      "passed": true
+    },
+    "specification_gate": {
+      "command": "python3 scripts/ocode_spec_gate.py",
+      "exit_code": 0,
+      "passed": true
+    }
+  },
+  "generated_at": 1786063598.149928,
+  "next_eligible_bite": "Bite 6 - Debugging - v3.6 (not started)",
+  "residual_risks": [
+    "Whole-file stage/unstage only; a file mixing wanted and unwanted changes has no hunk-level tool in this bite.",
+    "No network operations are exposed, so credential isolation is achieved by omission of the capability rather than a hardened credential broker - documented as the actual posture.",
+    "Single-process local HTTP server, no auth beyond the trust check; binds to 127.0.0.1 only, acceptable for local single-user mode.",
+    "Browser automation evidence was gathered in this development container's headless Chromium only, same environment-generalization caveat as the primitive-level testing in Bites 1-4."
+  ],
+  "schema_version": "ocode.bite-evidence-manifest.v1",
+  "scope_notes": {
+    "explicitly_out_of_scope_or_scaffolded": [
+      "Provider adapters (GitHub/GitLab pull or merge request creation, required-checks status, reviewer requests): no network call to any git remote is made by this bite at all",
+      "Protected branch rules, required checks, review gates: properties of a provider server, not enforceable locally",
+      "Interactive hunk-level staging: whole-file stage/unstage only",
+      "A secrets-backed credential vault: this bite has no code path that could need credentials in the first place (no fetch/push/clone/pull), which is the actual posture, not a vault that doesn't exist"
+    ],
+    "implemented_and_evidenced": [
+      "Hardened git backend: every operation runs the real git binary, confined to a trusted workspace (Bite 1's trust check, reused unmodified), hooks disabled via a real empty core.hooksPath directory, external diff disabled via --no-ext-diff (the -c diff.external= form was verified NOT to work), no pager, no interactive editor/credential prompts, no network operation exposed at all",
+      "status, diff (working tree vs index, index vs HEAD), stage/unstage (whole-file), commit, history, branches (create/switch/delete, refusing to delete the current branch), tags, stash (save/list/pop/drop), restore, cherry-pick, rebase, merge, conflict listing, and conflict resolution (ours/theirs/mark-resolved) - all verified against real git repositories, including a real merge conflict produced by two branches editing the same line",
+      "Graphical frontend: staged/unstaged/untracked/conflicted file lists with per-file actions, a commit box, a branch switcher with create, a tag panel, a stash panel, a history log, a hand-rolled unified-diff renderer, and a conflict banner with abort - verified end-to-end in real headless Chromium against the real backend and real on-disk git state",
+      "Path confinement and the protected .ocode metadata directory: same discipline as Bite 4's file service, reused and adapted for git operations (staging/diffing/restoring a path under .ocode is rejected outright, and it never appears in status)",
+      "Fail-closed workspace trust gating at both the gitservice and HTTP layers, reusing Bite 1's trust module unmodified"
+    ]
+  },
+  "truth_label": "LOCALLY_VERIFIED"
+}
