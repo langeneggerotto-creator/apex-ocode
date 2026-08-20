@@ -83,6 +83,13 @@ def validate_runway_package_schema(data: dict) -> list[str]:
     if seed is not None and (not isinstance(seed, int) or isinstance(seed, bool) or seed < 0):
         errors.append("runway_package seed, if present, must be a non-negative integer")
 
+    negative_prompt = data.get("negative_prompt")
+    if negative_prompt is not None and not _is_non_empty_str(negative_prompt):
+        errors.append("runway_package negative_prompt, if present, must be a non-empty string or null")
+
+    if "audio" in data and not isinstance(data["audio"], bool):
+        errors.append("runway_package audio must be a boolean")
+
     reference_manifest = data.get("reference_manifest", [])
     if not isinstance(reference_manifest, list) or not all(_is_non_empty_str(item) for item in reference_manifest):
         errors.append("runway_package reference_manifest must be a list of non-empty strings")

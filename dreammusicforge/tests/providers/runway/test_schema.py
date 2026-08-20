@@ -13,7 +13,8 @@ VALID_PROFILE = {
 VALID_PACKAGE = {
     "id": "RUNWAY-deadbeef", "render_task_id": "RENDER-deadbeef", "shot_id": "SHOT-deadbeef",
     "mode": "image_to_video", "model": "gen4_turbo", "prompt_text": "animate this", "duration_seconds": 5.0,
-    "ratio": "1280:720", "prompt_image": "https://example.com/ref.png", "seed": 7,
+    "ratio": "1280:720", "prompt_image": "https://example.com/ref.png", "negative_prompt": "identity drift",
+    "seed": 7, "audio": True,
     "reference_manifest": ["PERFORMER-deadbeef"],
 }
 
@@ -61,6 +62,20 @@ class RunwayPackageSchemaTests(unittest.TestCase):
         data = dict(VALID_PACKAGE, mode="video_extension")
         errors = validate_runway_package_schema(data)
         self.assertTrue(any("mode" in e for e in errors))
+
+    def test_non_bool_audio_is_rejected(self):
+        data = dict(VALID_PACKAGE, audio="yes")
+        errors = validate_runway_package_schema(data)
+        self.assertTrue(any("audio" in e for e in errors))
+
+    def test_empty_negative_prompt_is_rejected(self):
+        data = dict(VALID_PACKAGE, negative_prompt="")
+        errors = validate_runway_package_schema(data)
+        self.assertTrue(any("negative_prompt" in e for e in errors))
+
+    def test_null_negative_prompt_is_valid(self):
+        data = dict(VALID_PACKAGE, negative_prompt=None)
+        self.assertEqual(validate_runway_package_schema(data), [])
 
 
 if __name__ == "__main__":

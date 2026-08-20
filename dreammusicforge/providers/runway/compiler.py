@@ -20,12 +20,20 @@ controllable, more commonly used mode, matching Kling's own default
 for a fresh task) but compilation fails closed if that mode is chosen
 without a `prompt_image`.
 
-Runway's duration is a discrete choice (5 or 10 seconds), not a
-continuous range up to a max the way Kling's is -- compilation fails
-closed if the RenderTask's duration_seconds isn't (within a small
-tolerance) one of profile.supported_durations_seconds, rounding up to
-the nearest supported value rather than silently truncating a shot to
-a shorter clip than requested.
+Runway's duration is a discrete choice per model (commonly 4, 6, or 8
+seconds -- see models.py's RUNWAY_DURATION_OPTIONS_SECONDS revision
+note), not a continuous range up to a max the way Kling's is --
+compilation fails closed if the RenderTask's duration_seconds isn't
+(within a small tolerance) one of profile.supported_durations_seconds,
+rounding up to the nearest supported value rather than silently
+truncating a shot to a shorter clip than requested.
+
+`negative_prompt` defaults to RUNWAY_NEGATIVE_PROMPT_BASELINE (this
+pipeline's own vocabulary, reused from Kling's), confirmed to be a
+real, accepted parameter on Runway's side (see models.py's revision
+note -- the first version of this file wrongly assumed it wasn't).
+`audio` defaults to the shot's own `requirements.lip_sync_required`:
+a shot that needs lip sync needs audio generated with it.
 """
 from __future__ import annotations
 
@@ -33,7 +41,7 @@ from ...production.models import Shot
 from ...slicer.models import RenderTask
 from .errors import RunwayCompilerError
 from .ids import generate_runway_package_id
-from .models import RunwayPackage, RunwayProfile
+from .models import RUNWAY_NEGATIVE_PROMPT_BASELINE, RunwayPackage, RunwayProfile
 from .schema import validate_runway_package_schema
 
 _DURATION_TOLERANCE_SECONDS = 0.05
@@ -86,6 +94,9 @@ def compile_runway_package(
     profile: RunwayProfile,
     mode: str = "image_to_video",
     prompt_image: str | None = None,
+    negative_prompt: tuple[str, ...] | None = RUNWAY_NEGATIVE_PROMPT_BASELINE,
+    seed: int | None = None,
+    audio: bool | None = None,
     package_id: str | None = None,
 ) -> RunwayPackage:
     if render_task.shot_id != shot.id:
@@ -105,6 +116,9 @@ def compile_runway_package(
         duration_seconds=duration_seconds,
         ratio=ratio,
         prompt_image=prompt_image,
+        negative_prompt=", ".join(negative_prompt) if negative_prompt else None,
+        seed=seed,
+        audio=audio if audio is not None else shot.requirements.lip_sync_required,
         reference_manifest=render_task.required_assets,
     )
 

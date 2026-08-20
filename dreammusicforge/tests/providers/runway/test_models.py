@@ -13,7 +13,8 @@ PROFILE_DATA = {
 PACKAGE_DATA = {
     "id": "RUNWAY-deadbeef", "render_task_id": "RENDER-deadbeef", "shot_id": "SHOT-deadbeef",
     "mode": "image_to_video", "model": "gen4_turbo", "prompt_text": "animate this", "duration_seconds": 5.0,
-    "ratio": "1280:720", "prompt_image": "https://example.com/ref.png", "seed": 7,
+    "ratio": "1280:720", "prompt_image": "https://example.com/ref.png", "negative_prompt": "identity drift",
+    "seed": 7, "audio": True,
     "reference_manifest": ["PERFORMER-deadbeef", "COSTUME-deadbeef", "WORLD-deadbeef"],
 }
 
@@ -40,10 +41,12 @@ class RunwayPackageRoundTripTests(unittest.TestCase):
             package.duration_seconds = 20.0
 
     def test_missing_optional_fields_default_to_none_and_empty(self):
-        data = {k: v for k, v in PACKAGE_DATA.items() if k not in ("prompt_image", "seed", "reference_manifest")}
+        data = {k: v for k, v in PACKAGE_DATA.items() if k not in ("prompt_image", "negative_prompt", "seed", "audio", "reference_manifest")}
         package = RunwayPackage.from_dict(data)
         self.assertIsNone(package.prompt_image)
+        self.assertIsNone(package.negative_prompt)
         self.assertIsNone(package.seed)
+        self.assertFalse(package.audio)
         self.assertEqual(package.reference_manifest, ())
 
 

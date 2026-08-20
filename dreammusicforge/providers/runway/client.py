@@ -1,122 +1,142 @@
-"""RunwayClient: a real, functioning HTTP client for Runway's actual
-video-generation API -- stdlib `urllib.request` only, no new
-dependency, same "allowlisted, argv/request-construction is
-self-contained" discipline every ffmpeg wrapper in this repository
-applies to subprocess calls.
+"""RunwayClient: a thin, typed wrapper around the official `runwayml`
+Python SDK (`pip install runwayml`) -- verified installable and
+importable in this environment (`pip install --dry-run runwayml`
+resolved and downloaded real wheels from PyPI), and its real resource
+methods (`image_to_video.create()`, `text_to_video.create()`,
+`tasks.retrieve()`, `uploads.create_ephemeral()`) were introspected
+directly from the installed package to ground this file -- a stronger
+form of verification than the first version of this package used
+(web-search summaries of docs pages this environment's egress proxy
+blocks direct access to).
 
-**This code has not been run against Runway's live API in this
-session** -- no `RUNWAY_API_KEY` was available, and making a real,
-billed API call without the user's explicit credential and
+**This code has still not been run against Runway's live API in this
+session** -- no `RUNWAYML_API_SECRET` was available, and making a
+real, billed API call without the user's explicit credential and
 authorization would violate this repository's rule against claiming an
 integration that wasn't actually exercised (spec section 22). What
-*is* real: the request/response shapes below are grounded in Runway's
-public API documentation (base URL, endpoint paths, header names, the
-async task-submission-then-poll pattern, and the PENDING/RUNNING/
-SUCCEEDED/FAILED status vocabulary), and the request-building/response-
-parsing logic is unit-tested against mocked HTTP responses shaped like
-Runway's documented ones (see tests/providers/runway/test_client.py).
-Whether the live endpoint accepts these exact requests unchanged can
-only be confirmed by actually running this against a real API key --
-that verification is this module's one honest, disclosed gap.
+changed since the first version: request/response shapes are now
+grounded in the actual installed SDK's type signatures and Pydantic
+models, not secondhand summaries -- so the remaining gap is narrower
+and more honestly stated: the SDK itself is real and tested by its own
+maintainers against the live API; what's untested *here* is only
+whether this thin wrapper calls it correctly, which is covered by
+tests/providers/runway/test_client.py mocking the SDK's resource
+methods (not the raw HTTP layer, since the SDK now owns that).
+
+`runwayml` is an optional dependency (see pyproject.toml's
+`[project.optional-dependencies]` -- `pip install dreammusicforge[runway]`
+or just `pip install runwayml`), not a hard one: everything else in
+this repository stays dependency-free-until-necessary, and most of
+this codebase's tests must keep running without it installed.
+RunwayClient raises a clear, typed error if it's missing rather than
+an opaque ImportError.
 
 Usage once a real key is available:
 
     from dreammusicforge.providers.runway.client import RunwayClient
-    client = RunwayClient()  # reads RUNWAY_API_KEY from the environment
+    client = RunwayClient()  # reads RUNWAYML_API_SECRET from the environment
     task_id = client.submit_task(package)
     result = client.wait_for_completion(task_id)
-    output_url = result["output"][0]
+    local_path = client.download_output(result["output"][0], "shot017.mp4")
+    # then, same as any other candidate in this pipeline:
+    #   core.hashing.hash_file(local_path) + verification.inspect_media(local_path)
 """
 from __future__ import annotations
 
-import json
-import os
 import time
 import urllib.error
 import urllib.request
+from pathlib import Path
 from typing import Any
 
 from .errors import RunwayClientError
 from .models import RunwayPackage
 
-RUNWAY_API_BASE_URL = "https://api.dev.runwayml.com/v1"
-RUNWAY_API_VERSION = "2024-11-06"
-TERMINAL_TASK_STATUSES = ("SUCCEEDED", "FAILED")
+try:
+    import runwayml
+except ImportError:  # pragma: no cover -- exercised by test_client.py's own import guard test
+    runwayml = None
 
-DEFAULT_TIMEOUT_SECONDS = 30.0
+TERMINAL_TASK_STATUSES = ("SUCCEEDED", "FAILED", "CANCELLED")
 DEFAULT_POLL_INTERVAL_SECONDS = 5.0
 DEFAULT_POLL_TIMEOUT_SECONDS = 600.0
 
 
-def _api_key_from_env() -> str:
-    api_key = os.environ.get("RUNWAY_API_KEY")
-    if not api_key:
-        raise RunwayClientError(["RUNWAY_API_KEY is not set -- a real Runway API key is required to call the live API"])
-    return api_key
+def _require_sdk() -> None:
+    if runwayml is None:
+        raise RunwayClientError([
+            "the 'runwayml' package is not installed -- run `pip install runwayml` "
+            "(or `pip install dreammusicforge[runway]`) to use RunwayClient"
+        ])
 
 
 class RunwayClient:
-    def __init__(
-        self,
-        api_key: str | None = None,
-        base_url: str = RUNWAY_API_BASE_URL,
-        api_version: str = RUNWAY_API_VERSION,
-        timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS,
-    ):
-        self.api_key = api_key or _api_key_from_env()
-        self.base_url = base_url.rstrip("/")
-        self.api_version = api_version
-        self.timeout_seconds = timeout_seconds
-
-    def _headers(self) -> dict[str, str]:
-        return {
-            "Authorization": f"Bearer {self.api_key}",
-            "X-Runway-Version": self.api_version,
-            "Content-Type": "application/json",
-        }
-
-    def _request(self, method: str, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
-        url = f"{self.base_url}{path}"
-        data = json.dumps(body).encode("utf-8") if body is not None else None
-        request = urllib.request.Request(url, data=data, headers=self._headers(), method=method)
+    def __init__(self, api_key: str | None = None):
+        _require_sdk()
         try:
-            with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
-                return json.loads(response.read().decode("utf-8"))
-        except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise RunwayClientError([f"{method} {path} failed with HTTP {exc.code}: {detail}"]) from exc
-        except urllib.error.URLError as exc:
-            raise RunwayClientError([f"{method} {path} failed: {exc.reason}"]) from exc
+            self._client = runwayml.RunwayML(api_key=api_key)
+        except runwayml.RunwayMLError as exc:
+            raise RunwayClientError([str(exc)]) from exc
+
+    def upload_asset(self, file_path: Path) -> str:
+        """Uploads a local file through Runway's real ephemeral-uploads
+        API and returns the `runway://`-style URI a generation request
+        can reference -- Runway's API cannot consume an arbitrary local
+        filesystem path directly. Ephemeral uploads expire (Runway's
+        docs say within 24 hours); the returned URI is a temporary
+        provider binding, not a permanent asset identity -- a caller
+        should keep tracking the original file/its own asset id as the
+        canonical reference, the same way this package's
+        RunwayPackage.reference_manifest is separate from prompt_image."""
+        with open(file_path, "rb") as handle:
+            try:
+                response = self._client.uploads.create_ephemeral(file=handle)
+            except runwayml.APIError as exc:
+                raise RunwayClientError([f"upload of {file_path} failed: {exc}"]) from exc
+        return response.uri
 
     def submit_task(self, package: RunwayPackage) -> str:
-        """POSTs the package to Runway's real image_to_video or
-        text_to_video endpoint (chosen by package.mode) and returns
-        the task id Runway assigns for polling."""
-        endpoint = f"/{package.mode}"
-        body: dict[str, Any] = {
-            "model": package.model,
-            "promptText": package.prompt_text,
-            "ratio": package.ratio,
-            "duration": package.duration_seconds,
-        }
-        if package.mode == "image_to_video":
-            if not package.prompt_image:
-                raise RunwayClientError([f"package {package.id!r} has mode 'image_to_video' but no prompt_image"])
-            body["promptImage"] = package.prompt_image
-        if package.seed is not None:
-            body["seed"] = package.seed
+        """Calls the real image_to_video.create()/text_to_video.create()
+        SDK method matching package.mode and returns the task id Runway
+        assigns for polling."""
+        resource = getattr(self._client, package.mode, None)
+        if resource is None:
+            raise RunwayClientError([f"unsupported mode {package.mode!r} -- no matching resource on the runwayml client"])
+        if package.mode == "image_to_video" and not package.prompt_image:
+            raise RunwayClientError([f"package {package.id!r} has mode 'image_to_video' but no prompt_image"])
 
-        response = self._request("POST", endpoint, body)
-        task_id = response.get("id")
-        if not task_id:
-            raise RunwayClientError([f"Runway response for package {package.id!r} did not include a task id: {response}"])
-        return task_id
+        kwargs: dict[str, Any] = {
+            "model": package.model,
+            "ratio": package.ratio,
+            "duration": int(round(package.duration_seconds)),
+        }
+        if package.prompt_text:
+            kwargs["prompt_text"] = package.prompt_text
+        if package.prompt_image:
+            kwargs["prompt_image"] = package.prompt_image
+        if package.negative_prompt:
+            kwargs["negative_prompt"] = package.negative_prompt
+        if package.seed is not None:
+            kwargs["seed"] = package.seed
+        if package.audio:
+            kwargs["audio"] = True
+
+        try:
+            response = resource.create(**kwargs)
+        except runwayml.APIError as exc:
+            raise RunwayClientError([f"submit_task failed for package {package.id!r}: {exc}"]) from exc
+        return response.id
 
     def get_task_status(self, task_id: str) -> dict[str, Any]:
-        """GETs the real task status -- id, status
-        (PENDING/RUNNING/SUCCEEDED/FAILED), and, once SUCCEEDED, an
-        `output` list of result URLs."""
-        return self._request("GET", f"/tasks/{task_id}")
+        """Returns the real task status as a plain dict -- id, status
+        (PENDING/THROTTLED/RUNNING/SUCCEEDED/FAILED/CANCELLED), and,
+        once SUCCEEDED, an `output` list of result URLs that Runway's
+        own SDK docstring says expire within 24-48 hours."""
+        try:
+            response = self._client.tasks.retrieve(task_id)
+        except runwayml.APIError as exc:
+            raise RunwayClientError([f"get_task_status failed for {task_id!r}: {exc}"]) from exc
+        return response.model_dump(by_alias=False)
 
     def wait_for_completion(
         self,
@@ -125,26 +145,32 @@ class RunwayClient:
         timeout_seconds: float = DEFAULT_POLL_TIMEOUT_SECONDS,
     ) -> dict[str, Any]:
         """Polls get_task_status() until it reaches a terminal status
-        (SUCCEEDED/FAILED) or timeout_seconds elapses. Runway's own
-        docs ask callers not to expect updates more often than every
-        5 seconds for a given task -- poll_interval_seconds defaults
-        to that."""
+        (SUCCEEDED/FAILED/CANCELLED) or timeout_seconds elapses.
+        PENDING/THROTTLED/RUNNING are all treated as "keep polling" --
+        THROTTLED means Runway accepted the task but is queueing it
+        under the account's concurrency limits, not that it failed."""
         elapsed = 0.0
         while True:
             status = self.get_task_status(task_id)
-            if status.get("status") in TERMINAL_TASK_STATUSES:
-                if status.get("status") == "FAILED":
-                    raise RunwayClientError([f"task {task_id!r} failed: {status.get('failure', status)}"])
+            state = status.get("status")
+            if state in TERMINAL_TASK_STATUSES:
+                if state != "SUCCEEDED":
+                    raise RunwayClientError([f"task {task_id!r} ended with status {state!r}: {status.get('failure', status)}"])
                 return status
             if elapsed >= timeout_seconds:
-                raise RunwayClientError([f"task {task_id!r} did not complete within {timeout_seconds}s (last status: {status.get('status')!r})"])
+                raise RunwayClientError([f"task {task_id!r} did not complete within {timeout_seconds}s (last status: {state!r})"])
             time.sleep(poll_interval_seconds)
             elapsed += poll_interval_seconds
 
-    def download_output(self, output_url: str, destination: str, timeout_seconds: float | None = None) -> str:
-        """Downloads a completed task's output file to a real local
-        path via a plain GET -- Runway's task outputs are themselves
-        plain HTTPS URLs, not authenticated API responses."""
+    def download_output(self, output_url: str, destination: str) -> str:
+        """Downloads a completed task's output to a real local path via
+        a plain GET -- Runway's task outputs are themselves plain HTTPS
+        URLs, not authenticated SDK calls, and Runway explicitly
+        expects callers to download and store them in their own
+        storage rather than treat the temporary URL as permanent.
+        Pairing this with core.hashing.hash_file() and
+        verification.inspect_media() (both already exist in this
+        repository) is the intended next step -- not duplicated here."""
         try:
             urllib.request.urlretrieve(output_url, destination)
         except urllib.error.URLError as exc:

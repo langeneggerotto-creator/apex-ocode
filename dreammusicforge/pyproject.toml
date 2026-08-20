@@ -5,6 +5,15 @@ description = "DreamMusicForge Film Compiler -- provider-neutral AI music-video 
 requires-python = ">=3.11"
 dependencies = []
 
+[project.optional-dependencies]
+# Only providers.runway.RunwayClient needs this -- everything else in
+# this repository (including providers.runway's own compiler/models/
+# schema) stays dependency-free. Verified installable from PyPI in
+# this environment (`pip install --dry-run runwayml` resolves real
+# wheels); not verified against Runway's live API (no API key
+# available -- see providers/runway/client.py's module docstring).
+runway = ["runwayml>=5.0"]
+
 [project.scripts]
 dmf = "dreammusicforge.apps.cli.main:main"
 

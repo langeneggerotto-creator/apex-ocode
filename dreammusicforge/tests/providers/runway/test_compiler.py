@@ -9,14 +9,14 @@ from dreammusicforge.providers.runway.models import RunwayProfile
 from dreammusicforge.slicer.models import RenderTask
 
 
-def _shot(duration=6.5):
+def _shot(duration=6.5, lip_sync_required=True):
     return Shot(
         id="SHOT-deadbeef", sequence_id="SEQ-deadbeef",
         timing=ShotTiming(start_seconds=42.0, end_seconds=42.0 + duration, song_section="chorus_1"),
         purpose=ShotPurpose(semantic_event_id="SEM-deadbeef", narrative_function="declaration", editorial_function="chorus_hero_shot"),
         requirements=ShotRequirements(
             performer_id="PERFORMER-deadbeef", costume_id="COSTUME-deadbeef", world_id="WORLD-deadbeef",
-            lip_sync_required=True, choreography_complexity="medium", camera_motion="slow_push", character_count=1,
+            lip_sync_required=lip_sync_required, choreography_complexity="medium", camera_motion="slow_push", character_count=1,
         ),
         continuity=ShotContinuity(inherited_state="concealed", permitted_mutations=(), destination_state="revealed"),
         acceptance={"identity": 95.0},
@@ -44,6 +44,8 @@ class CompileRunwayPackageTests(unittest.TestCase):
         self.assertEqual(package.render_task_id, task.id)
         self.assertEqual(package.reference_manifest, task.required_assets)
         self.assertIn("chorus_1", package.prompt_text)
+        self.assertIn("identity drift", package.negative_prompt)  # RUNWAY_NEGATIVE_PROMPT_BASELINE default
+        self.assertTrue(package.audio)  # _shot() defaults lip_sync_required=True
 
     def test_image_to_video_without_prompt_image_raises(self):
         shot = _shot()
@@ -61,11 +63,11 @@ class CompileRunwayPackageTests(unittest.TestCase):
         self.assertIsNone(package.prompt_image)
 
     def test_duration_rounds_up_to_the_nearest_supported_option(self):
-        shot = _shot(duration=6.5)  # between 5.0 and 10.0
+        shot = _shot(duration=4.5)  # between the default 4.0 and 6.0 options
         task = _task(shot)
         profile = RunwayProfile(model="gen4_turbo")
         package = compile_runway_package(task, shot, profile, prompt_image="ref.png")
-        self.assertEqual(package.duration_seconds, 10.0)
+        self.assertEqual(package.duration_seconds, 6.0)
 
     def test_duration_exceeding_the_largest_supported_option_raises(self):
         shot = _shot(duration=25.0)
@@ -73,6 +75,22 @@ class CompileRunwayPackageTests(unittest.TestCase):
         profile = RunwayProfile(model="gen4_turbo")
         with self.assertRaises(RunwayCompilerError):
             compile_runway_package(task, shot, profile, prompt_image="ref.png")
+
+    def test_negative_prompt_can_be_overridden_or_disabled(self):
+        shot = _shot()
+        task = _task(shot)
+        profile = RunwayProfile(model="gen4_turbo")
+        custom = compile_runway_package(task, shot, profile, prompt_image="ref.png", negative_prompt=("blurry",))
+        self.assertEqual(custom.negative_prompt, "blurry")
+        disabled = compile_runway_package(task, shot, profile, prompt_image="ref.png", negative_prompt=None)
+        self.assertIsNone(disabled.negative_prompt)
+
+    def test_audio_defaults_to_lip_sync_required(self):
+        no_lip_sync_shot = _shot(lip_sync_required=False)
+        task = _task(no_lip_sync_shot)
+        profile = RunwayProfile(model="gen4_turbo")
+        package = compile_runway_package(task, no_lip_sync_shot, profile, prompt_image="ref.png")
+        self.assertFalse(package.audio)
 
     def test_mode_not_in_profile_raises(self):
         shot = _shot()

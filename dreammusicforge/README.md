@@ -1443,59 +1443,86 @@ to connect Runway as a second video-generation provider, mirroring
 `providers/kling/`'s Release 0.7 architecture rather than starting a
 third pattern.
 
+**Revision note.** The first version of this addition was grounded
+only in web-search summaries of Runway's docs (this environment's
+egress proxy blocks direct access to `docs.dev.runwayml.com`) and got
+a real detail wrong: it claimed Runway's API has no `negative_prompt`
+parameter. The user then relayed a detailed, largely accurate setup
+plan (correct env var name, correct official SDK, correct ephemeral-
+uploads pattern) that prompted actually installing the real `runwayml`
+PyPI package (`pip install runwayml` -- verified installable in this
+environment) and introspecting its real, current type signatures
+directly, rather than trusting secondhand summaries. That surfaced
+several corrections beyond just the one the user flagged: `negative_prompt`
+*is* real, current models include `seedance2`/`veo3.1`/`gen4.5`/etc.
+(a much longer list than first assumed), task statuses include
+`THROTTLED` and `CANCELLED` (both missing from the first version), and
+durations are commonly `4`/`6`/`8` seconds per model, not `5`/`10`.
+Everything below reflects the corrected, SDK-grounded version.
+
 New package `providers/runway/`. `compile_runway_package(render_task,
-shot, profile, mode="image_to_video", prompt_image=None)` builds a
+shot, profile, mode="image_to_video", prompt_image=None,
+negative_prompt=RUNWAY_NEGATIVE_PROMPT_BASELINE, audio=None)` builds a
 typed, schema-validated `RunwayPackage` -- same "one RenderTask
 compiles to one operator-usable provider package" shape as Kling's
-compiler, adapted to Runway's real, documented API constraints rather
-than copying Kling's shape blindly:
+compiler, adapted to Runway's real API rather than copying Kling's
+shape blindly:
 
-- **No `negative_prompt` field.** Runway's public API has no
-  equivalent parameter; inventing one that gets silently dropped
-  before the real request would misrepresent what's actually sent.
-- **A discrete duration set (5 or 10 seconds), not a continuous max.**
+- **`negative_prompt` defaults to `RUNWAY_NEGATIVE_PROMPT_BASELINE`**
+  (Kling's own vocabulary, reused verbatim now that the parameter is
+  confirmed real on Runway's side too) and can be overridden or
+  disabled (`negative_prompt=None`).
+- **`audio` defaults to the shot's own `requirements.
+  lip_sync_required`** -- a shot that needs lip sync needs audio
+  generated with it; this can also be set explicitly.
+- **A discrete duration set, not a continuous max.** The installed
+  SDK's `image_to_video.create()`/`text_to_video.create()` type
+  Runway's `duration` parameter as `int | Literal[4, 6, 8]`.
   `compile_runway_package()` rounds a shot's duration up to the
-  nearest supported option and fails closed if it exceeds the largest
-  one, rather than truncating a shot to a shorter clip than requested.
+  nearest option in `RunwayProfile.supported_durations_seconds` and
+  fails closed if it exceeds the largest one, rather than truncating a
+  shot to a shorter clip than requested.
 - **`prompt_image` is an explicit parameter, not sniffed from
   `RenderTask.required_assets`.** This repository's own
   `slicer/builder.py` always populates `required_assets` with entity
   ids (`performer_id`/`costume_id`/`world_id`), never a resolved image
-  path -- there's nothing there to sniff a real Runway `promptImage`
-  URL out of. Compilation fails closed if `mode="image_to_video"` (the
+  path -- there's nothing there to sniff a real Runway image reference
+  out of. Compilation fails closed if `mode="image_to_video"` (the
   default) is requested without one, the same "caller resolves the
   mapping, this function doesn't guess it" pattern
   `assembly/builder.py`'s `shots_by_candidate_id` parameter already
   uses.
+- **`ratio` stays a `RunwayProfile.supported_ratios` override**, not a
+  hardcoded list -- the real SDK's valid-ratio set is a different
+  `Literal[...]` *per model*, some with dozens of options; hardcoding
+  the whole matrix would also go stale the moment Runway adds a model.
 
-`providers/runway/client.py`'s `RunwayClient` is a real, functioning
-HTTP client (stdlib `urllib.request` only, no new dependency) for
-Runway's actual API -- `submit_task()`, `get_task_status()`,
-`wait_for_completion()` (polling PENDING/RUNNING through to
-SUCCEEDED/FAILED), and `download_output()`. **This has not been run
-against Runway's live API in this session** -- no `RUNWAY_API_KEY` was
-available, and making a real, billed API call without the user's
-explicit credential and authorization would violate this repository's
-rule against claiming an integration that wasn't actually exercised.
-The base URL, endpoint paths, header names, async task-submission-
-then-poll pattern, and status vocabulary are grounded in Runway's
-public developer documentation and third-party API references as of
-August 2026 -- not verified by this session's own eyes on Runway's own
-docs pages, which are behind an egress block this environment can't
-reach; verified only indirectly via web search results. The client's
-request-building and response-parsing logic is unit-tested against
-mocked HTTP responses shaped like Runway's documented ones
-(`tests/providers/runway/test_client.py`), which is a genuinely
-different, weaker claim than "this works against the live API" --
-that verification needs a real key, which the person running this
-against production Runway access would supply via the
-`RUNWAY_API_KEY` environment variable (or `RunwayClient(api_key=...)`
-directly).
+`providers/runway/client.py`'s `RunwayClient` is a thin, typed wrapper
+around the **official `runwayml` SDK** (`pip install runwayml`, an
+optional dependency -- see `pyproject.toml`'s
+`[project.optional-dependencies]`, everything else in this repository
+stays dependency-free), not a hand-rolled HTTP layer: `upload_asset()`
+(the real ephemeral-uploads API, since Runway's API cannot consume an
+arbitrary local filesystem path directly), `submit_task()`,
+`get_task_status()`, `wait_for_completion()` (polling
+PENDING/THROTTLED/RUNNING through to SUCCEEDED/FAILED/CANCELLED), and
+`download_output()`. **This has still not been run against Runway's
+live API in this session** -- no `RUNWAYML_API_SECRET` was available,
+and making a real, billed API call without the user's explicit
+credential and authorization would violate this repository's rule
+against claiming an integration that wasn't actually exercised. What
+changed: the request/response shapes are now grounded in the actual
+installed SDK's type signatures and Pydantic models (introspected
+directly), not secondhand summaries -- the SDK itself is tested by its
+own maintainers against the live API; what's untested *here* is only
+whether this thin wrapper calls it correctly.
 
-`tests/providers/runway/` -- 32 tests, all offline (models/schema/
-compiler tests need nothing external; client tests mock
-`urllib.request.urlopen` and `time.sleep`, so they run in milliseconds
-with no real network access and no real API key).
+`tests/providers/runway/` -- 39 tests, all offline: model/schema/
+compiler tests need nothing external; client tests mock `runwayml.
+RunwayML`'s resource methods (`image_to_video.create`, `tasks.
+retrieve`, `uploads.create_ephemeral`) directly rather than faking raw
+HTTP, so they exercise this wrapper's actual call shape against the
+real SDK's real method signatures.
 
 ### What connecting Runway deliberately does not include
 
@@ -1506,12 +1533,15 @@ and client a caller can use directly, the same way Kling's Release 0.7
 did before any later release connected it to shot-fit scoring. No
 video download/verification pipeline wired to `RunwayClient.
 download_output()`'s result -- a caller gets a real local file, but
-nothing automatically runs it through `verification/`'s technical
-report the way a Kling-sourced `Candidate` would after `generation/
-import_candidate()`. No cost controls, retry/backoff policy beyond
-the documented poll interval, or webhook-based completion (Runway's
-API reportedly supports webhooks as an alternative to polling; this
-client only implements polling).
+pairing it with `core.hashing.hash_file()` + `verification.
+inspect_media()` (both already exist in this repository) to turn it
+into an evidence-backed `Candidate` is the intended next step, not
+duplicated inside `providers/runway/`. No cost/budget/quota tracking,
+no retry/backoff beyond the fixed poll interval, no webhook-based
+completion (polling only), and no multi-model selection logic --
+`RunwayProfile.model` is one fixed model per profile; picking a model
+per shot based on cost/capability would be a real, separate piece of
+work layered on top of this, not something this addition does.
 
 ## The original, pre-spec governed baseline
 

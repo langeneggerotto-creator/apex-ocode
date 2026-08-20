@@ -12,6 +12,7 @@ Public API:
 
     from dreammusicforge.providers.runway import (
         RUNWAY_MODES, RUNWAY_MODELS, RUNWAY_RATIOS, RUNWAY_DURATION_OPTIONS_SECONDS,
+        RUNWAY_TASK_STATUSES, RUNWAY_NEGATIVE_PROMPT_BASELINE,
         RunwayProfile, RunwayPackage,
         compile_runway_package, compile_runway_packages,
         RunwayClient,
@@ -23,7 +24,9 @@ Public API:
 Same one-way-dependency discipline as providers.kling: this package
 imports production.models.Shot and slicer.models.RenderTask, never the
 reverse -- no other package in this repository imports from
-providers.runway.
+providers.runway. RunwayClient additionally depends on the optional
+`runwayml` PyPI package (see pyproject.toml); everything else here
+(models, schema, compiler) stays dependency-free.
 """
 from __future__ import annotations
 
@@ -32,13 +35,15 @@ from .compiler import compile_runway_package, compile_runway_packages
 from .errors import RunwayClientError, RunwayCompilerError
 from .ids import generate_runway_package_id, is_valid_runway_package_id
 from .models import (
-    RUNWAY_DURATION_OPTIONS_SECONDS, RUNWAY_MODELS, RUNWAY_MODES, RUNWAY_RATIOS, RunwayPackage, RunwayProfile,
+    RUNWAY_DURATION_OPTIONS_SECONDS, RUNWAY_MODELS, RUNWAY_MODES, RUNWAY_NEGATIVE_PROMPT_BASELINE,
+    RUNWAY_RATIOS, RUNWAY_TASK_STATUSES, RunwayPackage, RunwayProfile,
 )
 from .schema import validate_runway_package_schema, validate_runway_profile_schema
 
 __all__ = [
-    "RUNWAY_DURATION_OPTIONS_SECONDS", "RUNWAY_MODELS", "RUNWAY_MODES", "RUNWAY_RATIOS", "RunwayClient",
-    "RunwayClientError", "RunwayCompilerError", "RunwayPackage", "RunwayProfile", "compile_runway_package",
-    "compile_runway_packages", "generate_runway_package_id", "is_valid_runway_package_id",
-    "validate_runway_package_schema", "validate_runway_profile_schema",
+    "RUNWAY_DURATION_OPTIONS_SECONDS", "RUNWAY_MODELS", "RUNWAY_MODES", "RUNWAY_NEGATIVE_PROMPT_BASELINE",
+    "RUNWAY_RATIOS", "RUNWAY_TASK_STATUSES", "RunwayClient", "RunwayClientError", "RunwayCompilerError",
+    "RunwayPackage", "RunwayProfile", "compile_runway_package", "compile_runway_packages",
+    "generate_runway_package_id", "is_valid_runway_package_id", "validate_runway_package_schema",
+    "validate_runway_profile_schema",
 ]
