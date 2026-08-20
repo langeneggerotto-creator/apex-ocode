@@ -1435,6 +1435,84 @@ reasoning). Anyone continuing this build with access to the original
 spec document should treat 0.12-1.0 as a first draft to check against
 it, not as an already-verified implementation.
 
+## Second provider — Runway
+
+Not part of the original spec's numbered release plan at all (the spec
+only ever names Kling as a provider) -- added because the user asked
+to connect Runway as a second video-generation provider, mirroring
+`providers/kling/`'s Release 0.7 architecture rather than starting a
+third pattern.
+
+New package `providers/runway/`. `compile_runway_package(render_task,
+shot, profile, mode="image_to_video", prompt_image=None)` builds a
+typed, schema-validated `RunwayPackage` -- same "one RenderTask
+compiles to one operator-usable provider package" shape as Kling's
+compiler, adapted to Runway's real, documented API constraints rather
+than copying Kling's shape blindly:
+
+- **No `negative_prompt` field.** Runway's public API has no
+  equivalent parameter; inventing one that gets silently dropped
+  before the real request would misrepresent what's actually sent.
+- **A discrete duration set (5 or 10 seconds), not a continuous max.**
+  `compile_runway_package()` rounds a shot's duration up to the
+  nearest supported option and fails closed if it exceeds the largest
+  one, rather than truncating a shot to a shorter clip than requested.
+- **`prompt_image` is an explicit parameter, not sniffed from
+  `RenderTask.required_assets`.** This repository's own
+  `slicer/builder.py` always populates `required_assets` with entity
+  ids (`performer_id`/`costume_id`/`world_id`), never a resolved image
+  path -- there's nothing there to sniff a real Runway `promptImage`
+  URL out of. Compilation fails closed if `mode="image_to_video"` (the
+  default) is requested without one, the same "caller resolves the
+  mapping, this function doesn't guess it" pattern
+  `assembly/builder.py`'s `shots_by_candidate_id` parameter already
+  uses.
+
+`providers/runway/client.py`'s `RunwayClient` is a real, functioning
+HTTP client (stdlib `urllib.request` only, no new dependency) for
+Runway's actual API -- `submit_task()`, `get_task_status()`,
+`wait_for_completion()` (polling PENDING/RUNNING through to
+SUCCEEDED/FAILED), and `download_output()`. **This has not been run
+against Runway's live API in this session** -- no `RUNWAY_API_KEY` was
+available, and making a real, billed API call without the user's
+explicit credential and authorization would violate this repository's
+rule against claiming an integration that wasn't actually exercised.
+The base URL, endpoint paths, header names, async task-submission-
+then-poll pattern, and status vocabulary are grounded in Runway's
+public developer documentation and third-party API references as of
+August 2026 -- not verified by this session's own eyes on Runway's own
+docs pages, which are behind an egress block this environment can't
+reach; verified only indirectly via web search results. The client's
+request-building and response-parsing logic is unit-tested against
+mocked HTTP responses shaped like Runway's documented ones
+(`tests/providers/runway/test_client.py`), which is a genuinely
+different, weaker claim than "this works against the live API" --
+that verification needs a real key, which the person running this
+against production Runway access would supply via the
+`RUNWAY_API_KEY` environment variable (or `RunwayClient(api_key=...)`
+directly).
+
+`tests/providers/runway/` -- 32 tests, all offline (models/schema/
+compiler tests need nothing external; client tests mock
+`urllib.request.urlopen` and `time.sleep`, so they run in milliseconds
+with no real network access and no real API key).
+
+### What connecting Runway deliberately does not include
+
+No live API call ever made or verified in this session -- see above.
+No wiring into `capability_atlas/`'s `RendererCapabilityProfile` or
+`slicer/`'s provider-selection logic -- Runway exists as a compiler
+and client a caller can use directly, the same way Kling's Release 0.7
+did before any later release connected it to shot-fit scoring. No
+video download/verification pipeline wired to `RunwayClient.
+download_output()`'s result -- a caller gets a real local file, but
+nothing automatically runs it through `verification/`'s technical
+report the way a Kling-sourced `Candidate` would after `generation/
+import_candidate()`. No cost controls, retry/backoff policy beyond
+the documented poll interval, or webhook-based completion (Runway's
+API reportedly supports webhooks as an alternative to polling; this
+client only implements polling).
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
