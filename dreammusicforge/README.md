@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter, Release 0.13 — Masking and Compositing, Release 0.14 — Color and Audio Finishing, Release 0.15 — Operator Studio (0.12-0.15 not spec-text-verified, see their own sections below)
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter, Release 0.13 — Masking and Compositing, Release 0.14 — Color and Audio Finishing, Release 0.15 — Operator Studio, Release 1.0 — Benchmark 007 (0.12-1.0 not spec-text-verified, see their own sections below)
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -1383,9 +1383,61 @@ interface; that would mean writing back to `repair/`'s
 `VerificationResult`, which (like everywhere else in this codebase)
 has no persistence to write back to yet.
 
+## Release 1.0 — Benchmark 007
+
+**Not verified against the original spec's own text for this release**
+-- same gap as Releases 0.12-0.15. Only the name "Benchmark 007"
+survived this session's context compaction, with no further detail
+about what the "007" refers to. Interpreted here as this repository's
+own end-to-end acceptance benchmark: one real run through every
+release built this session, asserting the whole chain actually
+produces a playable, finished film -- not that each stage merely
+"didn't raise."
+
+`tests/benchmark/test_benchmark_007.py` -- one real, comprehensive
+integration test, on ffmpeg-generated synthetic fixtures rather than
+placeholder objects, that walks: 0.1 Project → 0.2 MasterSong → 0.3
+FilmGenome → 0.4 ProductionGraph (with a per-sequence camera/color
+language override, exercising the editorial-chapters addition made
+after 0.11) → 0.8 Candidate Intake (two real clips) → 0.9 Technical
+Verification → 0.10 Acceptance → 0.11 Assembly (with a real `dissolve`
+transition, not just `hard_cut`) → 0.12 Lip-Sync Adapter (a real
+extracted audio window for the shot that requires it) → 0.13 Masking
+and Compositing (a standalone chromakey demo -- not wired into the
+assembled film's clip list, since no release built any such wiring) →
+0.14 Color and Audio Finishing (real loudness measurement) → 0.15
+Operator Studio (a real HTML report served over a real HTTP request to
+a background server thread). Every stage's real output feeds the next
+stage's real input; nothing is mocked or stubbed. This mirrors, in
+synthetic and now-permanent form, the same real-Kling-footage pipeline
+shape this session already proved out by hand three times earlier
+(the "hope," "burgundy," and "rooftop" runs, all against genuine
+Kling AI 3.0 output).
+
+This brought the total DreamMusicForge test suite to **684 tests**
+across every package (0.1 through 1.0), all passing, zero regressions
+introduced across the six releases built after 0.11 (0.12-0.15, 1.0).
+
+### What Release 1.0 deliberately does not include
+
+Everything named as a gap in every release's own "does not include"
+section above still applies -- Benchmark 007 exercises what exists, it
+doesn't retroactively add persistence, a CLI, ensemble/multi-performer
+support, the eight still-unexecuted transition/mask types, or a real
+lip-sync/two-pass-loudness engine. It is a real, honest measurement of
+what this session actually built, not a claim that the system is
+production-complete. Most importantly: **Releases 0.12 through 1.0 are
+not verified against the original spec's own section text**, unlike
+0.1-0.11 -- they are this session's own best-effort design once that
+text was no longer available (see each release's own section above,
+and the conversation this repository was built in for the full
+reasoning). Anyone continuing this build with access to the original
+spec document should treat 0.12-1.0 as a first draft to check against
+it, not as an already-verified implementation.
+
 ## The original, pre-spec governed baseline
 
 `runtime.py` and `dmf_ir/` predate this specification and are unrelated
 to it -- see `TESTING.md` for their own test instructions. Nothing in
-Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, Release 0.8, Release 0.9, Release 0.10, or Release 0.11 imports from, depends on, or
+Release 0.1, Release 0.2, Release 0.3, Release 0.4, Release 0.5, Release 0.6, Release 0.7, Release 0.8, Release 0.9, Release 0.10, Release 0.11, Release 0.12, Release 0.13, Release 0.14, Release 0.15, or Release 1.0 imports from, depends on, or
 modifies either.
