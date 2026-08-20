@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter (not spec-text-verified, see its own section below)
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -1206,6 +1206,45 @@ inconsistent camera language from its film with no warning; that's a
 deliberate choice (chapters *should* be allowed to look different) but
 means this doesn't catch an override that's a typo rather than an
 intentional chapter change.
+
+## Release 0.12 — Lip-Sync Adapter
+
+**Not verified against the original spec's own section text for this
+release** -- only the name "Lip-Sync Adapter" survived this session's
+context compaction. This is this repository's own design, following
+the established conventions (typed frozen dataclasses, schema
+validation, fail-closed errors, package-scoped ffmpeg wrapper), not a
+field-for-field transcription of spec YAML the way 0.1-0.11 are.
+
+New package `lipsync/`. `build_lip_sync_request(shot, candidate,
+master_song, work_dir)` refuses any shot whose
+`requirements.lip_sync_required` is `False`, then really extracts (via
+its own `ffmpeg_runner.py`, same one-copy-per-package discipline as
+`assembly/`) the exact audio window `[shot.timing.start_seconds,
+shot.timing.end_seconds)` from the canonical `MasterSong` -- a real,
+traceable file a lip-sync engine could consume, the same evidence
+discipline `providers/kling`'s `KlingPackage` applies to video
+generation requests.
+
+`apply_lip_sync(request, adapter)` runs the request through a
+`LipSyncAdapter`. This release ships exactly one adapter,
+`NullLipSyncAdapter`, which always returns `status="not_applied"` --
+there's no lip-sync model in this dependency-free-until-necessary
+codebase, and claiming `"applied"` without a real engine behind it
+would violate this repository's rule against claiming an unexecuted
+integration. The request itself is real and complete; only the "run a
+model on it" step is missing, same as 0.7's Kling Compiler never calls
+Kling's actual API.
+
+`tests/lipsync/` -- 15 tests (needs ffmpeg on PATH for the builder
+tests; schema/model tests don't).
+
+### What Release 0.12 deliberately does not include
+
+No actual lip-sync model integration -- see above. No persistence or
+CLI. No batch/whole-sequence request building -- one shot at a time
+only. No re-verification of the lip-synced output (there is none to
+verify yet).
 
 ## The original, pre-spec governed baseline
 
