@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter, Release 0.13 — Masking and Compositing, Release 0.14 — Color and Audio Finishing (0.12-0.14 not spec-text-verified, see their own sections below)
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter, Release 0.13 — Masking and Compositing, Release 0.14 — Color and Audio Finishing, Release 0.15 — Operator Studio (0.12-0.15 not spec-text-verified, see their own sections below)
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -1331,6 +1331,57 @@ than asserting it hit the target, since single-pass is a disclosed
 estimate, not a promise. No connection to `assembly/`'s pipeline --
 this release takes an already-produced `ExportManifest`, it doesn't
 automatically run after `assemble_film()`. No persistence or CLI.
+
+## Release 0.15 — Operator Studio
+
+**Not verified against the original spec's own section text for this
+release** -- same gap as Releases 0.12-0.14. An earlier release's own
+README section (0.4's, written before this session's context
+compaction) forward-referenced this as "the Operator Studio web
+interface," which is the only scope hint that survived. Interpreted
+here as a read-only human-review status board over data this session's
+earlier releases already produce, not a live production dashboard --
+see models.py's module docstring for the full reasoning.
+
+New package `operator_studio/`. `build_operator_report(
+verification_results, export_manifests, finishing_results,
+generated_at)` assembles an immutable `OperatorReport` snapshot,
+validating every nested item by delegating to the validator its own
+package already established (`repair.schema.
+validate_verification_result_schema`, `assembly.schema.
+validate_export_manifest_schema`, `finishing.schema.
+validate_finishing_result_schema`) rather than re-implementing their
+rules. `render_report_html(report)` turns it into one self-contained
+HTML page (inline CSS, no JavaScript, no external assets) with sections
+for candidates needing a decision (rejected), accepted candidates,
+assembled exports, and finished (color/audio) exports -- every dynamic
+string is passed through `html.escape()` first, since none of this
+data (candidate ids, repair actions) is trusted input.
+`create_operator_server(report, host="127.0.0.1", port=0)` serves that
+rendered snapshot over a real, minimal `http.server.HTTPServer` --
+stdlib only, no new dependency -- bound to loopback by default so it's
+not reachable off the local machine.
+
+`tests/operator_studio/` -- 15 tests, including a real HTTP round trip
+(`urllib.request.urlopen` against a server started in a background
+thread) and a real XSS-style escaping check (a hostile candidate id
+containing `<script>` is asserted to appear only as its escaped
+`&lt;script&gt;` form in the rendered page, not verbatim).
+
+### What Release 0.15 deliberately does not include
+
+No persistence -- there is nothing to query and no store this server
+reads from; a caller must already hold the typed results in memory
+(or, at some future release, load them from a real store once one
+exists) before building a report. No live refresh -- the server always
+serves the one snapshot it was created with; a new snapshot means a
+new report and a new server. No authentication -- appropriate for a
+loopback-only local tool, not for anything exposed beyond the machine
+running it. No write actions -- an operator can *see* what needs a
+decision here, but cannot approve/reject/regenerate through this
+interface; that would mean writing back to `repair/`'s
+`VerificationResult`, which (like everywhere else in this codebase)
+has no persistence to write back to yet.
 
 ## The original, pre-spec governed baseline
 
