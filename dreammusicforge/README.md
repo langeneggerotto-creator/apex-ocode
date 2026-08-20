@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter, Release 0.13 — Masking and Compositing (0.12/0.13 not spec-text-verified, see their own sections below)
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter, Release 0.13 — Masking and Compositing, Release 0.14 — Color and Audio Finishing (0.12-0.14 not spec-text-verified, see their own sections below)
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -1288,6 +1288,49 @@ or automatically decide when a shot needs compositing versus direct
 render. No masking beyond a single foreground/background pair -- no
 multi-layer stacks, no time-varying masks, no rotoscoping. No
 persistence or CLI.
+
+## Release 0.14 — Color and Audio Finishing
+
+**Not verified against the original spec's own section text for this
+release** -- same gap as Releases 0.12/0.13. `-14.0` LUFS as the
+default loudness target is an industry-standard streaming-platform
+convention (Spotify/YouTube commonly cite it), not a number taken from
+the original spec text.
+
+New package `finishing/`. `finish_film(export_manifest, work_dir,
+target_lufs=-14.0, color_adjustment=None)` takes Release 0.11's
+`ExportManifest` and applies a real ffmpeg `loudnorm` pass (EBU R128
+single-pass), then an optional `eq`-filter brightness/contrast/
+saturation pass -- skipped entirely when `color_adjustment` is `None`
+or identity (`ColorAdjustment().is_identity()`), so a caller who only
+wants loudness fixed doesn't pay for a needless re-encode.
+
+The result's `measured_loudness` is a **second, real** ffmpeg
+measurement taken *after* normalizing, not the requested target echoed
+back -- `finish_film()` doesn't claim the output hit `-14.0` LUFS, it
+reports what it actually measured. `measure_loudness()`/
+`normalize_loudness()`/`adjust_color()` are independently usable
+pipeline functions, same split as every other package's `pipeline.py`.
+
+`tests/finishing/` -- 21 tests (needs ffmpeg on PATH for the builder
+tests). `test_loudness_normalization_moves_measurably_toward_target`
+is a real before/after measurement, not just "the command didn't
+fail": a deliberately quiet source clip's loudness is measured before
+and after, and the test asserts the *after* measurement is closer to
+`-14.0` LUFS than the *before* one was.
+
+### What Release 0.14 deliberately does not include
+
+Single-pass `loudnorm` only -- ffmpeg's two-pass mode (measure, then
+normalize using the first pass's exact stats) is more accurate and
+would be the right choice for a production finishing pass, but doubles
+the ffmpeg invocations for a difference this release's own test
+doesn't require. No hard failure if single-pass normalization lands
+off-target -- `finish_film()` reports the real measured result rather
+than asserting it hit the target, since single-pass is a disclosed
+estimate, not a promise. No connection to `assembly/`'s pipeline --
+this release takes an already-produced `ExportManifest`, it doesn't
+automatically run after `assemble_film()`. No persistence or CLI.
 
 ## The original, pre-spec governed baseline
 
