@@ -6,7 +6,7 @@ OCode module (`governance/DELEGATION_CONTRACT.yaml`). Built from
 independently testable, reviewable releases -- see the spec's section 19
 phased plan. **This README describes only what is actually built.**
 
-## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter (not spec-text-verified, see its own section below)
+## What exists today: Release 0.1 — Project Kernel, Release 0.2 — Master Song and Timeline, Release 0.3 — Film Genome, Release 0.4 — Production Graph, Release 0.5 — Renderer Capability Atlas, Release 0.6 — Video Slicer, Release 0.7 — Kling Compiler, Release 0.8 — Candidate Intake and Evidence, Release 0.9 — Technical Verification, Release 0.10 — Acceptance and Repair Engine, Release 0.11 — Assembly Engine, Release 0.12 — Lip-Sync Adapter, Release 0.13 — Masking and Compositing (0.12/0.13 not spec-text-verified, see their own sections below)
 
 The one domain object this release ships is `Project` (spec section 6.1):
 id, title, version, status, aspect ratio, resolution, frame rate, target
@@ -1245,6 +1245,49 @@ No actual lip-sync model integration -- see above. No persistence or
 CLI. No batch/whole-sequence request building -- one shot at a time
 only. No re-verification of the lip-synced output (there is none to
 verify yet).
+
+## Release 0.13 — Masking and Compositing
+
+**Not verified against the original spec's own section text for this
+release** -- same gap as Release 0.12. This is the first release that
+actually executes any part of spec section 7.4's "Layered Compositing"
+/ "Editorial Illusion" strategy names, which Release 0.5's README
+section only ever named as `slicer/` strategy choices, never ran.
+
+New package `compositing/`. `build_composite(shot_id, background,
+foreground, work_dir)` takes exactly one `background` and one
+`foreground` `CompositeLayer` and really composites them via ffmpeg
+(`compositing/ffmpeg_runner.py`, same one-copy-per-package discipline):
+`mask_type="chromakey"` keys out `chroma_color` from the foreground
+before overlaying it (ffmpeg's `colorkey` filter), `mask_type="none"`
+overlays it opaquely with no keying. `EXECUTABLE_MASK_TYPES =
+("chromakey", "none")`; `mask_type="alpha_channel"` is declared in
+`MASK_TYPES` but not executed -- fails closed, same discipline
+`assembly/`'s `EXECUTABLE_TRANSITION_TYPES` established. Result is a
+typed, hash-traceable `CompositeResult` inspected with
+`verification.inspect_media()`, same cross-package reuse pattern
+`assembly/builder.py` already established.
+
+`build_composite()` also fails closed on a `background`/`foreground`
+pair passed with swapped `layer_type`s -- catches a caller mixing up
+which layer is which before it ever reaches ffmpeg.
+
+`tests/compositing/` -- 18 tests (needs ffmpeg on PATH for the builder
+tests). The chromakey test is a real, verifiable claim, not just "the
+command didn't fail": a green background clip is composited over a red
+one with `chroma_color="green"`, and the test samples the actual output
+pixel and asserts it reads red, not green -- proving the key genuinely
+removed the foreground rather than just not erroring.
+
+### What Release 0.13 deliberately does not include
+
+No `alpha_channel` mask type execution -- see above. No connection to
+`slicer/`'s `StrategyDecision`/`RenderTask` yet -- this release takes a
+`shot_id` and two layers directly, it doesn't consume a `SliceResult`
+or automatically decide when a shot needs compositing versus direct
+render. No masking beyond a single foreground/background pair -- no
+multi-layer stacks, no time-varying masks, no rotoscoping. No
+persistence or CLI.
 
 ## The original, pre-spec governed baseline
 
