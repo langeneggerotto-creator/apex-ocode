@@ -1,0 +1,28 @@
+{
+  "source":"ScreenRecording_08-04-2026 08-08-49_1(5).mp4",
+  "analysis_date":"2026-08-28",
+  "technical":{"duration_seconds":235.666667,"video":{"codec":"h264","width":1106,"height":512,"fps":30},"audio":{"codec":"aac","sample_rate":44100,"channels":2}},
+  "global_findings":[
+    "The reference mixes true continuous spatial motion, diegetic portals, hidden cuts, material/graphic morphs, and ordinary editorial cuts.",
+    "Perceptual seamlessness is not correlated with low raw frame difference; elegant masked transitions can have very high adjacent-frame MAE.",
+    "Environment changes occur only after outgoing stable visual evidence has been sufficiently suppressed or spatially motivated.",
+    "Same-subject boundaries require persistence of identity, wardrobe, footwear, body scale, screen position, motion phase, camera axis and lens perspective unless those variables are explicitly transformed inside a safe zone.",
+    "Audio remains comparatively continuous through most visual portals and acts as perceptual glue."
+  ],
+  "transitions":[
+    {"id":"T01","window":[6.2,10.5],"archetype":"NESTED_FRAME_PORTAL","confidence":"HIGH","visual_peak_mae":4.178,"window_median_mae":3.482,"peak_time":8.5,"audio_delta_db_approx":1.19},
+    {"id":"T02","window":[21.7,23.2],"archetype":"DIEGETIC_FRAME_RECOMPOSITION","confidence":"MEDIUM_HIGH","visual_peak_mae":9.938,"window_median_mae":7.300,"peak_time":22.2,"audio_delta_db_approx":3.50},
+    {"id":"T03","window":[31.4,34.2],"archetype":"TRUE_SPATIAL_CARRY","confidence":"MEDIUM","visual_peak_mae":7.603,"window_median_mae":3.645,"peak_time":34.0,"audio_delta_db_approx":-3.77},
+    {"id":"T04","window":[37.0,40.2],"archetype":"DOORWAY_THRESHOLD_CARRY","confidence":"HIGH","visual_peak_mae":6.149,"window_median_mae":2.997,"peak_time":39.4,"audio_delta_db_approx":0.43},
+    {"id":"T05","window":[50.6,52.1],"archetype":"CURTAIN_FULL_COVERAGE_WIPE","confidence":"HIGH","visual_peak_mae":9.845,"window_median_mae":5.504,"peak_time":50.8,"audio_delta_db_approx":-0.28},
+    {"id":"T06","window":[89.7,90.2],"archetype":"INTENTIONAL_EDITORIAL_HARD_CUT","confidence":"HIGH","visual_peak_mae":33.888,"window_median_mae":7.245,"peak_time":90.133,"audio_delta_db_approx":-7.95},
+    {"id":"T07","window":[126.8,127.7],"archetype":"MATERIAL_TO_GRAPHIC_MATCH","confidence":"HIGH","visual_peak_mae":31.617,"window_median_mae":5.156,"peak_time":127.1,"audio_delta_db_approx":-2.15},
+    {"id":"T08","window":[165.7,167.6],"archetype":"CLAPPERBOARD_FULL_COVERAGE_WIPE","confidence":"HIGH","visual_peak_mae":24.741,"window_median_mae":8.492,"peak_time":167.267,"audio_delta_db_approx":2.18},
+    {"id":"T09","window":[183.9,185.0],"archetype":"FEATHER_MATERIAL_COLOR_MORPH","confidence":"HIGH","visual_peak_mae":29.066,"window_median_mae":18.927,"peak_time":184.667,"audio_delta_db_approx":-0.55},
+    {"id":"T10","window":[201.9,203.0],"archetype":"COSTUME_MATERIAL_BRIDGE","confidence":"MEDIUM_HIGH","visual_peak_mae":5.970,"window_median_mae":3.964,"peak_time":202.6,"audio_delta_db_approx":-0.71},
+    {"id":"T11","window":[219.2,220.5],"archetype":"WHIP_FLASH_FOREGROUND_BRIDGE","confidence":"MEDIUM_HIGH","visual_peak_mae":46.548,"window_median_mae":6.475,"peak_time":219.467,"audio_delta_db_approx":1.43},
+    {"id":"T12","window":[220.5,225.0],"archetype":"DOORWAY_ROOM_REVEAL","confidence":"MEDIUM_HIGH","visual_peak_mae":12.981,"window_median_mae":3.416,"peak_time":220.667}
+  ],
+  "hard_invariants_for_same_subject_boundaries":["identity_id","face_state","hair_state","makeup_state","body_proportions","wardrobe_id","footwear_id","subject_screen_x","subject_screen_y","subject_frame_height","camera_distance","focal_behavior","camera_height","horizon","screen_direction","motion_phase","velocity","lighting_direction","exposure_intent"],
+  "truth_boundary":"Archetypes and timing are derived from frame-by-frame inspection of the supplied screen recording. Where an invisible cut cannot be proven from encoded frames, the profile describes the observable mechanism and confidence rather than claiming production-set knowledge."
+}
