@@ -10,7 +10,7 @@
 
 Browser studio features: create multiple projects; four narrative engine templates; editable story/identity/world/audio bibles; nine-scene structured drafts; physical state and boundary contracts; Kling-budget-aware (~1,900-character) prompts; speaker-specific dialogue; attach and persist scene videos in browser IndexedDB; sequential **rough** previews; human-checkable quality ledger; fail-closed release status; production Markdown, portable JSON and clip-manifest exports; validated JSON import.
 
-Project details persist only in browser localStorage. Imported projects reset scene footage and QA attestations to unverified. Uploaded clips persist only in browser IndexedDB: **back up the original videos separately**. Browser storage may be cleared by the browser or operating system. Exported JSON deliberately does not include video binaries, images or privacy-sensitive credentials.
+Project details persist only in browser localStorage. Imported projects reset scene footage and QA attestations to unverified. Edits to canonical project intent invalidate all previous scene attestations; changes to one scene invalidate that scene’s QA and the master sign-off. Uploaded clips persist only in browser IndexedDB: **back up the original videos separately**. Browser storage may be cleared by the browser or operating system. Exported JSON deliberately does not include video binaries, images or privacy-sensitive credentials.
 
 ## Assemble a draft master from your generated videos
 
